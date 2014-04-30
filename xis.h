@@ -1,4 +1,4 @@
-#ifndef SKETCHES_XIS_H_
+#ifndef SKETCHES_XIS_H
 #define SKETCHES_XIS_H
 
 #include <stdint.h>
@@ -110,4 +110,4 @@ class Xi_BCH5 : Xi<T> {
 
 #include "xis.tpp"
 
-#endif SKETCHES_XIS_H // SKETCHES_XIS_H
+#endif // SKETCHES_XIS_H
