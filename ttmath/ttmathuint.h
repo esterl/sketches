@@ -3081,6 +3081,13 @@ public:
 		return table[0];
 	}
 
+	/*!
+		Conversion to unsigned int
+	*/
+	operator unsigned int() const
+	{
+		return table[0];
+	}
 
 	/*!
 		this method converts the value to uint type
