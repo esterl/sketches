@@ -19,7 +19,7 @@ class Sketch
         virtual void clear() = 0;
 
         //updating the sketch with the value corresponding to the given key
-        virtual void update_sketch(T key, double weight) = 0;
+        virtual void update(T key, double weight) = 0;
 
         //estimating the size of join of two sketches
         virtual double inner_join(Sketch<T> *other) = 0;
@@ -57,10 +57,11 @@ class AGMS_Sketch : public Sketch<T>
 
     public:
         AGMS_Sketch(unsigned int num_cols, unsigned int num_rows, Xi<T> **xis);
+        AGMS_Sketch(AGMS_Sketch<T>* copy);
         virtual ~AGMS_Sketch();
 
         virtual void clear();
-        virtual void update_sketch(T key, double weight);
+        virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
         virtual double difference(Sketch<T> *other);
@@ -94,10 +95,11 @@ class FAGMS_Sketch : public Sketch<T>
     public:
         FAGMS_Sketch(unsigned int num_buckets, unsigned int num_rows, 
                         Hash<T> **hashes, Xi<T> **xis);
+        FAGMS_Sketch(FAGMS_Sketch<T> *copy);
         virtual ~FAGMS_Sketch();
 
         virtual void clear();
-        virtual void update_sketch(T key, double weight);
+        virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
         virtual double difference(Sketch<T> *other);
@@ -128,10 +130,11 @@ class FastCount_Sketch : public Sketch<T>
       public:
         FastCount_Sketch(unsigned int num_buckets, unsigned int num_rows, 
                             Hash<T> **hashes);
+        FastCount_Sketch(FastCount_Sketch<T> *copy);
         virtual ~FastCount_Sketch();
 
         virtual void clear();
-        virtual void update_sketch(T key, double weight);
+        virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
         virtual double difference(Sketch<T> *other);
@@ -164,10 +167,11 @@ class CountMin_Sketch : public Sketch<T>
     public:
         CountMin_Sketch(unsigned int num_buckets, unsigned int num_rows, 
                         Hash<T> **hashes);
+        CountMin_Sketch(CountMin_Sketch<T> *copy);
         virtual ~CountMin_Sketch();
 
         virtual void clear();
-        virtual void update_sketch(T key, double weight);
+        virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
         virtual double difference(Sketch<T> *other);

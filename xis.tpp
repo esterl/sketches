@@ -51,6 +51,12 @@ int Xi_BCH3<T>::element(T j)
 }
 
 
+template<typename T>
+Xi<T>* Xi_BCH3<T>::copy(){
+    Xi_BCH3<T> *result = new Xi_BCH3(seeds[0], seeds[1]);
+    return (Xi<T>*) result;
+}
+
 /**************************Xi_EH3 implementation*******************************/
 
 template<typename T>
@@ -91,6 +97,12 @@ int Xi_EH3<T>::element(T j)
     return 1;
 } 
 
+template<typename T>
+Xi<T>* Xi_EH3<T>::copy()
+{
+    Xi_EH3<T> * result = new Xi_EH3<T>(seeds[0], seeds[1]);
+    return (Xi<T>*) result;
+}
 
 /**************************Xi_CW2 implementation*******************************/
 
@@ -127,6 +139,13 @@ int Xi_CW2<T1,T2>::element(T1 j)
     int res = result & temp;
     if (res == 0) return -1;
     return 1; 
+}
+
+template<typename T1, typename T2>
+Xi<T1>* Xi_CW2<T1,T2>::copy()
+{
+    Xi_CW2<T1,T2> * result = new Xi_CW2<T1,T2>(seeds[0], seeds[1]);
+    return (Xi<T1>*) result;
 }
 
 
@@ -178,6 +197,13 @@ int Xi_CW4<T1,T2>::element(T1 j)
     return 1;
 }
 
+template<typename T1, typename T2>
+Xi<T1>* Xi_CW4<T1,T2>::copy()
+{
+    Xi_CW4<T1,T2> * result = new Xi_CW4<T1,T2>(seeds[0], seeds[1], seeds[2], 
+                                                seeds[3]);
+    return (Xi<T1>*) result;
+}
 
 /**************************Xi_BCH3 implementation******************************/
 
@@ -208,4 +234,10 @@ int Xi_BCH5<T>::element(T j){
     unsigned int res = int(seeds[0]) ^ seq_xor(p_res);
     if (res == 0) return -1;
     return 1;
+}
+
+template<typename T>
+Xi<T>* Xi_BCH5<T>::copy(){
+    Xi_BCH5<T> *result = new Xi_BCH5(seeds[0], seeds[1], seeds[2]);
+    return (Xi<T>*) result;
 }

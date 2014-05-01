@@ -36,6 +36,13 @@ unsigned int Hash_CW2<T1,T2>::element(T1 j){
     return res;
 }
 
+template<typename T1, typename T2>
+Hash<T1>* Hash_CW2<T1,T2>::copy(){
+    Hash_CW2<T1,T2> *result = new Hash_CW2<T1,T2>(seeds[0], seeds[1], 
+                                                    num_buckets);
+    return (Hash<T1>*) result;
+}
+
 
 /**************************Hash_CW4 implementation*****************************/
 
@@ -71,8 +78,8 @@ unsigned int Hash_CW4<T1,T2>::element(T1 j)
 {
     T2 result;
     T2 exp1 = j;
-    T2 exp2 = mersenne_modulus<T2>(j*j, mersenne_exponent);
-    T2 exp3 = mersenne_modulus<T2>(exp2*j, mersenne_exponent);
+    T2 exp2 = mersenne_modulus<T2>(exp1*exp1, mersenne_exponent);
+    T2 exp3 = mersenne_modulus<T2>(exp2*exp1, mersenne_exponent);
     result = mersenne_modulus<T2>(exp3*seeds[3], mersenne_exponent) +
                 mersenne_modulus<T2>(exp2*seeds[2], mersenne_exponent);
     result = mersenne_modulus<T2>(result, mersenne_exponent) +
@@ -84,3 +91,10 @@ unsigned int Hash_CW4<T1,T2>::element(T1 j)
     return res;
 }
 
+template<typename T1, typename T2>
+Hash<T1>* Hash_CW4<T1,T2>::copy(){
+    Hash_CW4<T1,T2> * result = new Hash_CW4<T1,T2>(seeds[0], seeds[1], 
+                                                    seeds[2], seeds[3], 
+                                                    num_buckets);
+    return (Hash<T1>*) result;
+}
