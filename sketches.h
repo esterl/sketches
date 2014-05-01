@@ -22,7 +22,7 @@ class Sketch
         virtual void update_sketch(T key, double weight) = 0;
 
         //estimating the size of join of two sketches
-        virtual double inner_product(Sketch *other) = 0;
+        virtual double inner_join(Sketch<T> *other) = 0;
 
         //estimating the self-join size or the second frequency moment
         virtual double second_moment() = 0;
@@ -56,14 +56,121 @@ class AGMS_Sketch : public Sketch<T>
 
 
     public:
-        AGMS_Sketch(unsigned int num_rows, unsigned int num_rows, Xi **xis);
+        AGMS_Sketch(unsigned int num_cols, unsigned int num_rows, Xi<T> **xis);
         virtual ~AGMS_Sketch();
 
         virtual void clear();
         virtual void update_sketch(T key, double weight);
-        virtual double inner_product(Sketch *other);
+        virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
-        virtual double difference(Sketch *other);
+        virtual double difference(Sketch<T> *other);
+};
+
+/* Fast-AGMS sketches proposed in the paper:
+    1) "Sketching streams through the net: distributed approximate query 
+        tracking" by G. Cormode and M. Garofalakis
+   num_rows basic estimators are computed by hasing the key values to an array
+   with num_buckets elements. Then the median of the num_rows estimators is 
+   returned as the final estimator.
+   * sketch_elem is an array of num_rows * num_buckets counters.
+   * hashes is an array of num_rows 2-way hashing functions that determine which 
+     bucket will be updated on each row.
+   * xis is an array of num_rows +/-1 4-way random variable that determines 
+     the value used to update the bucket.
+   In general, when the sketch needs to be updated with a pair (key,weight), 
+   for every row the basic estimator selected by hashes(key) is updated adding
+   xis(key)*weight. */
+template<typename T>
+class FAGMS_Sketch : public Sketch<T>
+{
+    protected:
+        unsigned int num_buckets;
+        unsigned int num_rows;
+        double *sketch_elem;
+        Hash<T> **hashes;
+        Xi<T> **xis;
+
+
+    public:
+        FAGMS_Sketch(unsigned int num_buckets, unsigned int num_rows, 
+                        Hash<T> **hashes, Xi<T> **xis);
+        virtual ~FAGMS_Sketch();
+
+        virtual void clear();
+        virtual void update_sketch(T key, double weight);
+        virtual double inner_join(Sketch<T> *other);
+        virtual double second_moment();
+        virtual double difference(Sketch<T> *other);
+};
+
+/* Fast-Count sketches proposed in the paper:
+    1) "Tabulation-based 4-universal hashing with applications to second moment 
+       estimation" by M. Thorup and Y. Zhang
+   num_rows basic estimators are computed by hashing the key values to an array
+   with num_buckets elements. Then the average of the num_rows estimators is 
+   returned as teh final estimator.
+   * sketch_elem is an array of num_rows*num_buckets counters.
+   * hashes is an array of 4-way hash function in the {num_buckets} space.
+   In general, when the sketch needs to be updated with a pair (key,weight), 
+   for every row the basic estimator selected by hashes(key) is updated adding
+   the weight. */
+
+template<typename T>
+class FastCount_Sketch : public Sketch<T>
+{
+    protected:
+        unsigned int num_buckets;
+        unsigned int num_rows;
+        double *sketch_elem;
+        Hash<T> **hashes;
+
+
+      public:
+        FastCount_Sketch(unsigned int num_buckets, unsigned int num_rows, 
+                            Hash<T> **hashes);
+        virtual ~FastCount_Sketch();
+
+        virtual void clear();
+        virtual void update_sketch(T key, double weight);
+        virtual double inner_join(Sketch<T> *other);
+        virtual double second_moment();
+        virtual double difference(Sketch<T> *other);
+};
+
+
+
+
+/* Count-Min sketches proposed in the paper:
+    1) "An improved data stream summary: the count-min sketch and its 
+        applications" by G. Cormode and S. Muthukrishnan
+   num_rows basic estimators are computed by hashing the key values to an array 
+   with num_buckets elements. Then the minimum of the num_rows estimators is 
+   returned as the final estimator. 
+   * sketch_elem is an array of num_rows * num_buckets counters. 
+   * hashes is an array of num_rows 2-way hash functions in the space of 
+     {num_buckets}
+   In general, when the sketch needs to be updated with a pair (key,weight), 
+   for every row the basic estimator selected by hashes(key) is updated adding
+   the weight. */
+template<typename T>
+class CountMin_Sketch : public Sketch<T>
+{
+    protected:
+        unsigned int num_buckets;
+        unsigned int num_rows;
+        double *sketch_elem;
+        Hash<T> **hashes;
+
+    public:
+        CountMin_Sketch(unsigned int num_buckets, unsigned int num_rows, 
+                        Hash<T> **hashes);
+        virtual ~CountMin_Sketch();
+
+        virtual void clear();
+        virtual void update_sketch(T key, double weight);
+        virtual double inner_join(Sketch<T> *other);
+        virtual double second_moment();
+        virtual double difference(Sketch<T> *other);
 };
 
 #include "sketches.tpp"

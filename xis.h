@@ -40,6 +40,8 @@ class Xi_BCH3: Xi<T> {
 
     public:
         Xi_BCH3(T I1, T I2);
+        //Random constructor:
+        Xi_BCH3();
         virtual ~Xi_BCH3();
 
         virtual int element(T j);
@@ -55,6 +57,7 @@ class Xi_EH3: Xi<T> {
 
     public:
         Xi_EH3(T I1, T I2);
+        Xi_EH3();
         virtual ~Xi_EH3();
 
         virtual int element(T j);
@@ -74,6 +77,7 @@ class Xi_CW2 : Xi<T1>{
 
     public:
         Xi_CW2(T2 I1,T2 I2);
+        Xi_CW2();
         virtual ~Xi_CW2();
 
         virtual int element(T1 j);
@@ -89,6 +93,7 @@ class Xi_CW4 : Xi<T1> {
 
     public:
         Xi_CW4(T2 I1, T2 I2, T2 I3, T2 I4);
+        Xi_CW4();
         virtual ~Xi_CW4();
 
         virtual int element(T1 j);
@@ -102,6 +107,7 @@ class Xi_BCH5 : Xi<T> {
 
     public:
         Xi_BCH5(T I1, T I2, T I3);
+        Xi_BCH5();
         virtual ~Xi_BCH5();
 
         virtual int element(T j);

@@ -1,5 +1,5 @@
 #include "mersenne.h"
-
+#include "random.h"
 
 /**************************Hash_CW2 implementation*****************************/
 
@@ -10,6 +10,15 @@ Hash_CW2<T1,T2>::Hash_CW2(T2 I1, T2 I2, unsigned int B)
     num_buckets = B;
     seeds[0] = mersenne_modulus<T1>(I1, mersenne_exponent);
     seeds[1] = mersenne_modulus<T1>(I2, mersenne_exponent);
+}
+
+template<typename T1, typename T2>
+Hash_CW2<T1,T2>::Hash_CW2(unsigned int B)
+{
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    num_buckets = B;
+    seeds[0] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
+    seeds[1] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
 }
 
 template<typename T1, typename T2>
@@ -39,6 +48,17 @@ Hash_CW4<T1,T2>::Hash_CW4(T2 I1, T2 I2, T2 I3, T2 I4, unsigned int B)
     seeds[1] = mersenne_modulus<T1>(I2, mersenne_exponent);
     seeds[2] = mersenne_modulus<T1>(I3, mersenne_exponent);
     seeds[3] = mersenne_modulus<T1>(I4, mersenne_exponent);
+}
+
+template<typename T1, typename T2>
+Hash_CW4<T1,T2>::Hash_CW4(unsigned int B)
+{
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    num_buckets = B;
+    seeds[0] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
+    seeds[1] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
+    seeds[2] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
+    seeds[3] = mersenne_modulus<T1>(random<T2>(), mersenne_exponent);
 }
 
 template<typename T1, typename T2>

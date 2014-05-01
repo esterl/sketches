@@ -1,7 +1,12 @@
 /* Implementation of "xis.h" */
 //#include "xis2.h"
 #include <stdexcept>
+
+#include "ttmath/ttmath.h"
 #include "mersenne.h"
+#include "random.h"
+
+
 
 /*
   Computes parity bit of the bits of an integer
@@ -26,6 +31,13 @@ Xi_BCH3<T>::Xi_BCH3(T I1, T I2){
 }
 
 template<typename T>
+Xi_BCH3<T>::Xi_BCH3(){
+    T temp = 1UL;
+    seeds[0] = random<T>() & temp;
+    seeds[1] = random<T>();
+}
+
+template<typename T>
 Xi_BCH3<T>::~Xi_BCH3()
 {
 }
@@ -47,6 +59,14 @@ Xi_EH3<T>::Xi_EH3(T I1, T I2)
     T temp = 1UL;
     seeds[0] = I1 & temp;
     seeds[1] = I2;
+}
+
+template<typename T>
+Xi_EH3<T>::Xi_EH3()
+{
+    T temp = 1UL;
+    seeds[0] = random<T>() & temp;
+    seeds[1] = random<T>();
 }
 
 template<typename T>
@@ -84,6 +104,15 @@ Xi_CW2<T1,T2>::Xi_CW2(T2 I1,T2 I2)
 }
 
 template<typename T1, typename T2>
+Xi_CW2<T1,T2>::Xi_CW2()
+{
+    // Decide which Mersenne prime to use.
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    seeds[0] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+}
+
+template<typename T1, typename T2>
 Xi_CW2<T1,T2>::~Xi_CW2()
 {
 }
@@ -112,6 +141,17 @@ Xi_CW4<T1,T2>::Xi_CW4(T2 I1, T2 I2, T2 I3, T2 I4)
     seeds[1] = mersenne_modulus<T2>(I2, mersenne_exponent);
     seeds[2] = mersenne_modulus<T2>(I3, mersenne_exponent);
     seeds[3] = mersenne_modulus<T2>(I4, mersenne_exponent);
+}
+
+template<typename T1, typename T2>
+Xi_CW4<T1,T2>::Xi_CW4()
+{
+    // Decide which Mersenne prime to use
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    seeds[0] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[2] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[3] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
 }
 
 template<typename T1, typename T2>
@@ -147,6 +187,14 @@ Xi_BCH5<T>::Xi_BCH5(T I1, T I2, T I3){
     seeds[0] = I1&temp;
     seeds[1] = I2;
     seeds[2] = I3;
+}
+
+template<typename T>
+Xi_BCH5<T>::Xi_BCH5(){
+    T temp = 1U;
+    seeds[0] = random<T>()&temp;
+    seeds[1] = random<T>();
+    seeds[2] = random<T>();
 }
 
 template<typename T>

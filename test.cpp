@@ -5,6 +5,7 @@
 #include "ttmath/ttmath.h"
 #include "xis.h"
 #include "hash.h"
+#include "sketches.h"
 
 typedef ttmath::UInt<2> bigint;
 typedef ttmath::UInt<132> bigint2;
@@ -66,4 +67,113 @@ int main()
 
 /**********************Testing Sketches.h implementation***********************/
 
+    //TODO should make sure each Sketch goes with they Xi/Hash selected:
+    //AGMS sketch:
+    unsigned int num_buckets = 16;
+    unsigned int num_rows = 16;
+    Xi_BCH5<unsigned int>** xis;
+    xis = new Xi_BCH5<unsigned int>*[num_buckets*num_rows];
+    for (int i =0; i < num_buckets*num_rows; i++)
+        xis[i] = new Xi_BCH5<unsigned int>();
+    AGMS_Sketch<unsigned int> *sketch1, *sketch2;
+    sketch1 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis);
+    sketch2 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis);
+    sketch1->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
+                    std::endl;
+    sketch1->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
+                    std::endl;
+    sketch2->update_sketch(5,2);
+    std::cout << "Difference of the sketches " << sketch1->difference(sketch2) << 
+                    std::endl;
+    std::cout << "Inner join of the sketch " << sketch1->inner_join(sketch2) << 
+                    std::endl;
+    sketch1->clear();
+    delete sketch1;
+    delete sketch2;
+    delete [] xis;
+    
+    //FAGMS Sketch
+    xis = new Xi_BCH5<unsigned int>*[num_rows];
+    Hash_CW2<unsigned int, unsigned long>** hashes;
+    hashes = new Hash_CW2<unsigned int, unsigned long>*[num_rows];
+    for (int i =0; i < num_rows; i++) {
+        xis[i] = new Xi_BCH5<unsigned int>();
+        hashes[i] = new Hash_CW2<unsigned int, unsigned long>(num_buckets);
+    }
+    FAGMS_Sketch<unsigned int> *sketch3, *sketch4;
+    sketch3 = new FAGMS_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hashes, (Xi<unsigned int>**)xis);
+    sketch4 = new FAGMS_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hashes, (Xi<unsigned int>**)xis);
+    sketch3->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch3->second_moment() << 
+                    std::endl;
+    sketch3->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch3->second_moment() << 
+                    std::endl;
+    sketch4->update_sketch(5,2);
+    std::cout << "Difference of the sketches " << sketch3->difference(sketch4) << 
+                    std::endl;
+    std::cout << "Inner join of the sketch " << sketch3->inner_join(sketch4) << 
+                    std::endl;
+    sketch3->clear();
+    delete sketch3;
+    delete sketch4;
+    delete [] xis;
+    delete [] hashes;
+    
+    //FastCount Sketch
+    Hash_CW4<unsigned int, unsigned long>** hash4way;
+    hash4way = new Hash_CW4<unsigned int, unsigned long>*[num_rows];
+    for (int i =0; i < num_rows; i++) {
+        hash4way[i] = new Hash_CW4<unsigned int, unsigned long>(num_buckets);
+    }
+    FastCount_Sketch<unsigned int> *sketch5, *sketch6;
+    sketch5 = new FastCount_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hash4way);
+    sketch6 = new FastCount_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hash4way);
+    sketch5->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch5->second_moment() << 
+                    std::endl;
+    sketch5->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch5->second_moment() << 
+                    std::endl;
+    sketch6->update_sketch(5,2);
+    std::cout << "Difference of the sketches " << sketch5->difference(sketch6) << 
+                    std::endl;
+    std::cout << "Inner join of the sketch " << sketch5->inner_join(sketch6) << 
+                    std::endl;
+    sketch5->clear();
+    delete sketch5;
+    delete sketch6;
+    delete [] hash4way;
+    
+    //CountMin Sketch
+    hashes = new Hash_CW2<unsigned int, unsigned long>*[num_rows];
+    for (int i =0; i < num_rows; i++) {
+        hashes[i] = new Hash_CW2<unsigned int, unsigned long>(num_buckets);
+    }
+    CountMin_Sketch<unsigned int> *sketch7, *sketch8;
+    sketch7 = new CountMin_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hashes);
+    sketch8 = new CountMin_Sketch<unsigned int>(num_buckets, num_rows, 
+                        (Hash<unsigned int>**) hashes);
+    sketch7->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch7->second_moment() << 
+                    std::endl;
+    sketch7->update_sketch(5,1);
+    std::cout << "Second moment of the sketch " << sketch7->second_moment() << 
+                    std::endl;
+    sketch8->update_sketch(5,2);
+    std::cout << "Difference of the sketches " << sketch7->difference(sketch8) << 
+                    std::endl;
+    std::cout << "Inner join of the sketch " << sketch7->inner_join(sketch8) << 
+                    std::endl;
+    sketch7->clear();
+    delete sketch8;
+    delete sketch7;
+    delete [] hashes;
 }

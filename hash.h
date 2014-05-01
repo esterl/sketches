@@ -48,6 +48,7 @@ class Hash_CW2{
 
     public:
         Hash_CW2(T2 I1, T2 I2, unsigned int B);
+        Hash_CW2(unsigned int B);
         virtual ~Hash_CW2();
 
         virtual unsigned int element(T1 j);
@@ -65,6 +66,7 @@ class Hash_CW4 {
 
     public:
         Hash_CW4(T2 I1, T2 I2, T2 I3, T2 I4, unsigned int B);
+        Hash_CW4(unsigned int B);
         virtual ~Hash_CW4();
 
         virtual unsigned int element(T1 j);
