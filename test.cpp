@@ -179,6 +179,8 @@ int main()
     std::cout << "Inner join of the sketch " << sketch7->inner_join(sketch8) << 
                     std::endl;
     sketch7->clear();
+    std::cout << "Second moment of the sketch " << sketch7->second_moment() << 
+                    std::endl;
     delete sketch8;
     delete sketch7;
     delete [] hashes;
