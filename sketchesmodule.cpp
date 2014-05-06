@@ -2,19 +2,112 @@
 
 #include "sketches.h"
 
+// From http://www.cplusplus.com/forum/articles/9645/
+template <typename T>
+T StringToNumber ( const std::string &Text ) //Text not by const reference so that the function can be used with a 
+{                                       //character array as argument
+    std::stringstream ss(Text);
+    T result;
+    return ss >> result ? result : T(0);
+}
+
+/************************** Templated functions *******************************/
+
+template<typename SketchType>
+static PyObject *
+Sketch_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    SketchType *self;
+    self = PyObject_NEW(SketchType, type);
+    return (PyObject *)self;
+}
+
+
+template<typename SketchType>
+static void
+Sketch_dealloc(SketchType* self)
+{
+    delete self->sketch;
+    self->ob_type->tp_free((PyObject*)self);
+}
+
+
+template<typename SketchType, typename KeyType>
+static PyObject *
+Sketch_update(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    KeyType key;
+    char *str;
+    double weight;
+    static char *kwlist[] = {"key", "weight", NULL};
+    
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sd", kwlist, &str, &weight))
+        return NULL;
+    
+    key = StringToNumber<KeyType>(str);
+    self->sketch->update(key, weight);
+    
+    Py_RETURN_NONE; 
+}
+
+
+template<typename SketchType>
+static PyObject *
+Sketch_clear(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    self->sketch->clear();
+    Py_RETURN_NONE; 
+}
+
+
+template<typename SketchType, typename KeyType>
+static PyObject *
+Sketch_difference(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    SketchType* other;
+    double result;
+    static char *kwlist[] = {"other", NULL};
+    
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &other))
+        return NULL;
+    
+    if (! PyObject_TypeCheck((PyObject*) other, self->ob_type))
+        return NULL;
+    
+    result = self->sketch->difference((Sketch<KeyType>*)other->sketch);
+    return PyFloat_FromDouble(result);
+}
+
+
+
+template<typename SketchType>
+static PyObject *
+Sketch_second_moment(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    double result;
+    result = self->sketch->second_moment();
+    return PyFloat_FromDouble(result);
+}
+
+template<typename PyType, typename CType>
+static PyObject *
+Sketch_copy(PyType* self)
+{
+    PyType* result ;
+    
+    result = PyObject_NEW(PyType, self->ob_type);
+    result->sketch = new CType(self->sketch);
+    return (PyObject*) result;
+}
+
+
+/************************** FastCount sketch **********************************/
 template<typename T>
 struct FastCount {
     PyObject_HEAD
     FastCount_Sketch<T> * sketch;
 };
 
-template<typename T>
-static void
-FastCount_dealloc(FastCount<T>* self)
-{
-    delete self->sketch;
-    self->ob_type->tp_free((PyObject*)self);
-}
 
 // t1 = 16, t2 = 64
 template<typename T1, typename T2>
@@ -41,98 +134,17 @@ FastCount_init(FastCount<T1> *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
-// From http://www.cplusplus.com/forum/articles/9645/
-template <typename T>
-T StringToNumber ( const std::string &Text ) //Text not by const reference so that the function can be used with a 
-{                                       //character array as argument
-    std::stringstream ss(Text);
-    T result;
-    return ss >> result ? result : T(0);
-}
-
-template<typename T>
-static PyObject *
-FastCount_update(FastCount<T>* self, PyObject *args, PyObject *kwds)
-{
-    T key;
-    char *str;
-    double weight;
-    static char *kwlist[] = {"key", "weight", NULL};
-    
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sd", kwlist, &str, &weight))
-        return NULL;
-    
-    key = StringToNumber<T>(str);
-    self->sketch->update(key, weight);
-    
-    Py_RETURN_NONE; 
-}
-
-//Needs to be specific since we are parsing the key
-template<typename T>
-static PyObject *
-FastCount_clear(FastCount<T>* self, PyObject *args, PyObject *kwds)
-{
-    self->sketch->clear();
-    Py_RETURN_NONE; 
-}
-
-template<typename T>
-static PyObject *
-FastCount_difference(FastCount<T>* self, PyObject *args, PyObject *kwds)
-{
-    FastCount<T>* other;
-    double result;
-    static char *kwlist[] = {"other", NULL};
-    
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &other))
-        return NULL;
-    
-    if (! PyObject_TypeCheck((PyObject*) other, self->ob_type))
-        return NULL;
-    
-    result = self->sketch->difference((Sketch<T>*)other->sketch);
-    return PyFloat_FromDouble(result);
-}
-
-template<typename T>
-static PyObject *
-FastCount_second_moment(FastCount<T>* self, PyObject *args, PyObject *kwds)
-{
-    double result;
-    result = self->sketch->second_moment();
-    return PyFloat_FromDouble(result);
-}
-
-template<typename T>
-static PyObject *
-FastCount_copy(FastCount<T>* self)
-{
-    FastCount<T>* result ;
-    
-    result = PyObject_NEW(FastCount<T>, self->ob_type);
-    result->sketch = new FastCount_Sketch<T>(self->sketch);
-    return (PyObject*) result;
-}
-
-template<typename T>
-static PyObject *
-FastCount_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    FastCount<T> *self;
-    self = PyObject_NEW(FastCount<T>, type);
-    return (PyObject *)self;
-}
 
 /******************************** uint16_t ************************************/
-template static void FastCount_dealloc<uint16_t>(FastCount<uint16_t>*);
-template static int FastCount_init<uint16_t, uint64_t> (FastCount<uint16_t> *, PyObject *, PyObject *);
-template static PyObject * FastCount_difference<uint16_t>(FastCount<uint16_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_second_moment<uint16_t>(FastCount<uint16_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_copy<uint16_t>(FastCount<uint16_t>* );
-template static PyObject * FastCount_new<uint16_t>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * FastCount_update<uint16_t>(FastCount<uint16_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_clear<uint16_t>(FastCount<uint16_t>* , PyObject *, PyObject *);
+typedef FastCount<uint16_t> FastCount16;
+template static void Sketch_dealloc<FastCount16>(FastCount16*);
+template static int FastCount_init<uint16_t, uint64_t> (FastCount16 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount16, uint16_t>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FastCount16, FastCount_Sketch<uint16_t> >(FastCount16* );
+template static PyObject * Sketch_new<FastCount16 >(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount16,uint16_t>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FastCount16>(FastCount16* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -140,7 +152,7 @@ static PyTypeObject FastCount16Type = {
     "sketches.FastCount16",         /*tp_name*/
     sizeof(FastCount<uint16_t>),            /*tp_basicsize*/
     0,                              /*tp_itemsize*/
-    (destructor) FastCount_dealloc<uint16_t>,/*tp_dealloc*/
+    (destructor) Sketch_dealloc<FastCount16>,/*tp_dealloc*/
     0,                              /*tp_print*/
     0,                              /*tp_getattr*/
     0,                              /*tp_setattr*/
@@ -180,42 +192,43 @@ static PyTypeObject FastCount16Type = {
 
 
 static PyMethodDef FastCount16_methods[] = {
-    {"update", (PyCFunction)FastCount_update<uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FastCount<uint16_t>,uint16_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)FastCount_difference<uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FastCount<uint16_t>, uint16_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
-    {"second_moment", (PyCFunction)FastCount_second_moment<uint16_t>, METH_NOARGS,
+    {"second_moment", (PyCFunction)Sketch_second_moment<FastCount16>, METH_NOARGS,
      "Provides and estimation to the second moment of the sketch"
     },
-    {"copy", (PyCFunction)FastCount_copy<uint16_t>, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FastCount16, FastCount_Sketch<uint16_t> >, METH_NOARGS,
      "Copies a sketch"
     },
-    {"clear", (PyCFunction)FastCount_clear<uint16_t>, METH_NOARGS,
+    {"clear", (PyCFunction)Sketch_clear<FastCount16>, METH_NOARGS,
      "Clears the sketch"
     },
     {NULL}  /* Sentinel */
 };
 
 /******************************** uint32_t ************************************/
+typedef FastCount<uint32_t> FastCount32;
 typedef ttmath::UInt<3> uint192;
-template static void FastCount_dealloc<uint32_t>(FastCount<uint32_t>*);
-template static int FastCount_init< uint32_t, uint192> (FastCount<uint32_t> *, PyObject *, PyObject *);
-template static PyObject * FastCount_difference<uint32_t>(FastCount<uint32_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_second_moment<uint32_t>(FastCount<uint32_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_copy<uint32_t>(FastCount<uint32_t>* );
-template static PyObject * FastCount_new<uint32_t>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * FastCount_update<uint32_t>(FastCount<uint32_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_clear<uint32_t>(FastCount<uint32_t>* , PyObject *, PyObject *);
+template static void Sketch_dealloc<FastCount32>(FastCount32*);
+template static int FastCount_init< uint32_t, uint192> (FastCount32 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount32,uint32_t>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FastCount32, FastCount_Sketch<uint32_t> >(FastCount32* );
+template static PyObject * Sketch_new<FastCount32>(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount32, uint32_t>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FastCount32>(FastCount32* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount32Type = {
     PyObject_HEAD_INIT(NULL)
     0,                              /*ob_size*/
     "sketches.FastCount32",         /*tp_name*/
-    sizeof(FastCount<uint32_t>),            /*tp_basicsize*/
+    sizeof(FastCount32),            /*tp_basicsize*/
     0,                              /*tp_itemsize*/
-    (destructor) FastCount_dealloc<uint32_t>,/*tp_dealloc*/
+    (destructor) Sketch_dealloc<FastCount32>,/*tp_dealloc*/
     0,                              /*tp_print*/
     0,                              /*tp_getattr*/
     0,                              /*tp_setattr*/
@@ -252,19 +265,19 @@ static PyTypeObject FastCount32Type = {
 };
 
 static PyMethodDef FastCount32_methods[] = {
-    {"update", (PyCFunction)FastCount_update<uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FastCount32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)FastCount_difference<uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FastCount32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
-    {"second_moment", (PyCFunction)FastCount_second_moment<uint32_t>, METH_NOARGS,
+    {"second_moment", (PyCFunction)Sketch_second_moment<FastCount32>, METH_NOARGS,
      "Provides and estimation to the second moment of the sketch"
     },
-    {"copy", (PyCFunction)FastCount_copy<uint32_t>, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FastCount32, FastCount_Sketch<uint32_t> >, METH_NOARGS,
      "Copies a sketch"
     },
-    {"clear", (PyCFunction)FastCount_clear<uint32_t>, METH_NOARGS,
+    {"clear", (PyCFunction)Sketch_clear<FastCount32>, METH_NOARGS,
      "Copies a sketch"
     },
     {NULL}  /* Sentinel */
@@ -272,22 +285,23 @@ static PyMethodDef FastCount32_methods[] = {
 
 
 /******************************** uint64_t ************************************/
-template static void FastCount_dealloc<uint64_t>(FastCount<uint64_t>*);
-template static int FastCount_init< uint64_t, uint192> (FastCount<uint64_t> *, PyObject *, PyObject *);
-template static PyObject * FastCount_difference<uint64_t>(FastCount<uint64_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_second_moment<uint64_t>(FastCount<uint64_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_copy<uint64_t>(FastCount<uint64_t>* );
-template static PyObject * FastCount_new<uint64_t>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * FastCount_update<uint64_t>(FastCount<uint64_t>* , PyObject *, PyObject *);
-template static PyObject * FastCount_clear<uint64_t>(FastCount<uint64_t>* , PyObject *, PyObject *);
+typedef FastCount<uint64_t> FastCount64;
+template static void Sketch_dealloc<FastCount64>(FastCount64*);
+template static int FastCount_init< uint64_t, uint192> (FastCount64 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount64, uint64_t>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FastCount64, FastCount_Sketch<uint64_t> >(FastCount64* );
+template static PyObject * Sketch_new<FastCount64>(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount64, uint64_t>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FastCount64>(FastCount64* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount64Type = {
     PyObject_HEAD_INIT(NULL)
     0,                              /*ob_size*/
     "sketches.FastCount64",         /*tp_name*/
-    sizeof(FastCount<uint32_t>),            /*tp_basicsize*/
+    sizeof(FastCount64),            /*tp_basicsize*/
     0,                              /*tp_itemsize*/
-    (destructor) FastCount_dealloc<uint32_t>,/*tp_dealloc*/
+    (destructor) Sketch_dealloc<FastCount64>,/*tp_dealloc*/
     0,                              /*tp_print*/
     0,                              /*tp_getattr*/
     0,                              /*tp_setattr*/
@@ -324,19 +338,19 @@ static PyTypeObject FastCount64Type = {
 };
 
 static PyMethodDef FastCount64_methods[] = {
-    {"update", (PyCFunction)FastCount_update<uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FastCount64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)FastCount_difference<uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FastCount64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
-    {"second_moment", (PyCFunction)FastCount_second_moment<uint64_t>, METH_NOARGS,
+    {"second_moment", (PyCFunction)Sketch_second_moment<FastCount64>, METH_NOARGS,
      "Provides and estimation to the second moment of the sketch"
     },
-    {"copy", (PyCFunction)FastCount_copy<uint64_t>, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FastCount64, FastCount_Sketch<uint64_t> >, METH_NOARGS,
      "Copies a sketch"
     },
-    {"clear", (PyCFunction)FastCount_clear<uint64_t>, METH_NOARGS,
+    {"clear", (PyCFunction)Sketch_clear<FastCount64>, METH_NOARGS,
      "Copies a sketch"
     },
     {NULL}  /* Sentinel */
@@ -345,23 +359,23 @@ static PyMethodDef FastCount64_methods[] = {
 /******************************** uint128_t ************************************/
 typedef ttmath::UInt<2> uint128;
 typedef ttmath::UInt<17> uint1042;
-
-template static void FastCount_dealloc<uint128>(FastCount<uint128>*);
-template static int FastCount_init< uint128, uint1042> (FastCount<uint128> *, PyObject *, PyObject *);
-template static PyObject * FastCount_difference<uint128>(FastCount<uint128>* , PyObject *, PyObject *);
-template static PyObject * FastCount_second_moment<uint128>(FastCount<uint128>* , PyObject *, PyObject *);
-template static PyObject * FastCount_copy<uint128>(FastCount<uint128>* );
-template static PyObject * FastCount_new<uint128>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * FastCount_update<uint128>(FastCount<uint128>* , PyObject *, PyObject *);
-template static PyObject * FastCount_clear<uint128>(FastCount<uint128>* , PyObject *, PyObject *);
+typedef FastCount<uint128> FastCount128;
+template static void Sketch_dealloc<FastCount128>(FastCount128*);
+template static int FastCount_init< uint128, uint1042> (FastCount128 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount128, uint128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FastCount128, FastCount_Sketch<uint128> >(FastCount128* );
+template static PyObject * Sketch_new<FastCount128>(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount128,uint128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FastCount128>(FastCount128* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
     0,                              /*ob_size*/
     "sketches.FastCount128",         /*tp_name*/
-    sizeof(FastCount<uint128>),            /*tp_basicsize*/
+    sizeof(FastCount128),            /*tp_basicsize*/
     0,                              /*tp_itemsize*/
-    (destructor) FastCount_dealloc<uint128>,/*tp_dealloc*/
+    (destructor) Sketch_dealloc<FastCount128>,/*tp_dealloc*/
     0,                              /*tp_print*/
     0,                              /*tp_getattr*/
     0,                              /*tp_setattr*/
@@ -398,27 +412,25 @@ static PyTypeObject FastCount128Type = {
 };
 
 static PyMethodDef FastCount128_methods[] = {
-    {"update", (PyCFunction)FastCount_update<uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FastCount128, uint128>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)FastCount_difference<uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FastCount128, uint128>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
-    {"second_moment", (PyCFunction)FastCount_second_moment<uint128>, METH_NOARGS,
+    {"second_moment", (PyCFunction)Sketch_second_moment<FastCount128>, METH_NOARGS,
      "Provides and estimation to the second moment of the sketch"
     },
-    {"copy", (PyCFunction)FastCount_copy<uint128>, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FastCount128, FastCount_Sketch<uint128> >, METH_NOARGS,
      "Copies a sketch"
     },
-    {"clear", (PyCFunction)FastCount_clear<uint128>, METH_NOARGS,
+    {"clear", (PyCFunction)Sketch_clear<FastCount128>, METH_NOARGS,
      "Copies a sketch"
     },
     {NULL}  /* Sentinel */
 };
 
-
-
-
+/************************* Module *********************************************/
 static PyMethodDef sketches_methods[] = {
     {NULL}  /* Sentinel */
 };
@@ -432,22 +444,22 @@ initsketches(void)
 {
     PyObject* m;
 
-    FastCount16Type.tp_new = FastCount_new<uint16_t>;
+    FastCount16Type.tp_new = Sketch_new<FastCount16>;
     FastCount16Type.tp_methods = FastCount16_methods;
     if (PyType_Ready(&FastCount16Type) < 0)
         return;
 
-    FastCount32Type.tp_new = FastCount_new<uint32_t>;
+    FastCount32Type.tp_new = Sketch_new<FastCount32>;
     FastCount32Type.tp_methods = FastCount32_methods;
     if (PyType_Ready(&FastCount32Type) < 0)
         return;
 
-    FastCount64Type.tp_new = FastCount_new<uint64_t>;
+    FastCount64Type.tp_new = Sketch_new<FastCount64>;
     FastCount64Type.tp_methods = FastCount64_methods;
     if (PyType_Ready(&FastCount64Type) < 0)
         return;
 
-    FastCount128Type.tp_new = FastCount_new<uint128>;
+    FastCount128Type.tp_new = Sketch_new<FastCount128>;
     FastCount128Type.tp_methods = FastCount128_methods;
     if (PyType_Ready(&FastCount128Type) < 0)
         return;
