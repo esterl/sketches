@@ -1,15 +1,46 @@
 #include <Python.h>
+#include <string>
+#include <iostream>
 
 #include "sketches.h"
 
-// From http://www.cplusplus.com/forum/articles/9645/
-template <typename T>
-T StringToNumber ( const std::string &Text ) //Text not by const reference so that the function can be used with a 
-{                                       //character array as argument
-    std::stringstream ss(Text);
-    T result;
-    return ss >> result ? result : T(0);
+uint64_t PyObjectToNumber(PyObject *py_num){
+    uint64_t result=0;
+    if (PyInt_Check(py_num)){
+        result = PyInt_AsLong(py_num);
+    } else if (PyString_Check(py_num)){
+        result = std::stoull(PyString_AsString(py_num));
+    }
+    return result;
 }
+
+template<typename T>
+T PyObjectToNumber( PyObject *py_num){
+    T result = 0;
+    PyObject * py_str = PyObject_Str(py_num);
+    const char* str = PyString_AsString(py_str);
+    result = str;
+    return result;
+};
+
+template<>
+uint16_t PyObjectToNumber<uint16_t>(PyObject * py_num)
+{
+    return PyObjectToNumber(py_num);
+};
+
+template<>
+uint32_t PyObjectToNumber<uint32_t>(PyObject * py_num)
+{
+    return PyObjectToNumber(py_num);
+};
+
+template<>
+uint64_t PyObjectToNumber<uint64_t>(PyObject * py_num)
+{
+    return PyObjectToNumber(py_num);
+};
+
 
 /************************** Templated functions *******************************/
 
@@ -37,14 +68,15 @@ static PyObject *
 Sketch_update(SketchType* self, PyObject *args, PyObject *kwds)
 {
     KeyType key;
-    char *str;
-    double weight;
+    PyObject *py_key;
+    double weight=1.;
     static char *kwlist[] = {"key", "weight", NULL};
     
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sd", kwlist, &str, &weight))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|Od", kwlist, &py_key, &weight))
         return NULL;
     
-    key = StringToNumber<KeyType>(str);
+    key = PyObjectToNumber<KeyType>(py_key);
+
     self->sketch->update(key, weight);
     
     Py_RETURN_NONE; 
@@ -100,6 +132,15 @@ Sketch_copy(PyType* self)
     return (PyObject*) result;
 }
 
+template<typename SketchType>
+static PyObject *
+Sketch_get_key_size(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    unsigned int result;
+    
+    result = self->sketch->get_key_size();
+    return PyInt_FromLong(result);
+}
 
 /************************** FastCount sketch **********************************/
 template<typename T>
@@ -145,6 +186,7 @@ template static PyObject * Sketch_copy<FastCount16, FastCount_Sketch<uint16_t> >
 template static PyObject * Sketch_new<FastCount16 >(PyTypeObject *, PyObject *, PyObject *);
 template static PyObject * Sketch_update<FastCount16,uint16_t>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FastCount16>(FastCount16* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -207,6 +249,9 @@ static PyMethodDef FastCount16_methods[] = {
     {"clear", (PyCFunction)Sketch_clear<FastCount16>, METH_NOARGS,
      "Clears the sketch"
     },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount16>, METH_NOARGS,
+     "Returns the size of the key"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -221,6 +266,7 @@ template static PyObject * Sketch_copy<FastCount32, FastCount_Sketch<uint32_t> >
 template static PyObject * Sketch_new<FastCount32>(PyTypeObject *, PyObject *, PyObject *);
 template static PyObject * Sketch_update<FastCount32, uint32_t>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FastCount32>(FastCount32* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -280,6 +326,9 @@ static PyMethodDef FastCount32_methods[] = {
     {"clear", (PyCFunction)Sketch_clear<FastCount32>, METH_NOARGS,
      "Copies a sketch"
     },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount32>, METH_NOARGS,
+     "Returns the size of the key"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -294,6 +343,7 @@ template static PyObject * Sketch_copy<FastCount64, FastCount_Sketch<uint64_t> >
 template static PyObject * Sketch_new<FastCount64>(PyTypeObject *, PyObject *, PyObject *);
 template static PyObject * Sketch_update<FastCount64, uint64_t>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FastCount64>(FastCount64* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -353,6 +403,9 @@ static PyMethodDef FastCount64_methods[] = {
     {"clear", (PyCFunction)Sketch_clear<FastCount64>, METH_NOARGS,
      "Copies a sketch"
     },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount64>, METH_NOARGS,
+     "Returns the size of the key"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -368,6 +421,7 @@ template static PyObject * Sketch_copy<FastCount128, FastCount_Sketch<uint128> >
 template static PyObject * Sketch_new<FastCount128>(PyTypeObject *, PyObject *, PyObject *);
 template static PyObject * Sketch_update<FastCount128,uint128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FastCount128>(FastCount128* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -426,6 +480,9 @@ static PyMethodDef FastCount128_methods[] = {
     },
     {"clear", (PyCFunction)Sketch_clear<FastCount128>, METH_NOARGS,
      "Copies a sketch"
+    },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount128>, METH_NOARGS,
+     "Returns the size of the key"
     },
     {NULL}  /* Sentinel */
 };

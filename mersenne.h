@@ -14,7 +14,9 @@ template<typename T>
 inline int get_mersenne_exponent(){
     int mersenne_exponent;
     uint32_t space_exponent = sizeof(T)*8;
-    if (space_exponent < 17)
+    if (space_exponent < 13)
+        mersenne_exponent = 13;
+    else if (space_exponent < 17)
         mersenne_exponent = 17;
     else if (space_exponent < 31)
         mersenne_exponent = 31;

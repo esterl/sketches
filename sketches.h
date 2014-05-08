@@ -15,6 +15,7 @@ template<typename T>
 class Sketch
 {
     public:
+        unsigned int get_key_size(){ return sizeof(T)*8; }
         //reseting the sketch structure
         virtual void clear() = 0;
 

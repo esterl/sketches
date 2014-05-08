@@ -141,7 +141,7 @@ template<typename T>
 double AGMS_Sketch<T>::difference(Sketch<T> *other)
 {
     AGMS_Sketch<T> diff_sketch = AGMS_Sketch<T>(num_cols, num_rows, xis);
-    for (int i = 0; i < num_rows; i++)
+    for (int i = 0; i < num_rows*num_cols; i++)
         diff_sketch.sketch_elem[i] = sketch_elem[i] - 
                                     ((AGMS_Sketch<T>*)other)->sketch_elem[i];
     
@@ -244,10 +244,10 @@ double FAGMS_Sketch<T>::difference(Sketch<T> *other)
 {
     FAGMS_Sketch<T> diff_sketch = FAGMS_Sketch<T>(num_buckets, num_rows, 
                                                     hashes, xis);
-    for (unsigned int i = 0; i < num_rows; i++)
+    for (unsigned int i = 0; i < num_rows*num_buckets; i++){
         diff_sketch.sketch_elem[i] = sketch_elem[i] - 
                                     ((FAGMS_Sketch<T>*)other)->sketch_elem[i];
-    
+    }
     return diff_sketch.second_moment();
 }
 
@@ -449,7 +449,7 @@ double CountMin_Sketch<T>::difference(Sketch<T>* other)
 {
     CountMin_Sketch<T> diff_sketch = CountMin_Sketch<T>(num_buckets, num_rows,
                                                             hashes);
-    for (int i = 0; i < num_rows; i++)
+    for (int i = 0; i < num_rows*num_buckets; i++)
         diff_sketch.sketch_elem[i] = sketch_elem[i] - 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[i];
     
