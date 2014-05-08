@@ -28,8 +28,11 @@ class Sketch
         //estimating the self-join size or the second frequency moment
         virtual double second_moment() = 0;
         
+        //estimating the first frequency moment
+        virtual double first_moment() = 0;
+        
         //estimating the L2 difference
-        virtual double difference(Sketch *other)=0;
+        virtual Sketch* difference(Sketch *other)=0;
 };
 
 
@@ -65,7 +68,8 @@ class AGMS_Sketch : public Sketch<T>
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
-        virtual double difference(Sketch<T> *other);
+        virtual double first_moment();
+        virtual Sketch<T>* difference(Sketch<T> *other);
 };
 
 /* Fast-AGMS sketches proposed in the paper:
@@ -103,7 +107,8 @@ class FAGMS_Sketch : public Sketch<T>
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
-        virtual double difference(Sketch<T> *other);
+        virtual double first_moment();
+        virtual Sketch<T>* difference(Sketch<T> *other);
 };
 
 /* Fast-Count sketches proposed in the paper:
@@ -138,7 +143,8 @@ class FastCount_Sketch : public Sketch<T>
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
-        virtual double difference(Sketch<T> *other);
+        virtual double first_moment();
+        virtual Sketch<T>* difference(Sketch<T> *other);
 };
 
 
@@ -175,7 +181,8 @@ class CountMin_Sketch : public Sketch<T>
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
-        virtual double difference(Sketch<T> *other);
+        virtual double first_moment();
+        virtual Sketch<T>* difference(Sketch<T> *other);
 };
 
 #include "sketches.tpp"

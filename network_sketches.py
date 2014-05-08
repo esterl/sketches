@@ -32,8 +32,11 @@ class NetworkSketch():
         packet_hash = long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16)
         self.sketch.update(str((packet_hash^self.key)&self.mask),1.)
     
-    def estimate_difference(self, other):
-        return self.sketch.difference(other.sketch)
+    def estimate_first_moment(self, other):
+        return self.sketch.difference(other.sketch).first_moment()
+    
+    def estimate_second_moment(self, other):
+        return self.sketch.difference(other.sketch).second_moment()
     
     def copy(self):
         result = NetworkSketch(self.sketch.copy(), self.key)

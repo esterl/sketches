@@ -1,7 +1,17 @@
 #include "sketches.h"
 
 #include <string.h>
+#include <cmath>        // std::abs
 
+void print(double * values, unsigned int buckets, unsigned int rows){
+std::cout << std::endl;
+    for (int i = 0; i < rows; i++){
+        for (int j = i*buckets; j < (i+1)*buckets; j++){
+            std::cout << values[j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
 /**************************Basic math functions *******************************/
 inline double average(double* values, unsigned int n)
 {
@@ -77,7 +87,7 @@ template<typename T>
 AGMS_Sketch<T>::AGMS_Sketch(AGMS_Sketch<T>* copy)
 {
     num_rows = copy->num_rows;
-    num_cols = copy->cols;
+    num_cols = copy->num_cols;
     
     this->xis = new Xi<T>*[num_rows*num_cols];
     this->sketch_elem = new double[num_rows * num_cols];
@@ -138,14 +148,34 @@ double AGMS_Sketch<T>::second_moment()
 }
 
 template<typename T>
-double AGMS_Sketch<T>::difference(Sketch<T> *other)
+double AGMS_Sketch<T>::first_moment()
 {
-    AGMS_Sketch<T> diff_sketch = AGMS_Sketch<T>(num_cols, num_rows, xis);
-    for (int i = 0; i < num_rows*num_cols; i++)
-        diff_sketch.sketch_elem[i] = sketch_elem[i] - 
+    double *basic_est = new double[num_rows * num_cols];
+    for (int i = 0; i < num_rows * num_cols; i++)
+        basic_est[i] = std::abs(sketch_elem[i]);
+
+    double *avg_est = new double[num_rows];
+    for (int i = 0; i < num_rows; i++){
+        avg_est[i] = average(basic_est + i * num_cols, num_cols);
+    }
+
+    double result = median(avg_est, num_rows);
+
+    delete [] basic_est;
+    delete [] avg_est;
+
+    return result;
+}
+
+template<typename T>
+Sketch<T>* AGMS_Sketch<T>::difference(Sketch<T> *other)
+{
+    AGMS_Sketch<T>* diff_sketch = new AGMS_Sketch<T>(num_cols, num_rows, xis);
+    for (int i = 0; i < num_rows*num_cols; i++){
+        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
                                     ((AGMS_Sketch<T>*)other)->sketch_elem[i];
-    
-    return diff_sketch.second_moment();
+    }
+    return diff_sketch;
 }
 
 
@@ -240,15 +270,30 @@ double FAGMS_Sketch<T>::second_moment()
 }
 
 template<typename T>
-double FAGMS_Sketch<T>::difference(Sketch<T> *other)
+double FAGMS_Sketch<T>::first_moment()
 {
-    FAGMS_Sketch<T> diff_sketch = FAGMS_Sketch<T>(num_buckets, num_rows, 
+    double *basic_est = new double[num_rows];
+    for (int i = 0; i < num_rows; i++)
+    {
+        basic_est[i] = 0.0;
+        for (int j = i*num_buckets; j < (i+1)*num_buckets; j++)
+            basic_est[i] += std::abs(sketch_elem[j]);
+    }
+    double result = median(basic_est, num_rows);
+    delete [] basic_est;
+    return result;
+}
+
+template<typename T>
+Sketch<T>* FAGMS_Sketch<T>::difference(Sketch<T> *other)
+{
+    FAGMS_Sketch<T>* diff_sketch = new FAGMS_Sketch<T>(num_buckets, num_rows, 
                                                     hashes, xis);
     for (unsigned int i = 0; i < num_rows*num_buckets; i++){
-        diff_sketch.sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
                                     ((FAGMS_Sketch<T>*)other)->sketch_elem[i];
     }
-    return diff_sketch.second_moment();
+    return diff_sketch;
 }
 
 
@@ -347,14 +392,33 @@ double FastCount_Sketch<T>::second_moment()
 }
 
 template<typename T>
-double FastCount_Sketch<T>::difference(Sketch<T> *other)
+double FastCount_Sketch<T>::first_moment()
 {
-    FastCount_Sketch<T> diff_sketch = FastCount_Sketch<T>(this);
+    double* basic_est = new double[num_rows];
+    for (unsigned int i = 0; i < num_rows; i++)
+    {
+        basic_est[i] = 0.0;
+        for (unsigned int j = i*num_buckets; j < (i+1)*num_buckets; j++)
+        {
+            basic_est[i] += std::abs(sketch_elem[j]);
+        }
+    }
+
+    double result = average(basic_est, num_rows);
+    delete [] basic_est;
+    return result;
+}
+
+
+template<typename T>
+Sketch<T>* FastCount_Sketch<T>::difference(Sketch<T> *other)
+{
+    FastCount_Sketch<T>* diff_sketch = new FastCount_Sketch<T>(this);
     for (unsigned int i = 0; i < num_rows*num_buckets; i++) {
-        diff_sketch.sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
                                 ((FastCount_Sketch<T>*)other)->sketch_elem[i];
     }
-    return diff_sketch.second_moment();
+    return diff_sketch;
 }
 
 
@@ -411,9 +475,12 @@ void CountMin_Sketch<T>::clear()
         sketch_elem[i] = 0.0;
 }
 
+
+
 template<typename T>
 void CountMin_Sketch<T>::update(T key, double weight)
 {
+
     for (unsigned int i = 0; i < num_rows; i++)
     {
         int bucket = (int)hashes[i]->element(key);
@@ -428,9 +495,10 @@ double CountMin_Sketch<T>::inner_join(Sketch<T> *other)
     for (unsigned int i = 0; i < num_rows; i++)
     {
         basic_est[i] = 0.0;
-        for (int j = i*num_buckets; j < (i+1)*num_buckets; j++)
+        for (int j = i*num_buckets; j < (i+1)*num_buckets; j++){
             basic_est[i] += sketch_elem[j] * 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[j];
+        }
     }
 
     double result = min(basic_est, num_rows);
@@ -445,14 +513,29 @@ double CountMin_Sketch<T>::second_moment()
 }
 
 template<typename T>
-double CountMin_Sketch<T>::difference(Sketch<T>* other)
+double CountMin_Sketch<T>::first_moment()
 {
-    CountMin_Sketch<T> diff_sketch = CountMin_Sketch<T>(num_buckets, num_rows,
-                                                            hashes);
+    double *basic_est = new double[num_rows];
+    for (unsigned int i = 0; i < num_rows; i++)
+    {
+        basic_est[i] = 0.0;
+        for (int j = i*num_buckets; j < (i+1)*num_buckets; j++)
+            basic_est[i] += std::abs(sketch_elem[j]);
+    }
+
+    double result = min(basic_est, num_rows);
+    delete [] basic_est;
+    return result;
+}
+
+template<typename T>
+Sketch<T>* CountMin_Sketch<T>::difference(Sketch<T>* other)
+{
+    CountMin_Sketch<T>* diff_sketch = new CountMin_Sketch<T>(num_buckets, 
+                                                    num_rows, hashes);
     for (int i = 0; i < num_rows*num_buckets; i++)
-        diff_sketch.sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[i];
-    
-    return diff_sketch.second_moment();
+    return diff_sketch;
 }
 

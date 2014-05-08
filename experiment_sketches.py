@@ -8,10 +8,10 @@ import hashlib
 """ Tests a sketch """
 # TODO Obtain rows and columns from sketch
 def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
-    pkts = PcapReader('../equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     start_time = pkts.next().time
     pkts.close()
-    pkts = PcapReader('../equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     drop_probabilities = [0., 0.1, 0.2, 0.3, 0.5, 0.8, 1.]
     max_t = start_time + interval;
     sketches_out = [ sketch.copy() for drop_probability in drop_probabilities ]
@@ -29,14 +29,17 @@ def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
             n += 1
             for i in range(len(drop_probabilities)):
                 sketch_out = sketches_out[i]
-                drop_probability = float(input_packets - output_packets[i]) / input_packets
-                est_dropped = np.sqrt(sketch.estimate_difference(sketch_out))
-                est_probability = float(est_dropped) / np.sqrt(sketch.sketch.second_moment())
+                est_difference_1st = sketch.estimate_first_moment(sketch_out)
+                est_difference_2nd = sketch.estimate_second_moment(sketch_out)
+                est_input_1st = sketch.sketch.first_moment()
+                est_output_1st = sketch_out.sketch.second_moment()
+                est_input_2nd = sketch.sketch.second_moment()
+                est_output_2nd = sketch.sketch.second_moment()
                 sketch_out.clear()
-                result = ( drop_probability, est_probability, input_packets, 
-                           output_packets[i], input_packets - output_packets[i],
-                           est_dropped, interval, rows, columns, 
-                           str(sketch.sketch.__class__))
+                result = ( input_packets, output_packets[i], est_difference_1st,
+                           est_difference_2nd, est_input_1st, est_output_1st, 
+                           est_input_2nd, est_output_2nd, interval, rows, 
+                           columns, str(sketch.sketch.__class__))
                 results.append(result)
                 # Restart counters
                 output_packets[i] = 0
@@ -55,12 +58,14 @@ def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
                 sketches_out[i].update(complete_pkt)
         if n>max_tests:
             break
-    results_dtype = [ ('DropProbability', 'float'), 
-                      ('EstimatedProbability', 'float'),
-                      ('NumPacketsIn', 'float'), 
-                      ('NumPacketsOut', 'float'), 
-                      ('NumPacketsLost', 'float'), 
-                      ('EstimatedLostPackets', 'float'), 
+    results_dtype = [ ('InputPackets', 'float'), 
+                      ('OutputPackets', 'float'),
+                      ('EstimatedDifference1', 'float'), 
+                      ('EstimatedDifference2', 'float'), 
+                      ('EstimatedInput1', 'float'), 
+                      ('EstimatedOutput1', 'float'), 
+                      ('EstimatedInput2', 'float'),
+                      ('EstimatedOutput2', 'float'),
                       ('TimeInterval', 'float'), 
                       ('SketchRows', 'float'), 
                       ('SketchColumns', 'float'), 
@@ -68,10 +73,10 @@ def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
     return np.array(results, results_dtype)
 
 def test_corrupt(sketch, rows, columns, interval=0.001, max_tests=10):
-    pkts = PcapReader('../equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     start_time = pkts.next().time
     pkts.close()
-    pkts = PcapReader('../equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     corrupt_probabilities = [0., 0.1, 0.2, 0.3, 0.5, 0.8, 1.]
     max_t = start_time + interval;
     sketches_out = [ sketch.copy() for corrupt_probability in corrupt_probabilities ]
@@ -89,14 +94,17 @@ def test_corrupt(sketch, rows, columns, interval=0.001, max_tests=10):
             n += 1
             for i in range(len(corrupt_probabilities)):
                 sketch_out = sketches_out[i]
-                corrupt_probability = float(corrupt_packets[i]) / input_packets
-                est_corrupt = np.sqrt(sketch.estimate_difference(sketch_out))
-                est_probability = float(est_corrupt) / np.sqrt(sketch.sketch.second_moment())
+                est_difference_1st = sketch.estimate_first_moment(sketch_out)
+                est_difference_2nd = sketch.estimate_second_moment(sketch_out)
+                est_input_1st = sketch.sketch.first_moment()
+                est_output_1st = sketch_out.sketch.second_moment()
+                est_input_2nd = sketch.sketch.second_moment()
+                est_output_2nd = sketch.sketch.second_moment()
                 sketch_out.clear()
-                result = ( corrupt_probability, est_probability, input_packets, 
-                           corrupt_packets[i], input_packets - corrupt_packets[i],
-                           est_corrupt, interval, rows, columns, 
-                           str(sketch.sketch.__class__))
+                result = ( input_packets, corrupt_packets[i], est_difference_1st,
+                           est_difference_2nd, est_input_1st, est_output_1st, 
+                           est_input_2nd, est_output_2nd, interval, rows, 
+                           columns, str(sketch.sketch.__class__))
                 results.append(result)
                 # Restart counters
                 corrupt_packets[i] = 0
@@ -118,12 +126,14 @@ def test_corrupt(sketch, rows, columns, interval=0.001, max_tests=10):
                 sketches_out[i].update(corrupt_pkt)
         if n>max_tests:
             break
-    results_dtype = [ ('CorruptProbability', 'float'), 
-                      ('EstimatedProbability', 'float'),
-                      ('NumPacketsIn', 'float'), 
-                      ('NumPacketsCorrupt', 'float'), 
-                      ('NumPacketsOk', 'float'), 
-                      ('EstimatedCorruptPackets', 'float'), 
+    results_dtype = [ ('InputPackets', 'float'), 
+                      ('CorruptPackets', 'float'),
+                      ('EstimatedDifference1', 'float'), 
+                      ('EstimatedDifference2', 'float'), 
+                      ('EstimatedInput1', 'float'), 
+                      ('EstimatedOutput1', 'float'), 
+                      ('EstimatedInput2', 'float'),
+                      ('EstimatedOutput2', 'float'),
                       ('TimeInterval', 'float'), 
                       ('SketchRows', 'float'), 
                       ('SketchColumns', 'float'), 

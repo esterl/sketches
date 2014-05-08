@@ -68,6 +68,7 @@ int main()
 /**********************Testing Sketches.h implementation***********************/
 
     //TODO should make sure each Sketch goes with they Xi/Hash selected:
+    Sketch<unsigned int> *difference_sketch;
     //AGMS sketch:
     std::cout << "AGMS Sketch " << std::endl;
     unsigned int num_buckets = 16;
@@ -85,8 +86,12 @@ int main()
     sketch1->update(5,1);
     std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
                     std::endl;
-    sketch2->update(5,2);
-    std::cout << "Difference of the sketches " << sketch1->difference(sketch2) << 
+    sketch2->update(4,2);
+    sketch2->update(5,1);
+    difference_sketch = sketch1->difference(sketch2);
+    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
+                    std::endl;
+    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch1->inner_join(sketch2) << 
                     std::endl;
@@ -117,8 +122,12 @@ int main()
     sketch3->update(5,1);
     std::cout << "Second moment of the sketch " << sketch3->second_moment() << 
                     std::endl;
-    sketch4->update(5,2);
-    std::cout << "Difference of the sketches " << sketch3->difference(sketch4) << 
+    sketch4->update(4,2);
+    sketch4->update(5,1);
+    difference_sketch = sketch3->difference(sketch4);
+    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
+                    std::endl;
+    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch3->inner_join(sketch4) << 
                     std::endl;
@@ -146,8 +155,12 @@ int main()
     sketch5->update(5,1);
     std::cout << "Second moment of the sketch " << sketch5->second_moment() << 
                     std::endl;
-    sketch6->update(5,2);
-    std::cout << "Difference of the sketches " << sketch5->difference(sketch6) << 
+    sketch6->update(4,2);
+    sketch6->update(5,1);
+    difference_sketch = sketch5->difference(sketch6);
+    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
+                    std::endl;
+    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch5->inner_join(sketch6) << 
                     std::endl;
@@ -157,6 +170,8 @@ int main()
     delete [] hash4way;
     
     //CountMin Sketch
+    num_buckets = 4;
+    num_rows = 6;
     std::cout << "CountMin Sketch " << std::endl;
     hashes = new Hash_CW2<unsigned int, unsigned long>*[num_rows];
     for (int i =0; i < num_rows; i++) {
@@ -173,8 +188,12 @@ int main()
     sketch7->update(5,1);
     std::cout << "Second moment of the sketch " << sketch7->second_moment() << 
                     std::endl;
-    sketch8->update(5,2);
-    std::cout << "Difference of the sketches " << sketch7->difference(sketch8) << 
+    sketch8->update(4,2);
+    sketch8->update(5,1);
+    difference_sketch = sketch7->difference(sketch8);
+    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
+                    std::endl;
+    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch7->inner_join(sketch8) << 
                     std::endl;

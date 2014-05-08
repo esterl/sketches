@@ -9,11 +9,25 @@ from network_sketches import *
 import sketches
 from experiment_sketches import *
 
-
+sketch = sketches.CountMin64(16,16)
+aux = sketch.copy()
+sketch.update(4,2)
+aux.update(5,2)
+dif = sketch.difference(aux)
+dif.second_moment()
+dif.first_moment()
 
 sketch = sketches.FastCount64(16,16)
 net_sketch = NetworkSketch(sketch)
-results = test_corrupt(net_sketch, 16, 16, max_tests=1)
+results1 = test_corrupt(net_sketch, 16, 16, max_tests=1)
+
+sketch = sketches.AGMS64(16,16)
+net_sketch = NetworkSketch(sketch)
+results2 = test_corrupt(net_sketch, 16, 16, max_tests=1)
+
+sketch = sketches.CountMin64(16,16)
+net_sketch = NetworkSketch(sketch)
+results3 = test_corrupt(net_sketch, 16, 16, max_tests=1)
 """
 ############################ Different hash size ###############################
 # Test FastCount8:
@@ -82,6 +96,51 @@ for buckets in num_buckets:
             else:
                 results = np.hstack((results, test_corrupt(net_sketch, buckets, rows)))
 np.savetxt("corrupt_sketch_FastCount16.cvs", results, delimiter=',', fmt="%s")
+
+num_buckets = [4, 8 , 16]
+num_rows = [4, 8, 16]
+results = None
+for buckets in num_buckets:
+    for rows in num_rows:
+        #Several iterations
+        for i in range(10):
+            sketch = sketches.CountMin16(buckets,rows)
+            net_sketch = NetworkSketch(sketch)
+            if results is None:
+                results = test_corrupt(net_sketch, buckets, rows)
+            else:
+                results = np.hstack((results, test_corrupt(net_sketch, buckets, rows)))
+np.savetxt("corrupt_sketch_CountMin16.cvs", results, delimiter=',', fmt="%s")
+
+num_buckets = [4, 8 , 16]
+num_rows = [4, 8, 16]
+results = None
+for buckets in num_buckets:
+    for rows in num_rows:
+        #Several iterations
+        for i in range(10):
+            sketch = sketches.AGMS16(buckets,rows)
+            net_sketch = NetworkSketch(sketch)
+            if results is None:
+                results = test_corrupt(net_sketch, buckets, rows)
+            else:
+                results = np.hstack((results, test_corrupt(net_sketch, buckets, rows)))
+np.savetxt("corrupt_sketch_AGMS16.cvs", results, delimiter=',', fmt="%s")
+
+num_buckets = [4, 8 , 16]
+num_rows = [4, 8, 16]
+results = None
+for buckets in num_buckets:
+    for rows in num_rows:
+        #Several iterations
+        for i in range(10):
+            sketch = sketches.FAGMS16(buckets,rows)
+            net_sketch = NetworkSketch(sketch)
+            if results is None:
+                results = test_corrupt(net_sketch, buckets, rows)
+            else:
+                results = np.hstack((results, test_corrupt(net_sketch, buckets, rows)))
+np.savetxt("corrupt_sketch_FAGMS16.cvs", results, delimiter=',', fmt="%s")
 
 print 1
 
