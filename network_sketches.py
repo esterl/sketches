@@ -6,11 +6,14 @@ class NetworkSketch():
     #sketch
     #buffer
     
-    def __init__(self,sketch, key=0L):
+    def __init__(self,sketch, key=0L, mask=None):
         self.buffer = []
         self.sketch = sketch
         self.key=key
-        self.mask = (1L << sketch.get_key_size() ) -1
+        if mask is None:
+            self.mask = (1L << sketch.get_key_size() ) -1
+        else:
+            self.mask = mask
     
     def change_key(self,new_key):
         self.key = new_key
