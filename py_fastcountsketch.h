@@ -48,6 +48,8 @@ template static PyObject * Sketch_new<FastCount16 >(PyTypeObject *, PyObject *, 
 template static PyObject * Sketch_update<FastCount16,uint16_t>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount16>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FastCount16>(FastCount16* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -116,6 +118,12 @@ static PyMethodDef FastCount16_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount16>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FastCount16>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FastCount16>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -132,6 +140,8 @@ template static PyObject * Sketch_new<FastCount32>(PyTypeObject *, PyObject *, P
 template static PyObject * Sketch_update<FastCount32, uint32_t>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount32>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FastCount32>(FastCount32* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -197,6 +207,12 @@ static PyMethodDef FastCount32_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount32>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FastCount32>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FastCount32>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -213,6 +229,8 @@ template static PyObject * Sketch_new<FastCount64>(PyTypeObject *, PyObject *, P
 template static PyObject * Sketch_update<FastCount64, uint64_t>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount64>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FastCount64>(FastCount64* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -278,6 +296,12 @@ static PyMethodDef FastCount64_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount64>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FastCount64>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FastCount64>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -295,6 +319,8 @@ template static PyObject * Sketch_new<FastCount128>(PyTypeObject *, PyObject *, 
 template static PyObject * Sketch_update<FastCount128,uint128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FastCount128>(FastCount128* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -358,6 +384,12 @@ static PyMethodDef FastCount128_methods[] = {
      "Copies a sketch"
     },
     {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount128>, METH_NOARGS,
+     "Returns the size of the key"
+    },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FastCount128>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FastCount128>, METH_NOARGS,
      "Returns the size of the key"
     },
     {NULL}  /* Sentinel */

@@ -14,8 +14,14 @@
 template<typename T>
 class Sketch
 {
+    protected:
+        unsigned int num_rows;
+        unsigned int num_cols;
+        
     public:
         unsigned int get_key_size(){ return sizeof(T)*8; }
+        unsigned int get_num_rows(){ return num_rows; }
+        unsigned int get_num_columns(){ return num_cols; }
         //reseting the sketch structure
         virtual void clear() = 0;
 
@@ -51,11 +57,7 @@ template<typename T>
 class AGMS_Sketch : public Sketch<T>
 {
     protected:
-        unsigned int num_rows;
-        unsigned int num_cols;
-
         double *sketch_elem;
-
         Xi<T> **xis;
 
 
@@ -90,8 +92,6 @@ template<typename T>
 class FAGMS_Sketch : public Sketch<T>
 {
     protected:
-        unsigned int num_buckets;
-        unsigned int num_rows;
         double *sketch_elem;
         Hash<T> **hashes;
         Xi<T> **xis;

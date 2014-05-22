@@ -116,4 +116,23 @@ Sketch_get_key_size(SketchType* self, PyObject *args, PyObject *kwds)
     return PyInt_FromLong(result);
 }
 
+template<typename SketchType>
+static PyObject *
+Sketch_get_rows(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    unsigned int result;
+    
+    result = self->sketch->get_num_rows();
+    return PyInt_FromLong(result);
+}
+
+template<typename SketchType>
+static PyObject *
+Sketch_get_columns(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    unsigned int result;
+    
+    result = self->sketch->get_num_columns();
+    return PyInt_FromLong(result);
+}
 #endif

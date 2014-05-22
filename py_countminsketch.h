@@ -48,6 +48,8 @@ template static PyObject * Sketch_new<CountMin16 >(PyTypeObject *, PyObject *, P
 template static PyObject * Sketch_update<CountMin16,uint16_t>(CountMin16* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<CountMin16>(CountMin16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<CountMin16>(CountMin16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<CountMin16>(CountMin16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<CountMin16>(CountMin16* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -116,6 +118,12 @@ static PyMethodDef CountMin16_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<CountMin16>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<CountMin16>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<CountMin16>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -132,6 +140,8 @@ template static PyObject * Sketch_new<CountMin32>(PyTypeObject *, PyObject *, Py
 template static PyObject * Sketch_update<CountMin32, uint32_t>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<CountMin32>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<CountMin32>(CountMin32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<CountMin32>(CountMin32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<CountMin32>(CountMin32* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -197,6 +207,12 @@ static PyMethodDef CountMin32_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<CountMin32>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<CountMin32>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<CountMin32>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -213,6 +229,8 @@ template static PyObject * Sketch_new<CountMin64>(PyTypeObject *, PyObject *, Py
 template static PyObject * Sketch_update<CountMin64, uint64_t>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<CountMin64>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<CountMin64>(CountMin64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<CountMin64>(CountMin64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<CountMin64>(CountMin64* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -278,6 +296,12 @@ static PyMethodDef CountMin64_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<CountMin64>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<CountMin64>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<CountMin64>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -295,6 +319,8 @@ template static PyObject * Sketch_new<CountMin128>(PyTypeObject *, PyObject *, P
 template static PyObject * Sketch_update<CountMin128,uint128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<CountMin128>(CountMin128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<CountMin128>(CountMin128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<CountMin128>(CountMin128* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -359,6 +385,12 @@ static PyMethodDef CountMin128_methods[] = {
     },
     {"get_key_size", (PyCFunction)Sketch_get_key_size<CountMin128>, METH_NOARGS,
      "Returns the size of the key"
+    },
+    {"get_rows", (PyCFunction)Sketch_get_rows<CountMin128>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<CountMin128>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
     },
     {NULL}  /* Sentinel */
 };

@@ -7,12 +7,14 @@ import hashlib
 
 """ Tests a sketch """
 # TODO Obtain rows and columns from sketch
-def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
-    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+def test_drop(sketch, interval=0.001, max_tests=10):
+    rows = sketch.sketch.get_rows()
+    columns = sketch.sketch.get_columns()
+    pkts = PcapReader('/ssd/equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     start_time = pkts.next().time
     pkts.close()
-    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
-    drop_probabilities = [0., 0.1, 0.2, 0.3, 0.5, 0.8, 1.]
+    pkts = PcapReader('/ssd/equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    drop_probabilities = [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
     max_t = start_time + interval;
     sketches_out = [ sketch.copy() for drop_probability in drop_probabilities ]
     input_packets = 0.
@@ -72,12 +74,14 @@ def test_drop(sketch, rows, columns, interval=0.001, max_tests=10):
                       ('SketchClass','|S96')]
     return np.array(results, results_dtype)
 
-def test_corrupt(sketch, rows, columns, interval=0.001, max_tests=10):
-    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+def test_corrupt(sketch, interval=0.001, max_tests=10):
+    rows = sketch.sketch.get_rows()
+    columns = sketch.sketch.get_columns()
+    pkts = PcapReader('/ssd/equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
     start_time = pkts.next().time
     pkts.close()
-    pkts = PcapReader('equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
-    corrupt_probabilities = [0., 0.1, 0.2, 0.3, 0.5, 0.8, 1.]
+    pkts = PcapReader('/ssd/equinix-chicago.dirB.20130529-135900.UTC.anon.pcap')
+    corrupt_probabilities = [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
     max_t = start_time + interval;
     sketches_out = [ sketch.copy() for corrupt_probability in corrupt_probabilities ]
     input_packets = 0.

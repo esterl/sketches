@@ -48,6 +48,8 @@ template static PyObject * Sketch_new<AGMS16 >(PyTypeObject *, PyObject *, PyObj
 template static PyObject * Sketch_update<AGMS16,uint16_t>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<AGMS16>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<AGMS16>(AGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<AGMS16>(AGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<AGMS16>(AGMS16* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -116,6 +118,12 @@ static PyMethodDef AGMS16_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<AGMS16>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<AGMS16>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<AGMS16>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -132,6 +140,8 @@ template static PyObject * Sketch_new<AGMS32>(PyTypeObject *, PyObject *, PyObje
 template static PyObject * Sketch_update<AGMS32, uint32_t>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<AGMS32>(AGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<AGMS32>(AGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<AGMS32>(AGMS32* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -197,6 +207,12 @@ static PyMethodDef AGMS32_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<AGMS32>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<AGMS32>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<AGMS32>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -213,6 +229,8 @@ template static PyObject * Sketch_new<AGMS64>(PyTypeObject *, PyObject *, PyObje
 template static PyObject * Sketch_update<AGMS64, uint64_t>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<AGMS64>(AGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<AGMS64>(AGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<AGMS64>(AGMS64* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -278,6 +296,12 @@ static PyMethodDef AGMS64_methods[] = {
     {"get_key_size", (PyCFunction)Sketch_get_key_size<AGMS64>, METH_NOARGS,
      "Returns the size of the key"
     },
+    {"get_rows", (PyCFunction)Sketch_get_rows<AGMS64>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<AGMS64>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -295,6 +319,8 @@ template static PyObject * Sketch_new<AGMS128>(PyTypeObject *, PyObject *, PyObj
 template static PyObject * Sketch_update<AGMS128,uint128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<AGMS128>(AGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<AGMS128>(AGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<AGMS128>(AGMS128* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -359,6 +385,12 @@ static PyMethodDef AGMS128_methods[] = {
     },
     {"get_key_size", (PyCFunction)Sketch_get_key_size<AGMS128>, METH_NOARGS,
      "Returns the size of the key"
+    },
+    {"get_rows", (PyCFunction)Sketch_get_rows<AGMS128>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<AGMS128>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
     },
     {NULL}  /* Sentinel */
 };
