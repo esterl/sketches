@@ -95,6 +95,7 @@ int main()
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch1->inner_join(sketch2) << 
                     std::endl;
+    std::cout << "Number of rows" << sketch1->get_num_rows() << std::endl;
     sketch1->clear();
     delete sketch1;
     delete sketch2;
@@ -131,6 +132,7 @@ int main()
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch3->inner_join(sketch4) << 
                     std::endl;
+    std::cout << "Number of rows" << sketch3->get_num_rows() << std::endl;
     sketch3->clear();
     delete sketch3;
     delete sketch4;
@@ -164,6 +166,7 @@ int main()
                     std::endl;
     std::cout << "Inner join of the sketch " << sketch5->inner_join(sketch6) << 
                     std::endl;
+    std::cout << "Number of rows" << sketch5->get_num_rows() << std::endl;
     sketch5->clear();
     delete sketch5;
     delete sketch6;
@@ -200,6 +203,7 @@ int main()
     sketch7->clear();
     std::cout << "Second moment of the sketch " << sketch7->second_moment() << 
                     std::endl;
+    std::cout << "Number of rows" << sketch7->get_num_rows() << std::endl;
     delete sketch8;
     delete sketch7;
     delete [] hashes;

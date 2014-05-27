@@ -1,7 +1,10 @@
 #ifndef SKETCHES_PY_AGMSSKETCH_H
 #define SKETCHES_PY_AGMSSKETCH_H
 
+#include <string.h>
+#include <stdexcept> 
 #include "py_sketches.h"
+#include "mersenne.h"
 
 /************************** AGMS sketch **********************************/
 template<typename T>
@@ -16,21 +19,40 @@ static int
 AGMS_init(AGMS<KeyType> *self, PyObject *args, PyObject *kwds)
 {
     unsigned int buckets, rows;
-    static char *kwlist[] = {"num_buckets", "num_rows", NULL};
+    const char * random_generator = "cw";
+    static char *kwlist[] = {"num_buckets", "num_rows","random_generator", NULL};
     
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|II", kwlist, &buckets, &rows))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
         return -1;
     
     // Generate num_rows random hashes:
-    Xi_CW4<KeyType, PrimeSpaceType>** xis;
-    xis = new Xi_CW4<KeyType, PrimeSpaceType>*[rows*buckets];
-    for (unsigned int i =0; i < rows*buckets; i++) {
-        xis[i] = new Xi_CW4<KeyType, PrimeSpaceType>();
+    Xi<KeyType> ** xis;
+    if (strcmp(random_generator, "cw") == 0) {
+        xis = (Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_CW4<KeyType, PrimeSpaceType>();
+        }
+    } else if (strcmp(random_generator, "bch5") == 0) {
+        xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_BCH5<KeyType>();
+        }
+    } else if (strcmp(random_generator, "bch3") == 0) {
+        xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_BCH3<KeyType>();
+        }
+    } else if (strcmp(random_generator, "eh3") == 0) {
+        xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_EH3<KeyType>();
+        }
+    } else {
+        throw std::invalid_argument("Unknown random generator type");
     }
-    
     // Create the sketch:
     if ( self == NULL ) return -1;
-    self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, (Xi<KeyType>**) xis);
+    self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, xis);
 
     return 0;
 }
@@ -129,9 +151,8 @@ static PyMethodDef AGMS16_methods[] = {
 
 /******************************** uint32_t ************************************/
 typedef AGMS<uint32_t> AGMS32;
-typedef ttmath::UInt<3> uint192;
 template static void Sketch_dealloc<AGMS32>(AGMS32*);
-template static int AGMS_init< uint32_t, uint192> (AGMS32 *, PyObject *, PyObject *);
+template static int AGMS_init< uint32_t, prime61_t> (AGMS32 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<AGMS32, AGMS_Sketch<uint32_t>, uint32_t>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<AGMS32>(AGMS32* , PyObject *, PyObject *);
@@ -180,7 +201,7 @@ static PyTypeObject AGMS32Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)AGMS_init<uint32_t, uint192 >,     /* tp_init */
+    (initproc)AGMS_init<uint32_t, prime61_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -220,7 +241,7 @@ static PyMethodDef AGMS32_methods[] = {
 /******************************** uint64_t ************************************/
 typedef AGMS<uint64_t> AGMS64;
 template static void Sketch_dealloc<AGMS64>(AGMS64*);
-template static int AGMS_init< uint64_t, uint192> (AGMS64 *, PyObject *, PyObject *);
+template static int AGMS_init< uint64_t, prime89_t> (AGMS64 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<AGMS64, AGMS_Sketch<uint64_t>, uint64_t>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<AGMS64>(AGMS64* , PyObject *, PyObject *);
@@ -269,7 +290,7 @@ static PyTypeObject AGMS64Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)AGMS_init<uint64_t, uint192 >,     /* tp_init */
+    (initproc)AGMS_init<uint64_t, prime89_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -306,11 +327,9 @@ static PyMethodDef AGMS64_methods[] = {
 };
 
 /******************************** uint128_t ************************************/
-typedef ttmath::UInt<2> uint128;
-typedef ttmath::UInt<17> uint1042;
 typedef AGMS<uint128> AGMS128;
 template static void Sketch_dealloc<AGMS128>(AGMS128*);
-template static int AGMS_init< uint128, uint1042> (AGMS128 *, PyObject *, PyObject *);
+template static int AGMS_init< uint128, prime521_t> (AGMS128 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<AGMS128, AGMS_Sketch<uint128>, uint128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<AGMS128>(AGMS128* , PyObject *, PyObject *);
@@ -359,7 +378,7 @@ static PyTypeObject AGMS128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)AGMS_init<uint128, uint1042 >,     /* tp_init */
+    (initproc)AGMS_init<uint128, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };

@@ -1,7 +1,10 @@
 #ifndef SKETCHES_PY_FAGMSSKETCH_H
 #define SKETCHES_PY_FAGMSSKETCH_H
 
+#include <string.h>
+#include <stdexcept> 
 #include "py_sketches.h"
+#include "mersenne.h"
 
 /************************** FAGMS sketch **********************************/
 template<typename T>
@@ -16,9 +19,10 @@ static int
 FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
 {
     unsigned int buckets, rows;
-    static char *kwlist[] = {"num_buckets", "num_rows", NULL};
+    const char * random_generator = "cw";
+    static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
     
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|II", kwlist, &buckets, &rows))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
         return -1;
     
     // Generate num_rows random hashes:
@@ -29,16 +33,35 @@ FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
     }
     
     // Generate num_rows random variables:
-    Xi_CW4<KeyType, PrimeSpaceType>** xis;
-    xis = new Xi_CW4<KeyType, PrimeSpaceType>*[rows];
-    for (unsigned int i =0; i < rows; i++) {
-        xis[i] = new Xi_CW4<KeyType, PrimeSpaceType>();
+    Xi<KeyType> ** xis;
+    if (strcmp(random_generator, "cw") == 0) {
+        xis =(Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_CW4<KeyType, PrimeSpaceType>();
+        }
+    } else if (strcmp(random_generator, "bch5") == 0) {
+        xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_BCH5<KeyType>();
+        }
+    } else if (strcmp(random_generator, "bch3") == 0) {
+        xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_BCH3<KeyType>();
+        }
+    } else if (strcmp(random_generator, "eh3") == 0) {
+        xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows*buckets];
+        for (unsigned int i =0; i < rows*buckets; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_EH3<KeyType>();
+        }
+    }else {
+        throw std::invalid_argument("Unknown random generator type");
     }
     
     // Create the sketch:
     if ( self == NULL ) return -1;
     self->sketch = new FAGMS_Sketch<KeyType>(buckets, rows, 
-                            (Hash<KeyType>**) hashes, (Xi<KeyType>**) xis);
+                            (Hash<KeyType>**) hashes, xis);
 
     return 0;
 }
@@ -137,9 +160,8 @@ static PyMethodDef FAGMS16_methods[] = {
 
 /******************************** uint32_t ************************************/
 typedef FAGMS<uint32_t> FAGMS32;
-typedef ttmath::UInt<3> uint192;
 template static void Sketch_dealloc<FAGMS32>(FAGMS32*);
-template static int FAGMS_init< uint32_t, uint192> (FAGMS32 *, PyObject *, PyObject *);
+template static int FAGMS_init< uint32_t, prime61_t> (FAGMS32 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FAGMS32, FAGMS_Sketch<uint32_t>, uint32_t>(FAGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
@@ -188,7 +210,7 @@ static PyTypeObject FAGMS32Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FAGMS_init<uint32_t, uint192 >,     /* tp_init */
+    (initproc)FAGMS_init<uint32_t, prime61_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -228,7 +250,7 @@ static PyMethodDef FAGMS32_methods[] = {
 /******************************** uint64_t ************************************/
 typedef FAGMS<uint64_t> FAGMS64;
 template static void Sketch_dealloc<FAGMS64>(FAGMS64*);
-template static int FAGMS_init< uint64_t, uint192> (FAGMS64 *, PyObject *, PyObject *);
+template static int FAGMS_init< uint64_t, prime89_t> (FAGMS64 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FAGMS64, FAGMS_Sketch<uint64_t>, uint64_t>(FAGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
@@ -277,7 +299,7 @@ static PyTypeObject FAGMS64Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FAGMS_init<uint64_t, uint192 >,     /* tp_init */
+    (initproc)FAGMS_init<uint64_t, prime89_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -314,11 +336,9 @@ static PyMethodDef FAGMS64_methods[] = {
 };
 
 /******************************** uint128_t ************************************/
-typedef ttmath::UInt<2> uint128;
-typedef ttmath::UInt<17> uint1042;
 typedef FAGMS<uint128> FAGMS128;
 template static void Sketch_dealloc<FAGMS128>(FAGMS128*);
-template static int FAGMS_init< uint128, uint1042> (FAGMS128 *, PyObject *, PyObject *);
+template static int FAGMS_init< uint128, prime521_t> (FAGMS128 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FAGMS128, FAGMS_Sketch<uint128>, uint128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
@@ -367,7 +387,7 @@ static PyTypeObject FAGMS128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FAGMS_init<uint128, uint1042 >,     /* tp_init */
+    (initproc)FAGMS_init<uint128, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };

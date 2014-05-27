@@ -1,7 +1,10 @@
 #ifndef SKETCHES_PY_FASTCOUNTSKETCH_H
 #define SKETCHES_PY_FASTCOUNTSKETCH_H
 
+#include <string.h>
+#include <stdexcept> 
 #include "py_sketches.h"
+#include "mersenne.h"
 
 /************************** FastCount sketch **********************************/
 template<typename T>
@@ -16,21 +19,26 @@ static int
 FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
 {
     unsigned int buckets, rows;
-    static char *kwlist[] = {"num_buckets", "num_rows", NULL};
+    const char * random_generator = "cw";
+    static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
     
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|II", kwlist, &buckets, &rows))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
         return -1;
     
     // Generate num_rows random hashes:
-    Hash_CW4<KeyType, PrimeSpaceType>** hashes;
-    hashes = new Hash_CW4<KeyType, PrimeSpaceType>*[rows];
-    for (unsigned int i =0; i < rows; i++) {
-        hashes[i] = new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
-    }
+    Hash<KeyType>** hashes;
     
+    if (strcmp(random_generator, "cw") == 0) {
+        hashes = (Hash<KeyType>**) new Hash_CW4<KeyType, PrimeSpaceType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
+            hashes[i] = (Hash<KeyType>*) new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
+        }
+    } else {
+        throw std::invalid_argument("Unknown random generator type");
+    }
     // Create the sketch:
     if ( self == NULL ) return -1;
-    self->sketch = new FastCount_Sketch<KeyType>(buckets, rows, (Hash<KeyType>**) hashes);
+    self->sketch = new FastCount_Sketch<KeyType>(buckets, rows, hashes);
 
     return 0;
 }
@@ -129,9 +137,8 @@ static PyMethodDef FastCount16_methods[] = {
 
 /******************************** uint32_t ************************************/
 typedef FastCount<uint32_t> FastCount32;
-typedef ttmath::UInt<3> uint192;
 template static void Sketch_dealloc<FastCount32>(FastCount32*);
-template static int FastCount_init< uint32_t, uint192> (FastCount32 *, PyObject *, PyObject *);
+template static int FastCount_init< uint32_t, prime61_t> (FastCount32 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FastCount32, FastCount_Sketch<uint32_t>, uint32_t>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FastCount32>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FastCount32>(FastCount32* , PyObject *, PyObject *);
@@ -180,7 +187,7 @@ static PyTypeObject FastCount32Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FastCount_init<uint32_t, uint192 >,     /* tp_init */
+    (initproc)FastCount_init<uint32_t, prime61_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -220,7 +227,7 @@ static PyMethodDef FastCount32_methods[] = {
 /******************************** uint64_t ************************************/
 typedef FastCount<uint64_t> FastCount64;
 template static void Sketch_dealloc<FastCount64>(FastCount64*);
-template static int FastCount_init< uint64_t, uint192> (FastCount64 *, PyObject *, PyObject *);
+template static int FastCount_init< uint64_t, prime61_t> (FastCount64 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FastCount64, FastCount_Sketch<uint64_t>, uint64_t>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FastCount64>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FastCount64>(FastCount64* , PyObject *, PyObject *);
@@ -269,7 +276,7 @@ static PyTypeObject FastCount64Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FastCount_init<uint64_t, uint192 >,     /* tp_init */
+    (initproc)FastCount_init<uint64_t, prime61_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -306,11 +313,9 @@ static PyMethodDef FastCount64_methods[] = {
 };
 
 /******************************** uint128_t ************************************/
-typedef ttmath::UInt<2> uint128;
-typedef ttmath::UInt<17> uint1042;
 typedef FastCount<uint128> FastCount128;
 template static void Sketch_dealloc<FastCount128>(FastCount128*);
-template static int FastCount_init< uint128, uint1042> (FastCount128 *, PyObject *, PyObject *);
+template static int FastCount_init< uint128, prime521_t> (FastCount128 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FastCount128, FastCount_Sketch<uint128>, uint128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FastCount128>(FastCount128* , PyObject *, PyObject *);
@@ -359,7 +364,7 @@ static PyTypeObject FastCount128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FastCount_init<uint128, uint1042 >,     /* tp_init */
+    (initproc)FastCount_init<uint128, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };

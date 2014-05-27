@@ -1,7 +1,10 @@
 #ifndef SKETCHES_PY_COUNTMINSKETCH_H
 #define SKETCHES_PY_COUNTMINSKETCH_H
 
+#include <string.h> 
+#include <stdexcept> 
 #include "py_sketches.h"
+#include "mersenne.h"
 
 /************************** CountMin sketch **********************************/
 template<typename T>
@@ -16,21 +19,27 @@ static int
 CountMin_init(CountMin<KeyType> *self, PyObject *args, PyObject *kwds)
 {
     unsigned int buckets, rows;
+    const char * random_generator = "cw";
     static char *kwlist[] = {"num_buckets", "num_rows", NULL};
     
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|II", kwlist, &buckets, &rows))
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
         return -1;
     
     // Generate num_rows random hashes:
-    Hash_CW2<KeyType, PrimeSpaceType>** hashes;
-    hashes = new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
-    for (unsigned int i =0; i < rows; i++) {
-        hashes[i] = new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
+    Hash<KeyType>** hashes;
+    
+    if (strcmp(random_generator, "cw") == 0) {
+        hashes = (Hash<KeyType>**) new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
+            hashes[i] = (Hash<KeyType>*) new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
+        }
+    } else {
+        throw std::invalid_argument("Unknown random generator type");
     }
     
     // Create the sketch:
     if ( self == NULL ) return -1;
-    self->sketch = new CountMin_Sketch<KeyType>(buckets, rows, (Hash<KeyType>**) hashes);
+    self->sketch = new CountMin_Sketch<KeyType>(buckets, rows, hashes);
 
     return 0;
 }
@@ -129,9 +138,8 @@ static PyMethodDef CountMin16_methods[] = {
 
 /******************************** uint32_t ************************************/
 typedef CountMin<uint32_t> CountMin32;
-typedef ttmath::UInt<3> uint192;
 template static void Sketch_dealloc<CountMin32>(CountMin32*);
-template static int CountMin_init< uint32_t, uint192> (CountMin32 *, PyObject *, PyObject *);
+template static int CountMin_init< uint32_t, prime61_t> (CountMin32 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<CountMin32, CountMin_Sketch<uint32_t>, uint32_t>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<CountMin32>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<CountMin32>(CountMin32* , PyObject *, PyObject *);
@@ -180,7 +188,7 @@ static PyTypeObject CountMin32Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)CountMin_init<uint32_t, uint192 >,     /* tp_init */
+    (initproc)CountMin_init<uint32_t, prime61_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -220,7 +228,7 @@ static PyMethodDef CountMin32_methods[] = {
 /******************************** uint64_t ************************************/
 typedef CountMin<uint64_t> CountMin64;
 template static void Sketch_dealloc<CountMin64>(CountMin64*);
-template static int CountMin_init< uint64_t, uint192> (CountMin64 *, PyObject *, PyObject *);
+template static int CountMin_init< uint64_t, prime89_t> (CountMin64 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<CountMin64, CountMin_Sketch<uint64_t>, uint64_t>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<CountMin64>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<CountMin64>(CountMin64* , PyObject *, PyObject *);
@@ -269,7 +277,7 @@ static PyTypeObject CountMin64Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)CountMin_init<uint64_t, uint192 >,     /* tp_init */
+    (initproc)CountMin_init<uint64_t, prime89_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
@@ -306,11 +314,9 @@ static PyMethodDef CountMin64_methods[] = {
 };
 
 /******************************** uint128_t ************************************/
-typedef ttmath::UInt<2> uint128;
-typedef ttmath::UInt<17> uint1042;
 typedef CountMin<uint128> CountMin128;
 template static void Sketch_dealloc<CountMin128>(CountMin128*);
-template static int CountMin_init< uint128, uint1042> (CountMin128 *, PyObject *, PyObject *);
+template static int CountMin_init< uint128, prime521_t> (CountMin128 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<CountMin128, CountMin_Sketch<uint128>, uint128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<CountMin128>(CountMin128* , PyObject *, PyObject *);
@@ -359,7 +365,7 @@ static PyTypeObject CountMin128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)CountMin_init<uint128, uint1042 >,     /* tp_init */
+    (initproc)CountMin_init<uint128, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };

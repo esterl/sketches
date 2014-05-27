@@ -1,15 +1,15 @@
 #ifndef SKETCHES_UTILS_H
 #define SKETCHES_UTILS_H
 
-#include <string>
 #include <Python.h>
+#include <stdlib.h>
 
 uint64_t PyObjectToNumber(PyObject *py_num){
     uint64_t result=0;
     if (PyInt_Check(py_num)){
         result = PyInt_AsLong(py_num);
     } else if (PyString_Check(py_num)){
-        result = std::stoull(PyString_AsString(py_num));
+        result = strtoul(PyString_AsString(py_num),NULL,0);
     }
     return result;
 }

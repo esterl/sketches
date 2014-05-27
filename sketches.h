@@ -127,8 +127,6 @@ template<typename T>
 class FastCount_Sketch : public Sketch<T>
 {
     protected:
-        unsigned int num_buckets;
-        unsigned int num_rows;
         double *sketch_elem;
         Hash<T> **hashes;
 
@@ -166,8 +164,6 @@ template<typename T>
 class CountMin_Sketch : public Sketch<T>
 {
     protected:
-        unsigned int num_buckets;
-        unsigned int num_rows;
         double *sketch_elem;
         Hash<T> **hashes;
 

@@ -30,4 +30,10 @@ inline int get_mersenne_exponent(){
         throw std::domain_error("Element type two long");
     return mersenne_exponent;
 }
+
+//Define types associated with each prime and uint128
+typedef ttmath::UInt<2> uint128;
+typedef ttmath::UInt<2> prime61_t;
+typedef ttmath::UInt<3> prime89_t;
+typedef ttmath::UInt<17> prime521_t;
 #endif //SKETCHES_MERSENNE_H

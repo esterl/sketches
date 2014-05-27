@@ -449,8 +449,8 @@ CountMin_Sketch<T>::CountMin_Sketch(CountMin_Sketch<T> * copy)
     this->num_rows = copy->num_rows;
     
     // Copy hashes:
-    hashes = new Hash<T>*[num_rows];
-    for (unsigned int i =0; i < num_rows; i++) {
+    hashes = new Hash<T>*[this->num_rows];
+    for (unsigned int i =0; i < this->num_rows; i++) {
         hashes[i] = copy->hashes[i]->copy();
     }
     
@@ -482,7 +482,7 @@ template<typename T>
 void CountMin_Sketch<T>::update(T key, double weight)
 {
 
-    for (unsigned int i = 0; i < num_rows; i++)
+    for (unsigned int i = 0; i < this->num_rows; i++)
     {
         int bucket = (int)hashes[i]->element(key);
         sketch_elem[i * this->num_cols + bucket] += weight;
@@ -524,7 +524,7 @@ double CountMin_Sketch<T>::first_moment()
             basic_est[i] += std::abs(sketch_elem[j]);
     }
 
-    double result = min(basic_est, num_rows);
+    double result = min(basic_est, this->num_rows);
     delete [] basic_est;
     return result;
 }
@@ -533,7 +533,7 @@ template<typename T>
 Sketch<T>* CountMin_Sketch<T>::difference(Sketch<T>* other)
 {
     CountMin_Sketch<T>* diff_sketch = new CountMin_Sketch<T>(this->num_cols, 
-                                                    num_rows, hashes);
+                                                    this->num_rows, hashes);
     for (int i = 0; i < this->num_rows*this->num_cols; i++)
         diff_sketch->sketch_elem[i] = sketch_elem[i] - 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[i];
