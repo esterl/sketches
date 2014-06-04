@@ -20,7 +20,7 @@ CountMin_init(CountMin<KeyType> *self, PyObject *args, PyObject *kwds)
 {
     unsigned int buckets, rows;
     const char * random_generator = "cw";
-    static char *kwlist[] = {"num_buckets", "num_rows", NULL};
+    static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
     
     if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
         return -1;

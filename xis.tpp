@@ -83,14 +83,14 @@ Xi_EH3<T>::~Xi_EH3()
 template<typename T>
 int Xi_EH3<T>::element(T j)
 {
-    T maskA = 0xAAAAAAAA;
-    T mask32 = 0xFFFFFFFF;
+    uint64_t maskA = 0xAAAAAAAAAAAAAAAA;
+    uint64_t mask32 = 0xFFFFFFFFFFFFFFFF;
     unsigned int p_res = 0;
     T temp = j;
-    for (int i = 0; i <= sizeof(T)*8/32; i++){
-        T current = temp & mask32;
-        p_res ^= seq_xor((seeds[1]&current) ^ (current & (current<<1) & maskA));
-        temp = temp >> 32;
+    for (int i = 0; i <= sizeof(T)*8/64; i++){
+        T current = temp & (T) mask32;
+        p_res ^= seq_xor((seeds[1]&current) ^ (current & (current<<1) & (T) maskA));
+        temp = temp >> 64;
     }
     unsigned int res = int(seeds[0]) ^ p_res;
     if (res == 0) return -1;

@@ -19,15 +19,15 @@ dif.first_moment()
 
 sketch = sketches.FastCount64(16,16)
 net_sketch = NetworkSketch(sketch)
-results1 = test_corrupt(net_sketch, 16, 16, max_tests=1)
+results1 = test_corrupt(net_sketch, max_tests=1)
 
 sketch = sketches.AGMS64(16,16)
 net_sketch = NetworkSketch(sketch)
-results2 = test_corrupt(net_sketch, 16, 16, max_tests=1)
+results2 = test_corrupt(net_sketch, max_tests=1)
 
 sketch = sketches.CountMin64(16,16)
 net_sketch = NetworkSketch(sketch)
-results3 = test_corrupt(net_sketch, 16, 16, max_tests=1)
+results3 = test_corrupt(net_sketch, max_tests=1)
 """
 ############################ Different hash size ###############################
 # Test FastCount8:
