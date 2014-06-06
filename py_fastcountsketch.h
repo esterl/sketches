@@ -33,6 +33,11 @@ FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
         for (unsigned int i =0; i < rows; i++) {
             hashes[i] = (Hash<KeyType>*) new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
         }
+    } else if (strcmp(random_generator, "tab") == 0) {
+        hashes = (Hash<KeyType>**) new Hash_Tab<KeyType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
+            hashes[i] = (Hash<KeyType>*) new Hash_Tab<KeyType>(buckets);
+        }
     } else {
         throw std::invalid_argument("Unknown random generator type");
     }
