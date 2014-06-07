@@ -77,7 +77,7 @@ AGMS_Sketch<T>::AGMS_Sketch(unsigned int cols, unsigned int rows, Xi<T> **xis)
     this->num_cols = cols;
     
     this->xis = new Xi<T>*[rows*cols];
-    this->sketch_elem = new int16_t[rows * cols];
+    this->sketch_elem = new int32_t[rows * cols];
     for (int i = 0; i < rows * cols; i++) {
         this->sketch_elem[i] = 0.0;
         this->xis[i] = xis[i]->copy();
@@ -91,7 +91,7 @@ AGMS_Sketch<T>::AGMS_Sketch(AGMS_Sketch<T>* copy)
     this->num_cols = copy->num_cols;
     
     this->xis = new Xi<T>*[this->num_rows * this->num_cols];
-    this->sketch_elem = new int16_t[this->num_rows * this->num_cols];
+    this->sketch_elem = new int32_t[this->num_rows * this->num_cols];
     for (int i = 0; i < this->num_rows * this->num_cols; i++) {
         this->sketch_elem[i] = copy->sketch_elem[i];
         this->xis[i] = copy->xis[i]->copy();
@@ -119,7 +119,7 @@ template<typename T>
 void AGMS_Sketch<T>::update(T key, double weight)
 {
     for (int i = 0; i < this->num_rows * this->num_cols; i++)
-        sketch_elem[i] += int16_t(xis[i]->element(key)) * weight;
+        sketch_elem[i] += int32_t(xis[i]->element(key)) * weight;
 }
 
 template<typename T>
@@ -196,7 +196,7 @@ FAGMS_Sketch<T>::FAGMS_Sketch(unsigned int buckets, unsigned int rows,
         this->xis[i] = xis[i]->copy();
     }
     
-    this->sketch_elem = new int16_t[buckets*rows];
+    this->sketch_elem = new int32_t[buckets*rows];
     for (int i = 0; i < buckets*rows; i++)
         this->sketch_elem[i] = 0.0;
 }
@@ -214,7 +214,7 @@ FAGMS_Sketch<T>::FAGMS_Sketch(FAGMS_Sketch<T> *copy)
         xis[i] = copy->xis[i]->copy();
     }
     
-    sketch_elem = new int16_t[this->num_cols*this->num_rows];
+    sketch_elem = new int32_t[this->num_cols*this->num_rows];
     for (int i = 0; i < this->num_cols*this->num_rows; i++)
         sketch_elem[i] = copy->sketch_elem[i];
 }
@@ -313,7 +313,7 @@ FastCount_Sketch<T>::FastCount_Sketch(unsigned int buckets, unsigned int rows,
     for (unsigned int i =0; i < rows; i++) {
         this->hashes[i] = hashes[i]->copy();
     }
-    this->sketch_elem = new int16_t[buckets*rows];
+    this->sketch_elem = new int32_t[buckets*rows];
     for (unsigned int i = 0; i < buckets * rows; i++)
         this->sketch_elem[i] = 0.0;
 }
@@ -330,7 +330,7 @@ FastCount_Sketch<T>::FastCount_Sketch(FastCount_Sketch<T> *copy)
         hashes[i] = copy->hashes[i]->copy();
     }
     
-    this->sketch_elem = new int16_t[this->num_cols*this->num_rows];
+    this->sketch_elem = new int32_t[this->num_cols*this->num_rows];
     for (unsigned int i = 0; i < this->num_cols * this->num_rows; i++)
         this->sketch_elem[i] = copy->sketch_elem[i];
 }
@@ -437,7 +437,7 @@ CountMin_Sketch<T>::CountMin_Sketch(unsigned int buckets, unsigned int rows,
         this->hashes[i] = hashes[i]->copy();
     }
     
-    this->sketch_elem = new int16_t[buckets * rows];
+    this->sketch_elem = new int32_t[buckets * rows];
     for (unsigned int i = 0; i < buckets * rows; i++)
         this->sketch_elem[i] = 0.0;
 }
@@ -454,7 +454,7 @@ CountMin_Sketch<T>::CountMin_Sketch(CountMin_Sketch<T> * copy)
         hashes[i] = copy->hashes[i]->copy();
     }
     
-    this->sketch_elem = new int16_t[this->num_cols*this->num_rows];
+    this->sketch_elem = new int32_t[this->num_cols*this->num_rows];
     for (unsigned int i = 0; i < this->num_cols * this->num_rows; i++)
         this->sketch_elem[i] = copy->sketch_elem[i];
 }
