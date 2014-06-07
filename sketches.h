@@ -57,7 +57,7 @@ template<typename T>
 class AGMS_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
+        int8_t *sketch_elem;
         Xi<T> **xis;
 
 
@@ -92,7 +92,7 @@ template<typename T>
 class FAGMS_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
+        int8_t *sketch_elem;
         Hash<T> **hashes;
         Xi<T> **xis;
 
@@ -127,7 +127,7 @@ template<typename T>
 class FastCount_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
+        int8_t *sketch_elem;
         Hash<T> **hashes;
 
 
@@ -164,7 +164,7 @@ template<typename T>
 class CountMin_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
+        int8_t *sketch_elem;
         Hash<T> **hashes;
 
     public:
