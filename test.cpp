@@ -53,54 +53,58 @@ int main()
 
 /**********************Testing Hash.h implementation***************************/
 
-    Hash_CW2<bigint, bigint2> hash1 = Hash_CW2<bigint, bigint2>(4, 36, 16);
+    Hash_CW2<bigint, bigint2> hash1 = Hash_CW2<bigint, bigint2>(16, 4, 36);
     unsigned int result2 = hash1.element(2500);
     std::cout << "Result of applying CW 2-wise independent with I1=4, " <<
                     "I2=36 and 16 buckets over 2500(should be 4): " << 
                     result2 << std::endl;
     
-    Hash_CW4<uint16_t, uint64_t> hash2 = Hash_CW4<uint16_t, uint64_t>(4, 36, 2, 1, 16);
+    Hash_CW4<uint16_t, uint64_t> hash2 = Hash_CW4<uint16_t, uint64_t>(16, 4, 36, 2, 1);
     result2 = hash2.element(2500);
     std::cout << "Result of applying CW 4-wise independent with I1=4, " <<
                     "I2=36, I3=2, I4=1 and 16 buckets over 2500 " << 
                     "(should be 14): " << result2 << std::endl;
     
-    Hash_CW4<uint128, prime521_t> hash3 = Hash_CW4<uint128, prime521_t>(4, "10008304909439366572452194336228476807", 2, 1, 16);
+    Hash_CW4<uint128_t, prime521_t> hash3 = Hash_CW4<uint128_t, prime521_t>(16, 4, "10008304909439366572452194336228476807", 2, 1);
     result2 = hash3.element("123451455555555333333333304222");
     std::cout << "Result of applying CW 4-wise independent with I1=4, " <<
                     "I2=10008304909439366572452194336228476807, I3=2, I4=1 and 16 buckets over 123451455555555333333333304222 " << 
                     "(should be 6): " << result2 << std::endl;
     
-    Hash_Tab<uint16_t> hash4 = Hash_Tab<uint16_t>(4, 36, 2, 1, 16);
+    Hash_Tab<uint16_t> hash4 = Hash_Tab<uint16_t>(16, 4, 36, 2, 1);
     result2 = hash4.element(2500);
     std::cout << "Result of applying CW 4-wise independent with I1=4, " <<
                     "I2=36, I3=2, I4=1 and 16 buckets over 2500 " << 
                     "(should be 14): " << result2 << std::endl;
     
-    prime61_t s0[4];
+    prime31_t s0[4];
     s0[0] = 4; s0[1] = 36; s0[2] = 2; s0[3] = 1;
-    prime61_t s1[4];
+    prime31_t s1[4];
     s1[0] = 33; s1[1] = 3; s1[2] = 44; s1[3] = 0;
-    prime61_t s2[4];
+    prime31_t s2[4];
     s2[0] = 4; s2[1] = 2444; s2[2] = 23; s2[3] = 4;
     
-    Hash_Tab<uint32_t> hash5 = Hash_Tab<uint32_t>(s0, s1, s2, 16);
+    Hash_Tab<uint32_t> hash5 = Hash_Tab<uint32_t>(16, s0, s1, s2);
     result2 = hash5.element(2500);
     std::cout << "Result of applying TabHash over 2500 " << 
                     "(should be 13): " << result2 << std::endl;
     
     
-    prime61_t s3[4];
+    prime31_t s3[4];
     s3[0] = 1466; s3[1] = 1; s3[2] = 8756; s3[3] = 1;
-    prime61_t s4[4];
+    prime31_t s4[4];
     s4[0] = 6; s4[1] = 49; s4[2] = 59; s4[3] = 2;
-    prime61_t s5[4];
+    prime31_t s5[4];
     s5[0] = 90; s5[1] = 78; s5[2] = 88; s5[3] = 3;
-    prime61_t s6[4];
+    prime31_t s6[4];
     s6[0] = 68; s6[1] = 588; s6[2] = 789; s6[3] = 8;
     
-    Hash_Tab<uint64_t> hash6 = Hash_Tab<uint64_t>(s0, s1, s2, s3, s4, s5, s6, 16);
+    Hash_Tab<uint64_t> hash6 = Hash_Tab<uint64_t>(16, s0, s1, s2, s3, s4, s5, s6);
     result2 = hash6.element(2500);
+    Hash_Tab<uint64_t> hash7 = Hash_Tab<uint64_t>(16, s0, s1, s2, s3, s4, s5, s6);
+    std::cout << "Result of applying TabHash over 2500 " << 
+                    "(should be 10): " << result2 << std::endl;
+    result2 = hash7.element(2500);
     std::cout << "Result of applying TabHash over 2500 " << 
                     "(should be 10): " << result2 << std::endl;
 

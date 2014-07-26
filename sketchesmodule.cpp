@@ -65,6 +65,11 @@ initsketches(void)
     if (PyType_Ready(&CountMin128Type) < 0)
         return;
 
+    AGMS8Type.tp_new = Sketch_new<AGMS8>;
+    AGMS8Type.tp_methods = AGMS8_methods;
+    if (PyType_Ready(&AGMS8Type) < 0)
+        return;
+
     AGMS16Type.tp_new = Sketch_new<AGMS16>;
     AGMS16Type.tp_methods = AGMS16_methods;
     if (PyType_Ready(&AGMS16Type) < 0)
@@ -126,10 +131,12 @@ initsketches(void)
     PyModule_AddObject(m, "CountMin64", (PyObject *)&CountMin64Type);
     PyModule_AddObject(m, "CountMin128", (PyObject *)&CountMin128Type);
 
+    Py_INCREF(&AGMS8Type);
     Py_INCREF(&AGMS16Type);
     Py_INCREF(&AGMS32Type);
     Py_INCREF(&AGMS64Type);
     Py_INCREF(&AGMS128Type);
+    PyModule_AddObject(m, "AGMS8", (PyObject *)&AGMS8Type);
     PyModule_AddObject(m, "AGMS16", (PyObject *)&AGMS16Type);
     PyModule_AddObject(m, "AGMS32", (PyObject *)&AGMS32Type);
     PyModule_AddObject(m, "AGMS64", (PyObject *)&AGMS64Type);

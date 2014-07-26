@@ -4,8 +4,9 @@
 #include <stdint.h>
 
 #include "mersenne.h"
+#include "cauchy.h"
 /* Generating schemes for different types of {B} random variables (or hashes to
-   the output space B={0..B-1}). B should be representable with an unsigned int.
+   the output space B={0..B-1}). B should be representable with an unsigned.
    Based on the implementation by F. Rusu at:
    http://www.cise.ufl.edu/~frusu/code.html
    More details can be found on:
@@ -20,7 +21,7 @@
    operations should be defined for T: 
     * operator+
     * operator>>
-    * operator unsigned int
+    * operator unsigned
     * operator ^=
     * operator &
     * operator *
@@ -30,7 +31,7 @@ template<typename T>
 class Hash
 {
     public:
-        virtual unsigned int element(T j) = 0;
+        virtual unsigned element(T j) = 0;
         virtual Hash<T>* copy() {return NULL;};
         virtual ~Hash(){};
 };
@@ -45,14 +46,14 @@ template<typename T1, typename T2>
 class Hash_CW2: Hash<T1>{
     protected:
         T2 seeds[2];
-        unsigned int num_buckets;
-        unsigned int mersenne_exponent;
+        unsigned mask;
+        unsigned mersenne_exponent;
 
     public:
-        Hash_CW2(T2 I1, T2 I2, unsigned int B);
-        Hash_CW2(unsigned int B);
+        Hash_CW2(unsigned B, T2 seed0, T2 seed1);
+        Hash_CW2(unsigned B) : Hash_CW2(B, random<T2>(), random<T2>()){};
 
-        virtual unsigned int element(T1 j);
+        virtual unsigned element(T1 j);
         virtual Hash<T1>* copy();
         
         virtual ~Hash_CW2();
@@ -65,14 +66,17 @@ template<typename T1, typename T2>
 class Hash_CW4: Hash<T1> {
     protected:
         T2 seeds[4];
-        unsigned int num_buckets;
-        unsigned int mersenne_exponent;
+        unsigned mask;
+        unsigned mersenne_exponent;
 
     public:
-        Hash_CW4(T2 I1, T2 I2, T2 I3, T2 I4, unsigned int B);
-        Hash_CW4(unsigned int B);
+        Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3);
+        Hash_CW4(unsigned B) : Hash_CW4(B, random<T2>(), random<T2>(), 
+                                                random<T2>(), random<T2>()) {};
+        Hash_CW4(unsigned B, T2 *seeds) : Hash_CW4(B, seeds[0], seeds[1], 
+                                                seeds[2], seeds[3]) {};
 
-        virtual unsigned int element(T1 j);
+        virtual unsigned element(T1 j);
         virtual Hash<T1>* copy();
 
         virtual ~Hash_CW4();
@@ -80,17 +84,32 @@ class Hash_CW4: Hash<T1> {
 
 /* Tabulated Hashing as presented by Mikkel Thorup and Yin Zhang in "Tabulation
    Based 4-Universal Hashing with Applications to Second Moment Estimation" for
-   generating 4-wise independent random variables from {B}.*/
+   generating 4-wise independent random variables from {B}. We expect B to be a
+   power of 2 below 2^16, so that the pre-computed tables can be kept smaller.*/
 template<typename T>
 class Hash_Tab: Hash<T>{
-    protected:
-        unsigned int num_buckets;
-
     public:
         Hash_Tab(unsigned B);
 
-        virtual unsigned int element(T j);
+        virtual unsigned element(T j);
         virtual Hash<T>* copy();
+        
+        virtual ~Hash_Tab();
+};
+
+template<>
+class Hash_Tab<uint8_t>: Hash<uint8_t>{
+    protected:
+        uint16_t * table;
+
+    public:
+        Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2, prime13_t seed3);
+        Hash_Tab(unsigned B) : Hash_Tab(B, random<prime13_t>(), random<prime13_t>(), 
+                                            random<prime13_t>(), random<prime13_t>()) {};
+        Hash_Tab();
+        
+        virtual unsigned element(uint8_t j);
+        virtual Hash<uint8_t>* copy();
         
         virtual ~Hash_Tab();
 };
@@ -98,15 +117,15 @@ class Hash_Tab: Hash<T>{
 template<>
 class Hash_Tab<uint16_t>: Hash<uint16_t>{
     protected:
-        unsigned int num_buckets;
         uint16_t* table;
 
     public:
-        Hash_Tab(uint64_t I1, uint64_t I2, uint64_t I3, uint64_t I4, unsigned int B);
-        Hash_Tab(unsigned B);
+        Hash_Tab(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2, prime17_t s3);
+        Hash_Tab(unsigned B) : Hash_Tab(B, random<prime17_t>(), random<prime17_t>(),
+                                            random<prime17_t>(), random<prime17_t>()) {};
         Hash_Tab();
         
-        virtual unsigned int element(uint16_t j);
+        virtual unsigned element(uint16_t j);
         virtual Hash<uint16_t>* copy();
         
         virtual ~Hash_Tab();
@@ -115,15 +134,15 @@ class Hash_Tab<uint16_t>: Hash<uint16_t>{
 template<>
 class Hash_Tab<uint32_t>: Hash<uint32_t>{
     protected:
-        unsigned int num_buckets;
+        unsigned mask;
         uint16_t *T0, *T1, *T2;
 
     public:
-        Hash_Tab(prime61_t* seeds0, prime61_t* seeds1, prime61_t* seeds2, unsigned int B);
-        Hash_Tab(unsigned B);
+        Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2);
+        Hash_Tab(unsigned B): Hash_Tab(B, NULL, NULL, NULL){};
         Hash_Tab();
         
-        virtual unsigned int element(uint32_t j);
+        virtual unsigned element(uint32_t j);
         virtual Hash<uint32_t>* copy();
         
         virtual ~Hash_Tab();
@@ -132,37 +151,42 @@ class Hash_Tab<uint32_t>: Hash<uint32_t>{
 template<>
 class Hash_Tab<uint64_t>: Hash<uint64_t>{
     protected:
-        unsigned int num_buckets;
+        unsigned mask;
         uint16_t *T0, *T1, *T2, *T3, *T4, *T5, *T6;
         uint64_t **cauchy;
-
+        uint64_t** getCauchy();
+    
     public:
-        Hash_Tab(prime61_t* seeds0, prime61_t* seeds1, prime61_t* seeds2, 
-                    prime61_t* seeds3, prime61_t* seeds4, prime61_t* seeds5, 
-                    prime61_t* seeds6, unsigned int B);
+        Hash_Tab(unsigned B, prime31_t* seeds0, prime31_t* seeds1, prime31_t* seeds2, 
+                    prime31_t* seeds3, prime31_t* seeds4, prime31_t* seeds5, 
+                    prime31_t* seeds6);
         Hash_Tab(unsigned B);
         Hash_Tab();
         
-        virtual unsigned int element(uint64_t j);
+        virtual unsigned element(uint64_t j);
         virtual Hash<uint64_t>* copy();
         
         virtual ~Hash_Tab();
 };
 
 template<>
-class Hash_Tab<uint128>: Hash<uint128>{
+class Hash_Tab<uint128_t>: Hash<uint128_t>{
     protected:
-        unsigned int num_buckets;
+        uint16_t **T;
+        unsigned mask;
+        CauchyRow* cauchy;
+        CauchyRow* getCauchy();
 
     public:
-        Hash_Tab(unsigned B){ num_buckets = B;};
+        Hash_Tab(unsigned B, prime31_t** seeds=NULL);
         Hash_Tab(){};
         
-        unsigned int element(uint128 j){ return 0;};
-        Hash<uint128>* copy(){ };
+        unsigned element(uint128_t j);
+        Hash<uint128_t>* copy();
         
-        ~Hash_Tab(){};
+        ~Hash_Tab();
 };
+
 #include "hash.tpp"
 
 #endif // SKETCHES_HASH_H

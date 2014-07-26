@@ -313,16 +313,16 @@ static PyMethodDef CountMin64_methods[] = {
     {NULL}  /* Sentinel */
 };
 
-/******************************** uint128_t ************************************/
-typedef CountMin<uint128> CountMin128;
+/******************************** uint128_t_t ************************************/
+typedef CountMin<uint128_t> CountMin128;
 template static void Sketch_dealloc<CountMin128>(CountMin128*);
-template static int CountMin_init< uint128, prime521_t> (CountMin128 *, PyObject *, PyObject *);
-template static PyObject * Sketch_difference<CountMin128, CountMin_Sketch<uint128>, uint128>(CountMin128* , PyObject *, PyObject *);
+template static int CountMin_init< uint128_t, prime521_t> (CountMin128 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<CountMin128, CountMin_Sketch<uint128_t>, uint128_t>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<CountMin128>(CountMin128* , PyObject *, PyObject *);
-template static PyObject * Sketch_copy<CountMin128, CountMin_Sketch<uint128> >(CountMin128* );
+template static PyObject * Sketch_copy<CountMin128, CountMin_Sketch<uint128_t> >(CountMin128* );
 template static PyObject * Sketch_new<CountMin128>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * Sketch_update<CountMin128,uint128>(CountMin128* , PyObject *, PyObject *);
+template static PyObject * Sketch_update<CountMin128,uint128_t>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<CountMin128>(CountMin128* , PyObject *, PyObject *);
@@ -365,16 +365,16 @@ static PyTypeObject CountMin128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)CountMin_init<uint128, prime521_t >,     /* tp_init */
+    (initproc)CountMin_init<uint128_t, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
 
 static PyMethodDef CountMin128_methods[] = {
-    {"update", (PyCFunction)Sketch_update<CountMin128, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<CountMin128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)Sketch_difference<CountMin128, CountMin_Sketch<uint128>, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<CountMin128, CountMin_Sketch<uint128_t>, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
     {"second_moment", (PyCFunction)Sketch_second_moment<CountMin128>, METH_NOARGS,
@@ -383,7 +383,7 @@ static PyMethodDef CountMin128_methods[] = {
     {"first_moment", (PyCFunction)Sketch_first_moment<CountMin128>, METH_NOARGS,
      "Provides and estimation to the first moment of the sketch"
     },
-    {"copy", (PyCFunction)Sketch_copy<CountMin128, CountMin_Sketch<uint128> >, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<CountMin128, CountMin_Sketch<uint128_t> >, METH_NOARGS,
      "Copies a sketch"
     },
     {"clear", (PyCFunction)Sketch_clear<CountMin128>, METH_NOARGS,

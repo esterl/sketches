@@ -32,7 +32,10 @@ inline int get_mersenne_exponent(){
 }
 
 //Define types associated with each prime and uint128
-typedef ttmath::UInt<2> uint128;
+typedef ttmath::UInt<2> uint128_t;
+typedef uint32_t prime13_t;
+typedef uint64_t prime17_t;
+typedef uint64_t prime31_t;
 typedef ttmath::UInt<2> prime61_t;
 typedef ttmath::UInt<3> prime89_t;
 typedef ttmath::UInt<17> prime521_t;

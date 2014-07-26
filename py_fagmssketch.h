@@ -335,16 +335,16 @@ static PyMethodDef FAGMS64_methods[] = {
     {NULL}  /* Sentinel */
 };
 
-/******************************** uint128_t ************************************/
-typedef FAGMS<uint128> FAGMS128;
+/******************************** uint128_t_t ************************************/
+typedef FAGMS<uint128_t> FAGMS128;
 template static void Sketch_dealloc<FAGMS128>(FAGMS128*);
-template static int FAGMS_init< uint128, prime521_t> (FAGMS128 *, PyObject *, PyObject *);
-template static PyObject * Sketch_difference<FAGMS128, FAGMS_Sketch<uint128>, uint128>(FAGMS128* , PyObject *, PyObject *);
+template static int FAGMS_init< uint128_t, prime521_t> (FAGMS128 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FAGMS128, FAGMS_Sketch<uint128_t>, uint128_t>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
-template static PyObject * Sketch_copy<FAGMS128, FAGMS_Sketch<uint128> >(FAGMS128* );
+template static PyObject * Sketch_copy<FAGMS128, FAGMS_Sketch<uint128_t> >(FAGMS128* );
 template static PyObject * Sketch_new<FAGMS128>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * Sketch_update<FAGMS128,uint128>(FAGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_update<FAGMS128,uint128_t>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
@@ -387,16 +387,16 @@ static PyTypeObject FAGMS128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FAGMS_init<uint128, prime521_t >,     /* tp_init */
+    (initproc)FAGMS_init<uint128_t, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
 
 static PyMethodDef FAGMS128_methods[] = {
-    {"update", (PyCFunction)Sketch_update<FAGMS128, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FAGMS128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)Sketch_difference<FAGMS128, FAGMS_Sketch<uint128>, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FAGMS128, FAGMS_Sketch<uint128_t>, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
     {"second_moment", (PyCFunction)Sketch_second_moment<FAGMS128>, METH_NOARGS,
@@ -405,7 +405,7 @@ static PyMethodDef FAGMS128_methods[] = {
     {"first_moment", (PyCFunction)Sketch_first_moment<FAGMS128>, METH_NOARGS,
      "Provides and estimation to the first moment of the sketch"
     },
-    {"copy", (PyCFunction)Sketch_copy<FAGMS128, FAGMS_Sketch<uint128> >, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FAGMS128, FAGMS_Sketch<uint128_t> >, METH_NOARGS,
      "Copies a sketch"
     },
     {"clear", (PyCFunction)Sketch_clear<FAGMS128>, METH_NOARGS,

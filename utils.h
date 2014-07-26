@@ -24,6 +24,12 @@ T PyObjectToNumber( PyObject *py_num){
 };
 
 template<>
+uint8_t PyObjectToNumber<uint8_t>(PyObject * py_num)
+{
+    return PyObjectToNumber(py_num);
+};
+
+template<>
 uint16_t PyObjectToNumber<uint16_t>(PyObject * py_num)
 {
     return PyObjectToNumber(py_num);

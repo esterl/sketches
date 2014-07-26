@@ -317,16 +317,16 @@ static PyMethodDef FastCount64_methods[] = {
     {NULL}  /* Sentinel */
 };
 
-/******************************** uint128_t ************************************/
-typedef FastCount<uint128> FastCount128;
+/******************************** uint128_t_t ************************************/
+typedef FastCount<uint128_t> FastCount128;
 template static void Sketch_dealloc<FastCount128>(FastCount128*);
-template static int FastCount_init< uint128, prime521_t> (FastCount128 *, PyObject *, PyObject *);
-template static PyObject * Sketch_difference<FastCount128, FastCount_Sketch<uint128>, uint128>(FastCount128* , PyObject *, PyObject *);
+template static int FastCount_init< uint128_t, prime521_t> (FastCount128 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount128, FastCount_Sketch<uint128_t>, uint128_t>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FastCount128>(FastCount128* , PyObject *, PyObject *);
-template static PyObject * Sketch_copy<FastCount128, FastCount_Sketch<uint128> >(FastCount128* );
+template static PyObject * Sketch_copy<FastCount128, FastCount_Sketch<uint128_t> >(FastCount128* );
 template static PyObject * Sketch_new<FastCount128>(PyTypeObject *, PyObject *, PyObject *);
-template static PyObject * Sketch_update<FastCount128,uint128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount128,uint128_t>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_clear<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount128>(FastCount128* , PyObject *, PyObject *);
@@ -369,16 +369,16 @@ static PyTypeObject FastCount128Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)FastCount_init<uint128, prime521_t >,     /* tp_init */
+    (initproc)FastCount_init<uint128_t, prime521_t >,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
 
 static PyMethodDef FastCount128_methods[] = {
-    {"update", (PyCFunction)Sketch_update<FastCount128, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<FastCount128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)Sketch_difference<FastCount128, FastCount_Sketch<uint128>, uint128>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<FastCount128, FastCount_Sketch<uint128_t>, uint128_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
     {"second_moment", (PyCFunction)Sketch_second_moment<FastCount128>, METH_NOARGS,
@@ -387,7 +387,7 @@ static PyMethodDef FastCount128_methods[] = {
     {"first_moment", (PyCFunction)Sketch_first_moment<FastCount128>, METH_NOARGS,
      "Provides and estimation to the first moment of the sketch"
     },
-    {"copy", (PyCFunction)Sketch_copy<FastCount128, FastCount_Sketch<uint128> >, METH_NOARGS,
+    {"copy", (PyCFunction)Sketch_copy<FastCount128, FastCount_Sketch<uint128_t> >, METH_NOARGS,
      "Copies a sketch"
     },
     {"clear", (PyCFunction)Sketch_clear<FastCount128>, METH_NOARGS,
