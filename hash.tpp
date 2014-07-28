@@ -8,7 +8,7 @@ inline bool isPowerOfTwo(unsigned x)
 /**************************Hash_CW2 implementation*****************************/
 
 template<typename T1, typename T2>
-Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1)
+void Hash_CW2<T1,T2>::init(unsigned B, T2 seed0, T2 seed1)
 {
     mersenne_exponent = get_mersenne_exponent<T1>();
     if (!isPowerOfTwo(B)) 
@@ -16,6 +16,18 @@ Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1)
     mask = B - 1;
     seeds[0] = mersenne_modulus<T1>(seed0, mersenne_exponent);
     seeds[1] = mersenne_modulus<T1>(seed1, mersenne_exponent);
+}
+
+template<typename T1, typename T2>
+Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1)
+{
+    init(B, seed0, seed1);
+}
+
+template<typename T1, typename T2>
+Hash_CW2<T1,T2>::Hash_CW2(unsigned B)
+{
+    init(B, random<T2>(), random<T2>());
 }
 
 template<typename T1, typename T2>
@@ -43,9 +55,8 @@ Hash<T1>* Hash_CW2<T1,T2>::copy()
 
 
 /**************************Hash_CW4 implementation*****************************/
-
 template<typename T1, typename T2>
-Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
+void Hash_CW4<T1,T2>::init(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
 {
     mersenne_exponent = get_mersenne_exponent<T1>();
     if (!isPowerOfTwo(B)) 
@@ -55,6 +66,24 @@ Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
     seeds[1] = mersenne_modulus<T1>(seed1, mersenne_exponent);
     seeds[2] = mersenne_modulus<T1>(seed2, mersenne_exponent);
     seeds[3] = mersenne_modulus<T1>(seed3, mersenne_exponent);
+}
+
+template<typename T1, typename T2>
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
+{
+    init(B, seed0, seed1, seed2, seed3);
+}
+
+template<typename T1, typename T2>
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B)
+{
+    init(B, random<T2>(), random<T2>(), random<T2>(), random<T2>());
+}
+
+template<typename T1, typename T2>
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 *seeds)
+{
+    init(B,  seeds[0], seeds[1], seeds[2], seeds[3]);
 }
 
 template<typename T1, typename T2>
@@ -98,7 +127,7 @@ const uint64_t mask16 = 0xFFFF;
 const uint64_t mask21 = 0x1FFFFF;
 
 // Implementation for 8b --> Mersenne prime 13 == 8191 (max number of buckets)
-Hash_Tab<uint8_t>::Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1, 
+void Hash_Tab<uint8_t>::init(unsigned B, prime13_t seed0, prime13_t seed1, 
                             prime13_t seed2, prime13_t seed3)
 {
     table = new uint16_t[POW8];
@@ -107,6 +136,17 @@ Hash_Tab<uint8_t>::Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1,
     Hash_CW4<uint8_t, prime13_t> aux_hash = Hash_CW4<uint8_t, prime13_t>(B, seed0, seed1, seed2, seed3);
     for (unsigned i=0; i < POW8; i++)
         table[i] = aux_hash.element(i);
+}
+
+Hash_Tab<uint8_t>::Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1, 
+                            prime13_t seed2, prime13_t seed3)
+{
+    init(B, seed0, seed1, seed2, seed3);
+}
+
+Hash_Tab<uint8_t>::Hash_Tab(unsigned B)
+{
+    init(B, random<prime13_t>(), random<prime13_t>(), random<prime13_t>(), random<prime13_t>());
 }
 
 // Empty constructor (for copy)
@@ -136,7 +176,7 @@ Hash_Tab<uint8_t>::~Hash_Tab()
 
 
 // Implementation for 16b
-Hash_Tab<uint16_t>::Hash_Tab(unsigned B, prime17_t seed0, prime17_t seed1, 
+void Hash_Tab<uint16_t>::init(unsigned B, prime17_t seed0, prime17_t seed1, 
                                 prime17_t seed2,prime17_t seed3)
 {
     table = new uint16_t[POW16];
@@ -145,6 +185,17 @@ Hash_Tab<uint16_t>::Hash_Tab(unsigned B, prime17_t seed0, prime17_t seed1,
     Hash_CW4<uint16_t, prime17_t> aux_hash = Hash_CW4<uint16_t, prime17_t>(B, seed0, seed1, seed2, seed3);
     for (unsigned i=0; i < POW16; i++)
         table[i] = aux_hash.element(i);
+}
+
+Hash_Tab<uint16_t>::Hash_Tab(unsigned B, prime17_t seed0, prime17_t seed1, 
+                                prime17_t seed2,prime17_t seed3)
+{
+    init(B, seed0, seed1, seed2, seed3);
+}
+
+Hash_Tab<uint16_t>::Hash_Tab(unsigned B)
+{
+    init(B, random<prime17_t>(), random<prime17_t>(), random<prime17_t>(), random<prime17_t>());
 }
 
 // Empty constructor (for copy)
@@ -172,7 +223,7 @@ Hash_Tab<uint16_t>::~Hash_Tab()
 }
 
 // Implementation for 32b
-Hash_Tab<uint32_t>::Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2)
+void Hash_Tab<uint32_t>::init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2)
 {
     T0 = new uint16_t[POW16];
     T1 = new uint16_t[POW16];
@@ -202,6 +253,16 @@ Hash_Tab<uint32_t>::Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t
     delete aux_hash0;
     delete aux_hash1;
     delete aux_hash2;
+}
+
+Hash_Tab<uint32_t>::Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2)
+{
+    init(B, s0, s1, s2);
+}
+
+Hash_Tab<uint32_t>::Hash_Tab(unsigned B)
+{
+    init(B, NULL, NULL, NULL);
 }
 
 Hash_Tab<uint32_t>::Hash_Tab()

@@ -48,10 +48,11 @@ class Hash_CW2: Hash<T1>{
         T2 seeds[2];
         unsigned mask;
         unsigned mersenne_exponent;
+        void init(unsigned B, T2 seed0, T2 seed1);
 
     public:
         Hash_CW2(unsigned B, T2 seed0, T2 seed1);
-        Hash_CW2(unsigned B) : Hash_CW2(B, random<T2>(), random<T2>()){};
+        Hash_CW2(unsigned B);
 
         virtual unsigned element(T1 j);
         virtual Hash<T1>* copy();
@@ -68,13 +69,12 @@ class Hash_CW4: Hash<T1> {
         T2 seeds[4];
         unsigned mask;
         unsigned mersenne_exponent;
+        void init(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3);
 
     public:
         Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3);
-        Hash_CW4(unsigned B) : Hash_CW4(B, random<T2>(), random<T2>(), 
-                                                random<T2>(), random<T2>()) {};
-        Hash_CW4(unsigned B, T2 *seeds) : Hash_CW4(B, seeds[0], seeds[1], 
-                                                seeds[2], seeds[3]) {};
+        Hash_CW4(unsigned B);
+        Hash_CW4(unsigned B, T2 *seeds);
 
         virtual unsigned element(T1 j);
         virtual Hash<T1>* copy();
@@ -101,11 +101,11 @@ template<>
 class Hash_Tab<uint8_t>: Hash<uint8_t>{
     protected:
         uint16_t * table;
+        void init(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2, prime13_t seed3);
 
     public:
         Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2, prime13_t seed3);
-        Hash_Tab(unsigned B) : Hash_Tab(B, random<prime13_t>(), random<prime13_t>(), 
-                                            random<prime13_t>(), random<prime13_t>()) {};
+        Hash_Tab(unsigned B);
         Hash_Tab();
         
         virtual unsigned element(uint8_t j);
@@ -118,11 +118,11 @@ template<>
 class Hash_Tab<uint16_t>: Hash<uint16_t>{
     protected:
         uint16_t* table;
+        void init(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2, prime17_t s3);
 
     public:
         Hash_Tab(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2, prime17_t s3);
-        Hash_Tab(unsigned B) : Hash_Tab(B, random<prime17_t>(), random<prime17_t>(),
-                                            random<prime17_t>(), random<prime17_t>()) {};
+        Hash_Tab(unsigned B);
         Hash_Tab();
         
         virtual unsigned element(uint16_t j);
@@ -136,10 +136,11 @@ class Hash_Tab<uint32_t>: Hash<uint32_t>{
     protected:
         unsigned mask;
         uint16_t *T0, *T1, *T2;
+        void init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2);
 
     public:
         Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2);
-        Hash_Tab(unsigned B): Hash_Tab(B, NULL, NULL, NULL){};
+        Hash_Tab(unsigned B);
         Hash_Tab();
         
         virtual unsigned element(uint32_t j);
