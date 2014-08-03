@@ -90,6 +90,11 @@ initsketches(void)
     if (PyType_Ready(&AGMS128Type) < 0)
         return;
 
+    FAGMS8Type.tp_new = Sketch_new<FAGMS8>;
+    FAGMS8Type.tp_methods = FAGMS8_methods;
+    if (PyType_Ready(&FAGMS8Type) < 0)
+        return;
+
     FAGMS16Type.tp_new = Sketch_new<FAGMS16>;
     FAGMS16Type.tp_methods = FAGMS16_methods;
     if (PyType_Ready(&FAGMS16Type) < 0)
@@ -142,10 +147,12 @@ initsketches(void)
     PyModule_AddObject(m, "AGMS64", (PyObject *)&AGMS64Type);
     PyModule_AddObject(m, "AGMS128", (PyObject *)&AGMS128Type);
 
+    Py_INCREF(&FAGMS8Type);
     Py_INCREF(&FAGMS16Type);
     Py_INCREF(&FAGMS32Type);
     Py_INCREF(&FAGMS64Type);
     Py_INCREF(&FAGMS128Type);
+    PyModule_AddObject(m, "FAGMS8", (PyObject *)&FAGMS16Type);
     PyModule_AddObject(m, "FAGMS16", (PyObject *)&FAGMS16Type);
     PyModule_AddObject(m, "FAGMS32", (PyObject *)&FAGMS32Type);
     PyModule_AddObject(m, "FAGMS64", (PyObject *)&FAGMS64Type);

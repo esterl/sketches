@@ -18,7 +18,7 @@ def get_sketch(sketch_type, hash_length, columns, rows, random_generator):
             sketch = sketches.AGMS128(columns, rows, random_generator)
         else:
             raise AttributeError('Hash length not valid: %i' % hash_length)
-    elif sketch_type=='FAGMS'
+    elif sketch_type=='FAGMS':
         if hash_length==8:
             sketch = sketches.FAGMS8(columns, rows, random_generator)
         elif hash_length==16:
@@ -31,7 +31,7 @@ def get_sketch(sketch_type, hash_length, columns, rows, random_generator):
             sketch = sketches.FAGMS128(columns, rows, random_generator)
         else:
             raise AttributeError('Hash length not valid: %i' % hash_length)
-    elif sketch_type=='FastCount'
+    elif sketch_type=='FastCount':
         if hash_length==8:
             sketch = sketches.FastCount8(columns, rows, random_generator)
         elif hash_length==16:
@@ -44,7 +44,7 @@ def get_sketch(sketch_type, hash_length, columns, rows, random_generator):
             sketch = sketches.FastCount128(columns, rows, random_generator)
         else:
             raise AttributeError('Hash length not valid: %i' % hash_length)
-    elif sketch_type=='CountMin'
+    elif sketch_type=='CountMin':
         if hash_length==8:
             sketch = sketches.CountMin8(columns, rows, random_generator)
         elif hash_length==16:

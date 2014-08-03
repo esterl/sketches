@@ -34,24 +34,29 @@ FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
     
     // Generate num_rows random variables:
     Xi<KeyType> ** xis;
-    if (strcmp(random_generator, "cw") == 0) {
-        xis =(Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows*buckets];
-        for (unsigned int i =0; i < rows*buckets; i++) {
+    if (strcmp(random_generator, "cw4") == 0) {
+        xis =(Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
             xis[i] = (Xi<KeyType>*) new Xi_CW4<KeyType, PrimeSpaceType>();
         }
+    } else if (strcmp(random_generator, "cw2") == 0) {
+        xis = (Xi<KeyType>**) new Xi_CW2<KeyType, PrimeSpaceType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
+            xis[i] = (Xi<KeyType>*) new Xi_CW2<KeyType, PrimeSpaceType>();
+        }
     } else if (strcmp(random_generator, "bch5") == 0) {
-        xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows*buckets];
-        for (unsigned int i =0; i < rows*buckets; i++) {
+        xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
             xis[i] = (Xi<KeyType>*) new Xi_BCH5<KeyType>();
         }
     } else if (strcmp(random_generator, "bch3") == 0) {
-        xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows*buckets];
-        for (unsigned int i =0; i < rows*buckets; i++) {
+        xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
             xis[i] = (Xi<KeyType>*) new Xi_BCH3<KeyType>();
         }
     } else if (strcmp(random_generator, "eh3") == 0) {
-        xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows*buckets];
-        for (unsigned int i =0; i < rows*buckets; i++) {
+        xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
             xis[i] = (Xi<KeyType>*) new Xi_EH3<KeyType>();
         }
     }else {
@@ -66,6 +71,95 @@ FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
     return 0;
 }
 
+
+/******************************** uint8_t *************************************/
+typedef FAGMS<uint8_t> FAGMS8;
+template static void Sketch_dealloc<FAGMS8>(FAGMS8*);
+template static int FAGMS_init<uint8_t, prime13_t> (FAGMS8 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FAGMS8, FAGMS_Sketch<uint8_t>, uint8_t>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_first_moment<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FAGMS8, FAGMS_Sketch<uint8_t> >(FAGMS8* );
+template static PyObject * Sketch_new<FAGMS8 >(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FAGMS8,uint8_t>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+
+static PyTypeObject FAGMS8Type = {
+    PyObject_HEAD_INIT(NULL)
+    0,                              /*ob_size*/
+    "sketches.FAGMS8",         /*tp_name*/
+    sizeof(FAGMS<uint8_t>),            /*tp_basicsize*/
+    0,                              /*tp_itemsize*/
+    (destructor) Sketch_dealloc<FAGMS8>,/*tp_dealloc*/
+    0,                              /*tp_print*/
+    0,                              /*tp_getattr*/
+    0,                              /*tp_setattr*/
+    0,                              /*tp_compare*/
+    0,                              /*tp_repr*/
+    0,                              /*tp_as_number*/
+    0,                              /*tp_as_sequence*/
+    0,                              /*tp_as_mapping*/
+    0,                              /*tp_hash */
+    0,                              /*tp_call*/
+    0,                              /*tp_str*/
+    0,                              /*tp_getattro*/
+    0,                              /*tp_setattro*/
+    0,                              /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,             /*tp_flags*/
+    "FAGMS sketch for numbers within I={2^8}", /* tp_doc */
+    0,                              /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    0,                              /* tp_iter */
+    0,                              /* tp_iternext */
+    0,                              /* tp_methods */
+    0,                              /* tp_members */
+    0,                              /* tp_getset */
+    0,                              /* tp_base */
+    0,                              /* tp_dict */
+    0,                              /* tp_descr_get */
+    0,                              /* tp_descr_set */
+    0,                              /* tp_dictoffset */
+    (initproc)FAGMS_init<uint8_t, prime13_t>,     /* tp_init */
+    0,                              /* tp_alloc */
+    0,                              /* tp_new */
+};
+
+
+static PyMethodDef FAGMS8_methods[] = {
+    {"update", (PyCFunction)Sketch_update<FAGMS<uint8_t>,uint8_t>, METH_VARARGS|METH_KEYWORDS,
+     "Updates the sketch with the given key and value"
+    },
+    {"difference", (PyCFunction)Sketch_difference<FAGMS<uint8_t>, FAGMS_Sketch<uint8_t>, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+     "Provides and estimation to the L2 difference between the sketches"
+    },
+    {"second_moment", (PyCFunction)Sketch_second_moment<FAGMS8>, METH_NOARGS,
+     "Provides and estimation to the second moment of the sketch"
+    },
+    {"first_moment", (PyCFunction)Sketch_first_moment<FAGMS8>, METH_NOARGS,
+     "Provides and estimation to the first moment of the sketch"
+    },
+    {"copy", (PyCFunction)Sketch_copy<FAGMS8, FAGMS_Sketch<uint8_t> >, METH_NOARGS,
+     "Copies a sketch"
+    },
+    {"clear", (PyCFunction)Sketch_clear<FAGMS8>, METH_NOARGS,
+     "Clears the sketch"
+    },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FAGMS8>, METH_NOARGS,
+     "Returns the size of the key"
+    },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FAGMS8>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS8>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
+    {NULL}  /* Sentinel */
+};
 
 /******************************** uint16_t ************************************/
 typedef FAGMS<uint16_t> FAGMS16;

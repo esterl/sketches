@@ -296,7 +296,7 @@ static PyTypeObject AGMS32Type = {
     0,                              /* tp_descr_get */
     0,                              /* tp_descr_set */
     0,                              /* tp_dictoffset */
-    (initproc)AGMS_init<uint32_t, prime61_t >,     /* tp_init */
+    (initproc)AGMS_init<uint32_t, prime61_t>,     /* tp_init */
     0,                              /* tp_alloc */
     0,                              /* tp_new */
 };
