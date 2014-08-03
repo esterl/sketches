@@ -90,7 +90,7 @@ for columns in num_cols:
         results = np.hstack((results, result))
 
 header = ','.join(results.dtype.names)
-np.savetxt(save_floder + 'test_columns_%s_%s_%i_%i_%s.csv' % (sketch_type, random_generator, hash_length, num_pkts, run_id), results, delimiter=',', fmt="%s", header=header)
+np.savetxt(save_folder + 'test_columns_%s_%s_%i_%i_%s.csv' % (sketch_type, random_generator, hash_length, num_pkts, run_id), results, delimiter=',', fmt="%s", header=header)
 
 ########################## Test the error vs rows ##############################
 # Variables
@@ -113,7 +113,7 @@ for rows in num_rows:
         results = np.hstack((results, result))
 
 header = ','.join(results.dtype.names)
-np.savetxt(save_floder + 'test_rows_%s_%s_%i_%i_%s.csv' % (sketch_type, random_generator, hash_length, num_pkts, run_id), results, delimiter=',', fmt="%s", header=header)
+np.savetxt(save_folder + 'test_rows_%s_%s_%i_%i_%s.csv' % (sketch_type, random_generator, hash_length, num_pkts, run_id), results, delimiter=',', fmt="%s", header=header)
 
 ########################## Test the error vs F2 ################################
 # Variables
