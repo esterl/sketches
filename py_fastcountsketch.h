@@ -28,10 +28,15 @@ FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
     // Generate num_rows random hashes:
     Hash<KeyType>** hashes;
     
-    if (strcmp(random_generator, "cw") == 0) {
+    if (strcmp(random_generator, "cw4") == 0) {
         hashes = (Hash<KeyType>**) new Hash_CW4<KeyType, PrimeSpaceType>*[rows];
         for (unsigned int i =0; i < rows; i++) {
             hashes[i] = (Hash<KeyType>*) new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
+        }
+    } else if (strcmp(random_generator, "cw2") == 0) {
+        hashes = (Hash<KeyType>**) new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
+        for (unsigned int i =0; i < rows; i++) {
+            hashes[i] = (Hash<KeyType>*) new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
         }
     } else if (strcmp(random_generator, "tab") == 0) {
         hashes = (Hash<KeyType>**) new Hash_Tab<KeyType>*[rows];
@@ -49,10 +54,101 @@ FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
 }
 
 
+/******************************** uint8_t ************************************/
+typedef FastCount<uint8_t> FastCount8;
+template static void Sketch_dealloc<FastCount8>(FastCount8*);
+template static int FastCount_init<uint8_t, prime13_t> (FastCount8 *, PyObject *, PyObject *);
+template static PyObject * Sketch_difference<FastCount8, FastCount_Sketch<uint8_t>, uint8_t>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_second_moment<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_first_moment<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_copy<FastCount8, FastCount_Sketch<uint8_t> >(FastCount8* );
+template static PyObject * Sketch_new<FastCount8 >(PyTypeObject *, PyObject *, PyObject *);
+template static PyObject * Sketch_update<FastCount8,uint8_t>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_clear<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_key_size<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_rows<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_columns<FastCount8>(FastCount8* , PyObject *, PyObject *);
+
+static PyTypeObject FastCount8Type = {
+    PyObject_HEAD_INIT(NULL)
+    0,                              /*ob_size*/
+    "sketches.FastCount8",         /*tp_name*/
+    sizeof(FastCount<uint8_t>),            /*tp_basicsize*/
+    0,                              /*tp_itemsize*/
+    (destructor) Sketch_dealloc<FastCount8>,/*tp_dealloc*/
+    0,                              /*tp_print*/
+    0,                              /*tp_getattr*/
+    0,                              /*tp_setattr*/
+    0,                              /*tp_compare*/
+    0,                              /*tp_repr*/
+    0,                              /*tp_as_number*/
+    0,                              /*tp_as_sequence*/
+    0,                              /*tp_as_mapping*/
+    0,                              /*tp_hash */
+    0,                              /*tp_call*/
+    0,                              /*tp_str*/
+    0,                              /*tp_getattro*/
+    0,                              /*tp_setattro*/
+    0,                              /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT,             /*tp_flags*/
+    "FastCount sketch for numbers within I={2^8}", /* tp_doc */
+    0,                              /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    0,                              /* tp_iter */
+    0,                              /* tp_iternext */
+    0,                              /* tp_methods */
+    0,                              /* tp_members */
+    0,                              /* tp_getset */
+    0,                              /* tp_base */
+    0,                              /* tp_dict */
+    0,                              /* tp_descr_get */
+    0,                              /* tp_descr_set */
+    0,                              /* tp_dictoffset */
+    (initproc)FastCount_init<uint8_t, prime13_t>,     /* tp_init */
+    0,                              /* tp_alloc */
+    0,                              /* tp_new */
+};
+
+
+
+
+static PyMethodDef FastCount8_methods[] = {
+    {"update", (PyCFunction)Sketch_update<FastCount<uint8_t>,uint8_t>, METH_VARARGS|METH_KEYWORDS,
+     "Updates the sketch with the given key and value"
+    },
+    {"difference", (PyCFunction)Sketch_difference<FastCount<uint8_t>, FastCount_Sketch<uint8_t>, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+     "Provides and estimation to the L2 difference between the sketches"
+    },
+    {"second_moment", (PyCFunction)Sketch_second_moment<FastCount8>, METH_NOARGS,
+     "Provides and estimation to the second moment of the sketch"
+    },
+    {"first_moment", (PyCFunction)Sketch_first_moment<FastCount8>, METH_NOARGS,
+     "Provides and estimation to the first moment of the sketch"
+    },
+    {"copy", (PyCFunction)Sketch_copy<FastCount8, FastCount_Sketch<uint8_t> >, METH_NOARGS,
+     "Copies a sketch"
+    },
+    {"clear", (PyCFunction)Sketch_clear<FastCount8>, METH_NOARGS,
+     "Clears the sketch"
+    },
+    {"get_key_size", (PyCFunction)Sketch_get_key_size<FastCount8>, METH_NOARGS,
+     "Returns the size of the key"
+    },
+    {"get_rows", (PyCFunction)Sketch_get_rows<FastCount8>, METH_NOARGS,
+     "Returns the number of rows of the sketch"
+    },
+    {"get_columns", (PyCFunction)Sketch_get_columns<FastCount8>, METH_NOARGS,
+     "Returns the number of columns of the sketch"
+    },
+    {NULL}  /* Sentinel */
+};
+
 /******************************** uint16_t ************************************/
 typedef FastCount<uint16_t> FastCount16;
 template static void Sketch_dealloc<FastCount16>(FastCount16*);
-template static int FastCount_init<uint16_t, uint64_t> (FastCount16 *, PyObject *, PyObject *);
+template static int FastCount_init<uint16_t, prime17_t> (FastCount16 *, PyObject *, PyObject *);
 template static PyObject * Sketch_difference<FastCount16, FastCount_Sketch<uint16_t>, uint16_t>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_second_moment<FastCount16>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_first_moment<FastCount16>(FastCount16* , PyObject *, PyObject *);
