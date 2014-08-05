@@ -25,6 +25,11 @@ initsketches(void)
 {
     PyObject* m;
 
+    FastCount8Type.tp_new = Sketch_new<FastCount8>;
+    FastCount8Type.tp_methods = FastCount8_methods;
+    if (PyType_Ready(&FastCount8Type) < 0)
+        return;
+
     FastCount16Type.tp_new = Sketch_new<FastCount16>;
     FastCount16Type.tp_methods = FastCount16_methods;
     if (PyType_Ready(&FastCount16Type) < 0)
@@ -44,7 +49,12 @@ initsketches(void)
     FastCount128Type.tp_methods = FastCount128_methods;
     if (PyType_Ready(&FastCount128Type) < 0)
         return;
-    
+
+    CountMin8Type.tp_new = Sketch_new<CountMin8>;
+    CountMin8Type.tp_methods = CountMin8_methods;
+    if (PyType_Ready(&CountMin8Type) < 0)
+        return;
+
     CountMin16Type.tp_new = Sketch_new<CountMin16>;
     CountMin16Type.tp_methods = CountMin16_methods;
     if (PyType_Ready(&CountMin16Type) < 0)
@@ -118,19 +128,23 @@ initsketches(void)
     m = Py_InitModule3("sketches", sketches_methods,
                        "Module with a list of sketches for data stream 2-moment estimations.");
 
+    Py_INCREF(&FastCount8Type);
     Py_INCREF(&FastCount16Type);
     Py_INCREF(&FastCount32Type);
     Py_INCREF(&FastCount64Type);
     Py_INCREF(&FastCount128Type);
+    PyModule_AddObject(m, "FastCount8", (PyObject *)&FastCount8Type);
     PyModule_AddObject(m, "FastCount16", (PyObject *)&FastCount16Type);
     PyModule_AddObject(m, "FastCount32", (PyObject *)&FastCount32Type);
     PyModule_AddObject(m, "FastCount64", (PyObject *)&FastCount64Type);
     PyModule_AddObject(m, "FastCount128", (PyObject *)&FastCount128Type);
     
+    Py_INCREF(&CountMin8Type);
     Py_INCREF(&CountMin16Type);
     Py_INCREF(&CountMin32Type);
     Py_INCREF(&CountMin64Type);
     Py_INCREF(&CountMin128Type);
+    PyModule_AddObject(m, "CountMin8", (PyObject *)&CountMin8Type);
     PyModule_AddObject(m, "CountMin16", (PyObject *)&CountMin16Type);
     PyModule_AddObject(m, "CountMin32", (PyObject *)&CountMin32Type);
     PyModule_AddObject(m, "CountMin64", (PyObject *)&CountMin64Type);
