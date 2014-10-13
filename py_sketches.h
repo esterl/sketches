@@ -152,4 +152,13 @@ Sketch_iadd(PyType* self, PyObject *args, PyObject *kwds)
     Py_INCREF(self);
     return (PyObject*) self;
 }
+
+template<typename SketchType>
+static PyObject *
+Sketch_get_max(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    double result;
+    result = self->sketch->get_max();
+    return PyFloat_FromDouble(result);
+}
 #endif

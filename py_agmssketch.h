@@ -77,6 +77,7 @@ template static PyObject * Sketch_clear<AGMS8>(AGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_key_size<AGMS8>(AGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<AGMS8>(AGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS8>(AGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<AGMS8>(AGMS8* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -154,6 +155,9 @@ static PyMethodDef AGMS8_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<AGMS8>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<AGMS8>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 /******************************** uint16_t ************************************/
@@ -170,6 +174,7 @@ template static PyObject * Sketch_clear<AGMS16>(AGMS16* , PyObject *, PyObject *
 template static PyObject * Sketch_get_key_size<AGMS16>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<AGMS16>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS16>(AGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<AGMS16>(AGMS16* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -247,6 +252,9 @@ static PyMethodDef AGMS16_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<AGMS16>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<AGMS16>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -264,6 +272,7 @@ template static PyObject * Sketch_clear<AGMS32>(AGMS32* , PyObject *, PyObject *
 template static PyObject * Sketch_get_key_size<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS32>(AGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<AGMS32>(AGMS32* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -338,6 +347,9 @@ static PyMethodDef AGMS32_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<AGMS32>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<AGMS32>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -356,6 +368,7 @@ template static PyObject * Sketch_clear<AGMS64>(AGMS64* , PyObject *, PyObject *
 template static PyObject * Sketch_get_key_size<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS64>(AGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<AGMS64>(AGMS64* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -430,6 +443,9 @@ static PyMethodDef AGMS64_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<AGMS64>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<AGMS64>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -447,6 +463,7 @@ template static PyObject * Sketch_clear<AGMS128>(AGMS128* , PyObject *, PyObject
 template static PyObject * Sketch_get_key_size<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS128>(AGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<AGMS128>(AGMS128* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -520,6 +537,9 @@ static PyMethodDef AGMS128_methods[] = {
     },
     {"__iadd__", (PyCFunction)Sketch_iadd<AGMS128>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
+    },
+    {"get_max", (PyCFunction)Sketch_get_max<AGMS128>, METH_NOARGS,
+     "Returns the value of the biggest counter"
     },
     {NULL}  /* Sentinel */
 };

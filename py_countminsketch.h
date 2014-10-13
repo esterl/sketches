@@ -60,6 +60,7 @@ template static PyObject * Sketch_get_key_size<CountMin8>(CountMin8* , PyObject 
 template static PyObject * Sketch_get_rows<CountMin8>(CountMin8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<CountMin8>(CountMin8* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin8>(CountMin8*, PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<CountMin8>(CountMin8* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -137,6 +138,9 @@ static PyMethodDef CountMin8_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<CountMin8>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<CountMin8>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -155,6 +159,7 @@ template static PyObject * Sketch_get_key_size<CountMin16>(CountMin16* , PyObjec
 template static PyObject * Sketch_get_rows<CountMin16>(CountMin16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<CountMin16>(CountMin16* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin16>(CountMin16*, PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<CountMin16>(CountMin16* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -232,6 +237,9 @@ static PyMethodDef CountMin16_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<CountMin16>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<CountMin16>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -250,6 +258,7 @@ template static PyObject * Sketch_get_key_size<CountMin32>(CountMin32* , PyObjec
 template static PyObject * Sketch_get_rows<CountMin32>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<CountMin32>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin32>(CountMin32*, PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<CountMin32>(CountMin32* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -324,6 +333,9 @@ static PyMethodDef CountMin32_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<CountMin32>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<CountMin32>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -343,6 +355,7 @@ template static PyObject * Sketch_get_key_size<CountMin64>(CountMin64* , PyObjec
 template static PyObject * Sketch_get_rows<CountMin64>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<CountMin64>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin64>(CountMin64*, PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<CountMin64>(CountMin64* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -417,6 +430,9 @@ static PyMethodDef CountMin64_methods[] = {
     {"__iadd__", (PyCFunction)Sketch_iadd<CountMin64>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
     },
+    {"get_max", (PyCFunction)Sketch_get_max<CountMin64>, METH_NOARGS,
+     "Returns the value of the biggest counter"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -435,6 +451,7 @@ template static PyObject * Sketch_get_key_size<CountMin128>(CountMin128* , PyObj
 template static PyObject * Sketch_get_rows<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin128>(CountMin128*, PyObject *, PyObject *);
+template static PyObject * Sketch_get_max<CountMin128>(CountMin128* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -508,6 +525,9 @@ static PyMethodDef CountMin128_methods[] = {
     },
     {"__iadd__", (PyCFunction)Sketch_iadd<CountMin128>, METH_VARARGS|METH_KEYWORDS,
     "Inplace add of sketches"
+    },
+    {"get_max", (PyCFunction)Sketch_get_max<CountMin128>, METH_NOARGS,
+     "Returns the value of the biggest counter"
     },
     {NULL}  /* Sentinel */
 };

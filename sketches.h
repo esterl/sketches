@@ -1,6 +1,8 @@
 #ifndef SKETCHES_SKETCHES_H
 #define SKETCHES_SKETCHES_H
 
+#include <algorithm>
+
 #include "xis.h"
 #include "hash.h"
 
@@ -25,6 +27,7 @@ class Sketch
         unsigned int get_num_rows(){ return num_rows; }
         unsigned int get_num_columns(){ return num_cols; }
         double* get_counters() { return sketch_elem; };
+        double get_max() { return *std::max_element(sketch_elem, sketch_elem + num_rows*num_cols);};
         void clear() { for (int i = 0; i < num_rows*num_cols; i++) sketch_elem[i] = 0.0;};
         Sketch<T>& operator+=(const Sketch<T>& other) { 
                 for (int i = 0; i < num_rows*num_cols; i++)
