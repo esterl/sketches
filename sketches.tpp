@@ -105,21 +105,13 @@ AGMS_Sketch<T>::~AGMS_Sketch()
         delete xis[i];
     }
     delete [] xis;
-    delete [] sketch_elem;
-}
-
-template<typename T>
-void AGMS_Sketch<T>::clear()
-{
-    for (int i = 0; i < this->num_rows * this->num_cols; i++)
-        sketch_elem[i] = 0.0;
 }
 
 template<typename T>
 void AGMS_Sketch<T>::update(T key, double weight)
 {
     for (int i = 0; i < this->num_rows * this->num_cols; i++)
-        sketch_elem[i] += double(xis[i]->element(key)) * weight;
+        this->sketch_elem[i] += double(xis[i]->element(key)) * weight;
 }
 
 template<typename T>
@@ -127,7 +119,7 @@ double AGMS_Sketch<T>::inner_join(Sketch<T> *other)
 {
     double *basic_est = new double[this->num_rows * this->num_cols];
     for (int i = 0; i < this->num_rows * this->num_cols; i++)
-        basic_est[i] = sketch_elem[i] * 
+        basic_est[i] = this->sketch_elem[i] * 
                             ((AGMS_Sketch<T>*)other)->sketch_elem[i];
 
     double *avg_est = new double[this->num_rows];
@@ -145,6 +137,8 @@ double AGMS_Sketch<T>::inner_join(Sketch<T> *other)
 template<typename T>
 double AGMS_Sketch<T>::second_moment()
 {
+std::cout << "second_moment" << std::endl;
+print(this->sketch_elem, this->num_cols, this->num_rows);
     return this->inner_join(this);
 }
 
@@ -153,7 +147,7 @@ double AGMS_Sketch<T>::first_moment()
 {
     double *basic_est = new double[this->num_rows * this->num_cols];
     for (int i = 0; i < this->num_rows * this->num_cols; i++)
-        basic_est[i] = std::abs(sketch_elem[i]);
+        basic_est[i] = std::abs(this->sketch_elem[i]);
 
     double *avg_est = new double[this->num_rows];
     for (int i = 0; i < this->num_rows; i++){
@@ -173,7 +167,7 @@ Sketch<T>* AGMS_Sketch<T>::difference(Sketch<T> *other)
 {
     AGMS_Sketch<T>* diff_sketch = new AGMS_Sketch<T>(this->num_cols, this->num_rows, xis);
     for (int i = 0; i < this->num_rows*this->num_cols; i++){
-        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = this->sketch_elem[i] - 
                                     ((AGMS_Sketch<T>*)other)->sketch_elem[i];
     }
     return diff_sketch;
@@ -214,9 +208,9 @@ FAGMS_Sketch<T>::FAGMS_Sketch(FAGMS_Sketch<T> *copy)
         xis[i] = copy->xis[i]->copy();
     }
     
-    sketch_elem = new double[this->num_cols*this->num_rows];
+    this->sketch_elem = new double[this->num_cols*this->num_rows];
     for (int i = 0; i < this->num_cols*this->num_rows; i++)
-        sketch_elem[i] = copy->sketch_elem[i];
+        this->sketch_elem[i] = copy->sketch_elem[i];
 }
 
 template<typename T>
@@ -228,14 +222,6 @@ FAGMS_Sketch<T>::~FAGMS_Sketch()
     }
     delete [] hashes;
     delete [] xis;
-    delete [] sketch_elem;
-}
-
-template<typename T>
-void FAGMS_Sketch<T>::clear()
-{
-    for (int i = 0; i < this->num_cols * this->num_rows; i++)
-        sketch_elem[i] = 0.0;
 }
 
 template<typename T>
@@ -244,7 +230,7 @@ void FAGMS_Sketch<T>::update(T key, double weight)
     for (int i = 0; i < this->num_rows; i++)
     {
         int bucket = (int)hashes[i]->element(key);
-        sketch_elem[i * this->num_cols + bucket] += xis[i]->element(key) * weight;
+        this->sketch_elem[i * this->num_cols + bucket] += xis[i]->element(key) * weight;
     }
 }
 
@@ -256,7 +242,7 @@ double FAGMS_Sketch<T>::inner_join(Sketch<T> *other)
     {
         basic_est[i] = 0.0;
         for (int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
-            basic_est[i] += sketch_elem[j] * 
+            basic_est[i] += this->sketch_elem[j] * 
                                 ((FAGMS_Sketch<T>*)other)->sketch_elem[j];
     }
     double result = median(basic_est, this->num_rows);
@@ -278,7 +264,7 @@ double FAGMS_Sketch<T>::first_moment()
     {
         basic_est[i] = 0.0;
         for (int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
-            basic_est[i] += std::abs(sketch_elem[j]);
+            basic_est[i] += std::abs(this->sketch_elem[j]);
     }
     double result = median(basic_est, this->num_rows);
     delete [] basic_est;
@@ -291,7 +277,7 @@ Sketch<T>* FAGMS_Sketch<T>::difference(Sketch<T> *other)
     FAGMS_Sketch<T>* diff_sketch = new FAGMS_Sketch<T>(this->num_cols, this->num_rows, 
                                                     hashes, xis);
     for (unsigned int i = 0; i < this->num_rows*this->num_cols; i++){
-        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = this->sketch_elem[i] - 
                                     ((FAGMS_Sketch<T>*)other)->sketch_elem[i];
     }
     return diff_sketch;
@@ -342,15 +328,8 @@ FastCount_Sketch<T>::~FastCount_Sketch()
         delete hashes[i];
     }
     delete [] hashes;
-    delete [] sketch_elem;
 }
 
-template<typename T>
-void FastCount_Sketch<T>::clear()
-{
-    for (unsigned int i = 0; i < this->num_cols * this->num_rows; i++)
-        sketch_elem[i] = 0.0;
-}
 
 template<typename T>
 void FastCount_Sketch<T>::update(T key, double weight)
@@ -358,7 +337,7 @@ void FastCount_Sketch<T>::update(T key, double weight)
     for (unsigned int i = 0; i < this->num_rows; i++)
     {
         int bucket = (int)hashes[i]->element(key);
-        sketch_elem[i * this->num_cols + bucket] += weight;
+        this->sketch_elem[i * this->num_cols + bucket] += weight;
     }
 }
 
@@ -373,9 +352,9 @@ double FastCount_Sketch<T>::inner_join(Sketch<T> *other)
         double L2 = 0.0;
         for (unsigned int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
         {
-            L1 += sketch_elem[j];
+            L1 += this->sketch_elem[j];
             L1p += ((FastCount_Sketch<T>*)other)->sketch_elem[j];
-            L2 += sketch_elem[j] * ((FastCount_Sketch<T>*)other)->sketch_elem[j];
+            L2 += this->sketch_elem[j] * ((FastCount_Sketch<T>*)other)->sketch_elem[j];
         }
         basic_est[i] = 1.0 / 
             ((double)this->num_cols - 1) * ((double)this->num_cols * L2 - L1 * L1p);
@@ -401,7 +380,7 @@ double FastCount_Sketch<T>::first_moment()
         basic_est[i] = 0.0;
         for (unsigned int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
         {
-            basic_est[i] += std::abs(sketch_elem[j]);
+            basic_est[i] += std::abs(this->sketch_elem[j]);
         }
     }
 
@@ -416,7 +395,7 @@ Sketch<T>* FastCount_Sketch<T>::difference(Sketch<T> *other)
 {
     FastCount_Sketch<T>* diff_sketch = new FastCount_Sketch<T>(this);
     for (unsigned int i = 0; i < this->num_rows*this->num_cols; i++) {
-        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = this->sketch_elem[i] - 
                                 ((FastCount_Sketch<T>*)other)->sketch_elem[i];
     }
     return diff_sketch;
@@ -466,16 +445,7 @@ CountMin_Sketch<T>::~CountMin_Sketch()
         delete hashes[i];
     }
     delete [] hashes;
-    delete [] sketch_elem;
 }
-
-template<typename T>
-void CountMin_Sketch<T>::clear()
-{
-    for (unsigned int i = 0; i < this->num_cols * this->num_rows; i++)
-        sketch_elem[i] = 0.0;
-}
-
 
 
 template<typename T>
@@ -485,7 +455,7 @@ void CountMin_Sketch<T>::update(T key, double weight)
     for (unsigned int i = 0; i < this->num_rows; i++)
     {
         int bucket = (int)hashes[i]->element(key);
-        sketch_elem[i * this->num_cols + bucket] += weight;
+        this->sketch_elem[i * this->num_cols + bucket] += weight;
     }
 }
 
@@ -497,7 +467,7 @@ double CountMin_Sketch<T>::inner_join(Sketch<T> *other)
     {
         basic_est[i] = 0.0;
         for (int j = i*this->num_cols; j < (i+1)*this->num_cols; j++){
-            basic_est[i] += sketch_elem[j] * 
+            basic_est[i] += this->sketch_elem[j] * 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[j];
         }
     }
@@ -521,7 +491,7 @@ double CountMin_Sketch<T>::first_moment()
     {
         basic_est[i] = 0.0;
         for (int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
-            basic_est[i] += std::abs(sketch_elem[j]);
+            basic_est[i] += std::abs(this->sketch_elem[j]);
     }
 
     double result = min(basic_est, this->num_rows);
@@ -535,7 +505,7 @@ Sketch<T>* CountMin_Sketch<T>::difference(Sketch<T>* other)
     CountMin_Sketch<T>* diff_sketch = new CountMin_Sketch<T>(this->num_cols, 
                                                     this->num_rows, hashes);
     for (int i = 0; i < this->num_rows*this->num_cols; i++)
-        diff_sketch->sketch_elem[i] = sketch_elem[i] - 
+        diff_sketch->sketch_elem[i] = this->sketch_elem[i] - 
                                 ((CountMin_Sketch<T>*)other)->sketch_elem[i];
     return diff_sketch;
 }

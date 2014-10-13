@@ -68,6 +68,7 @@ template static PyObject * Sketch_clear<FastCount8>(FastCount8* , PyObject *, Py
 template static PyObject * Sketch_get_key_size<FastCount8>(FastCount8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount8>(FastCount8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FastCount8>(FastCount8*, PyObject *, PyObject *);
 
 static PyTypeObject FastCount8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -142,6 +143,9 @@ static PyMethodDef FastCount8_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FastCount8>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FastCount8>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -159,6 +163,7 @@ template static PyObject * Sketch_clear<FastCount16>(FastCount16* , PyObject *, 
 template static PyObject * Sketch_get_key_size<FastCount16>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount16>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FastCount16>(FastCount16*, PyObject *, PyObject *);
 
 static PyTypeObject FastCount16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -233,6 +238,9 @@ static PyMethodDef FastCount16_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FastCount16>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FastCount16>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -250,6 +258,7 @@ template static PyObject * Sketch_clear<FastCount32>(FastCount32* , PyObject *, 
 template static PyObject * Sketch_get_key_size<FastCount32>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount32>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FastCount32>(FastCount32*, PyObject *, PyObject *);
 
 static PyTypeObject FastCount32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -321,6 +330,9 @@ static PyMethodDef FastCount32_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FastCount32>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FastCount32>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -339,6 +351,7 @@ template static PyObject * Sketch_clear<FastCount64>(FastCount64* , PyObject *, 
 template static PyObject * Sketch_get_key_size<FastCount64>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount64>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FastCount64>(FastCount64*, PyObject *, PyObject *);
 
 static PyTypeObject FastCount64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -410,6 +423,9 @@ static PyMethodDef FastCount64_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FastCount64>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FastCount64>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -427,6 +443,7 @@ template static PyObject * Sketch_clear<FastCount128>(FastCount128* , PyObject *
 template static PyObject * Sketch_get_key_size<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FastCount128>(FastCount128*, PyObject *, PyObject *);
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -497,6 +514,9 @@ static PyMethodDef FastCount128_methods[] = {
     },
     {"get_columns", (PyCFunction)Sketch_get_columns<FastCount128>, METH_NOARGS,
      "Returns the size of the key"
+    },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FastCount128>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
     },
     {NULL}  /* Sentinel */
 };

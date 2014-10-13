@@ -151,6 +151,9 @@ static PyMethodDef AGMS8_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<AGMS8>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<AGMS8>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 /******************************** uint16_t ************************************/
@@ -241,6 +244,9 @@ static PyMethodDef AGMS16_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<AGMS16>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<AGMS16>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -328,6 +334,9 @@ static PyMethodDef AGMS32_methods[] = {
     },
     {"get_columns", (PyCFunction)Sketch_get_columns<AGMS32>, METH_NOARGS,
      "Returns the number of columns of the sketch"
+    },
+    {"__iadd__", (PyCFunction)Sketch_iadd<AGMS32>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
     },
     {NULL}  /* Sentinel */
 };
@@ -418,6 +427,9 @@ static PyMethodDef AGMS64_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<AGMS64>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<AGMS64>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -505,6 +517,9 @@ static PyMethodDef AGMS128_methods[] = {
     },
     {"get_columns", (PyCFunction)Sketch_get_columns<AGMS128>, METH_NOARGS,
      "Returns the number of columns of the sketch"
+    },
+    {"__iadd__", (PyCFunction)Sketch_iadd<AGMS128>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
     },
     {NULL}  /* Sentinel */
 };

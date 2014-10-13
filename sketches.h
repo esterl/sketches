@@ -11,19 +11,29 @@
    For details on all the sketches implemented here, see the paper:
     1) "Statistical Analysis of Sketch Estimators" by F. Rusu and A. Dobra */
 
+// TODO move implementations to tpp
 template<typename T>
 class Sketch
 {
     protected:
         unsigned int num_rows;
         unsigned int num_cols;
+        double *sketch_elem;
         
     public:
         unsigned int get_key_size(){ return sizeof(T)*8; }
         unsigned int get_num_rows(){ return num_rows; }
         unsigned int get_num_columns(){ return num_cols; }
-        //reseting the sketch structure
-        virtual void clear() = 0;
+        double* get_counters() { return sketch_elem; };
+        void clear() { for (int i = 0; i < num_rows*num_cols; i++) sketch_elem[i] = 0.0;};
+        Sketch<T>& operator+=(const Sketch<T>& other) { 
+                for (int i = 0; i < num_rows*num_cols; i++)
+                    sketch_elem[i] += other.sketch_elem[i]; return *this;};
+        void operator-=(const Sketch<T>& other) {
+            for (int i = 0; i < num_rows*num_cols; i++)
+                sketch_elem[i] -= other.sketch_elem[i];};
+        
+        virtual ~Sketch(){ delete [] sketch_elem;};
 
         //updating the sketch with the value corresponding to the given key
         virtual void update(T key, double weight) = 0;
@@ -38,7 +48,8 @@ class Sketch
         virtual double first_moment() = 0;
         
         //estimating the L2 difference
-        virtual Sketch* difference(Sketch *other)=0;
+        virtual Sketch* difference(Sketch *other) = 0 ;
+        
 };
 
 
@@ -57,7 +68,6 @@ template<typename T>
 class AGMS_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
         Xi<T> **xis;
 
 
@@ -66,7 +76,6 @@ class AGMS_Sketch : public Sketch<T>
         AGMS_Sketch(AGMS_Sketch<T>* copy);
         virtual ~AGMS_Sketch();
 
-        virtual void clear();
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
@@ -92,7 +101,6 @@ template<typename T>
 class FAGMS_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
         Hash<T> **hashes;
         Xi<T> **xis;
 
@@ -103,7 +111,6 @@ class FAGMS_Sketch : public Sketch<T>
         FAGMS_Sketch(FAGMS_Sketch<T> *copy);
         virtual ~FAGMS_Sketch();
 
-        virtual void clear();
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
@@ -127,7 +134,6 @@ template<typename T>
 class FastCount_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
         Hash<T> **hashes;
 
 
@@ -137,7 +143,6 @@ class FastCount_Sketch : public Sketch<T>
         FastCount_Sketch(FastCount_Sketch<T> *copy);
         virtual ~FastCount_Sketch();
 
-        virtual void clear();
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();
@@ -164,7 +169,6 @@ template<typename T>
 class CountMin_Sketch : public Sketch<T>
 {
     protected:
-        double *sketch_elem;
         Hash<T> **hashes;
 
     public:
@@ -173,7 +177,6 @@ class CountMin_Sketch : public Sketch<T>
         CountMin_Sketch(CountMin_Sketch<T> *copy);
         virtual ~CountMin_Sketch();
 
-        virtual void clear();
         virtual void update(T key, double weight);
         virtual double inner_join(Sketch<T> *other);
         virtual double second_moment();

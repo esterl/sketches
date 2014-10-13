@@ -135,4 +135,21 @@ Sketch_get_columns(SketchType* self, PyObject *args, PyObject *kwds)
     result = self->sketch->get_num_columns();
     return PyInt_FromLong(result);
 }
+
+template<typename PyType>
+static PyObject * 
+Sketch_iadd(PyType* self, PyObject *args, PyObject *kwds)
+{
+    PyType* other;
+    static char *kwlist[] = {"other", NULL};
+    
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &other))
+        return NULL;
+    
+    if (! PyObject_TypeCheck((PyObject*) other, self->ob_type))
+        return NULL;
+    (*self->sketch) += (*other->sketch);
+    Py_INCREF(self);
+    return (PyObject*) self;
+}
 #endif

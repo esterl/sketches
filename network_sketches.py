@@ -41,18 +41,37 @@ class NetworkSketch():
         self.buffer=[]
         return self.sketch
     
+    def get_columns(self):
+        return self.sketch.get_columns()
+    
+    def get_rows(self):
+        return self.sketch.get_rows()
+    
     def buffer_packet(self, pkt):
         self.buffer.append(long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16))
     
     def update(self, pkt):
-        packet_hash = long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16)
+	if pkt.name == 'Ethernet':
+            pkt = pkt.getlayer(1)
+        if pkt.name == 'IPv6':
+            pkt.setfieldval('hlim', 0)
+        elif pkt.name == 'IP':
+            pkt.setfieldval('ttl', 0)
+        packet_hash = long(hashlib.md5(str(pkt)).hexdigest(),base=16)
         self.sketch.update(str((packet_hash^self.key)&self.mask),1.)
+    
+    def second_moment(self):
+        return self.sketch.second_moment()
     
     def estimate_first_moment(self, other):
         return self.sketch.difference(other.sketch).first_moment()
     
-    def estimate_second_moment(self, other):
+    def difference(self, other):
         return self.sketch.difference(other.sketch).second_moment()
+    
+    def __iadd__(self, other):
+        self.sketch = self.sketch.__iadd__(other.sketch)
+        return self
     
     def copy(self):
         result = NetworkSketch(self.sketch.copy(), self.key)

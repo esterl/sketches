@@ -86,6 +86,7 @@ template static PyObject * Sketch_clear<FAGMS8>(FAGMS8* , PyObject *, PyObject *
 template static PyObject * Sketch_get_key_size<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FAGMS8>(FAGMS8*, PyObject *, PyObject *);
 
 static PyTypeObject FAGMS8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -158,6 +159,9 @@ static PyMethodDef FAGMS8_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS8>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FAGMS8>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -175,6 +179,7 @@ template static PyObject * Sketch_clear<FAGMS16>(FAGMS16* , PyObject *, PyObject
 template static PyObject * Sketch_get_key_size<FAGMS16>(FAGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS16>(FAGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FAGMS16>(FAGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FAGMS16>(FAGMS16*, PyObject *, PyObject *);
 
 static PyTypeObject FAGMS16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -249,6 +254,9 @@ static PyMethodDef FAGMS16_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS16>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FAGMS16>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -266,6 +274,7 @@ template static PyObject * Sketch_clear<FAGMS32>(FAGMS32* , PyObject *, PyObject
 template static PyObject * Sketch_get_key_size<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FAGMS32>(FAGMS32*, PyObject *, PyObject *);
 
 static PyTypeObject FAGMS32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -337,6 +346,9 @@ static PyMethodDef FAGMS32_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS32>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FAGMS32>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -355,6 +367,7 @@ template static PyObject * Sketch_clear<FAGMS64>(FAGMS64* , PyObject *, PyObject
 template static PyObject * Sketch_get_key_size<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FAGMS64>(FAGMS64*, PyObject *, PyObject *);
 
 static PyTypeObject FAGMS64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -426,6 +439,9 @@ static PyMethodDef FAGMS64_methods[] = {
     {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS64>, METH_NOARGS,
      "Returns the number of columns of the sketch"
     },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FAGMS64>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -443,6 +459,7 @@ template static PyObject * Sketch_clear<FAGMS128>(FAGMS128* , PyObject *, PyObje
 template static PyObject * Sketch_get_key_size<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_rows<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_iadd<FAGMS128>(FAGMS128*, PyObject *, PyObject *);
 
 static PyTypeObject FAGMS128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -513,6 +530,9 @@ static PyMethodDef FAGMS128_methods[] = {
     },
     {"get_columns", (PyCFunction)Sketch_get_columns<FAGMS128>, METH_NOARGS,
      "Returns the number of columns"
+    },
+    {"__iadd__", (PyCFunction)Sketch_iadd<FAGMS128>, METH_VARARGS|METH_KEYWORDS,
+    "Inplace add of sketches"
     },
     {NULL}  /* Sentinel */
 };
