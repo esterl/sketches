@@ -75,6 +75,23 @@ Sketch_difference(PyType* self, PyObject *args, PyObject *kwds)
     return (PyObject*) result;
 }
 
+template<typename PyType,typename KeyType>
+static PyObject *
+Sketch_inner_product(PyType* self, PyObject *args, PyObject *kwds)
+{
+    PyType* other;
+    double result;
+    static char *kwlist[] = {"other", NULL};
+    
+    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &other))
+        return NULL;
+    
+    if (! PyObject_TypeCheck((PyObject*) other, self->ob_type))
+        return NULL;
+    
+    result = self->sketch->inner_join((Sketch<KeyType>*)other->sketch);
+    return PyFloat_FromDouble(result);
+}
 
 template<typename PyType, typename CType>
 static PyObject *

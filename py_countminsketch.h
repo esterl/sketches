@@ -61,6 +61,7 @@ template static PyObject * Sketch_get_rows<CountMin8>(CountMin8* , PyObject *, P
 template static PyObject * Sketch_get_columns<CountMin8>(CountMin8* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin8>(CountMin8*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<CountMin8>(CountMin8* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<CountMin8, uint8_t>(CountMin8* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -141,6 +142,9 @@ static PyMethodDef CountMin8_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<CountMin8>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<CountMin8, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -160,6 +164,7 @@ template static PyObject * Sketch_get_rows<CountMin16>(CountMin16* , PyObject *,
 template static PyObject * Sketch_get_columns<CountMin16>(CountMin16* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin16>(CountMin16*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<CountMin16>(CountMin16* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<CountMin16, uint16_t>(CountMin16* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -240,6 +245,9 @@ static PyMethodDef CountMin16_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<CountMin16>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<CountMin16, uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -259,6 +267,7 @@ template static PyObject * Sketch_get_rows<CountMin32>(CountMin32* , PyObject *,
 template static PyObject * Sketch_get_columns<CountMin32>(CountMin32* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin32>(CountMin32*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<CountMin32>(CountMin32* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<CountMin32, uint32_t>(CountMin32* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -336,6 +345,9 @@ static PyMethodDef CountMin32_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<CountMin32>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<CountMin32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -356,6 +368,7 @@ template static PyObject * Sketch_get_rows<CountMin64>(CountMin64* , PyObject *,
 template static PyObject * Sketch_get_columns<CountMin64>(CountMin64* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin64>(CountMin64*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<CountMin64>(CountMin64* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<CountMin64, uint64_t>(CountMin64* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -433,6 +446,9 @@ static PyMethodDef CountMin64_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<CountMin64>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<CountMin64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -452,6 +468,7 @@ template static PyObject * Sketch_get_rows<CountMin128>(CountMin128* , PyObject 
 template static PyObject * Sketch_get_columns<CountMin128>(CountMin128* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<CountMin128>(CountMin128*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<CountMin128>(CountMin128* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<CountMin128, uint128_t>(CountMin128* , PyObject *, PyObject *);
 
 static PyTypeObject CountMin128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -528,6 +545,9 @@ static PyMethodDef CountMin128_methods[] = {
     },
     {"get_max", (PyCFunction)Sketch_get_max<CountMin128>, METH_NOARGS,
      "Returns the value of the biggest counter"
+    },
+    {"inner_product", (PyCFunction)Sketch_inner_product<CountMin128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
     },
     {NULL}  /* Sentinel */
 };

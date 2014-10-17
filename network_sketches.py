@@ -69,6 +69,9 @@ class NetworkSketch():
     def difference(self, other):
         return self.sketch.difference(other.sketch).second_moment()
     
+    def inner_product(self, other):
+        return self.sketch.inner_product(other.sketch)
+    
     def __iadd__(self, other):
         self.sketch = self.sketch.__iadd__(other.sketch)
         return self

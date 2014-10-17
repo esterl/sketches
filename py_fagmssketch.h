@@ -88,6 +88,7 @@ template static PyObject * Sketch_get_rows<FAGMS8>(FAGMS8* , PyObject *, PyObjec
 template static PyObject * Sketch_get_columns<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FAGMS8>(FAGMS8*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FAGMS8>(FAGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FAGMS8, uint8_t>(FAGMS8* , PyObject *, PyObject *);
 
 static PyTypeObject FAGMS8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -166,6 +167,9 @@ static PyMethodDef FAGMS8_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FAGMS8>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FAGMS8, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -185,6 +189,7 @@ template static PyObject * Sketch_get_rows<FAGMS16>(FAGMS16* , PyObject *, PyObj
 template static PyObject * Sketch_get_columns<FAGMS16>(FAGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FAGMS16>(FAGMS16*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FAGMS16>(FAGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FAGMS16, uint16_t>(FAGMS16* , PyObject *, PyObject *);
 
 static PyTypeObject FAGMS16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -265,6 +270,9 @@ static PyMethodDef FAGMS16_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FAGMS16>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FAGMS16, uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -284,6 +292,7 @@ template static PyObject * Sketch_get_rows<FAGMS32>(FAGMS32* , PyObject *, PyObj
 template static PyObject * Sketch_get_columns<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FAGMS32>(FAGMS32*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FAGMS32>(FAGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FAGMS32, uint32_t>(FAGMS32* , PyObject *, PyObject *);
 
 static PyTypeObject FAGMS32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -361,6 +370,9 @@ static PyMethodDef FAGMS32_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FAGMS32>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FAGMS32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -381,6 +393,7 @@ template static PyObject * Sketch_get_rows<FAGMS64>(FAGMS64* , PyObject *, PyObj
 template static PyObject * Sketch_get_columns<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FAGMS64>(FAGMS64*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FAGMS64>(FAGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FAGMS64, uint64_t>(FAGMS64* , PyObject *, PyObject *);
 
 static PyTypeObject FAGMS64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -458,6 +471,9 @@ static PyMethodDef FAGMS64_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FAGMS64>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FAGMS64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -477,6 +493,7 @@ template static PyObject * Sketch_get_rows<FAGMS128>(FAGMS128* , PyObject *, PyO
 template static PyObject * Sketch_get_columns<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FAGMS128>(FAGMS128*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FAGMS128>(FAGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FAGMS128, uint128_t>(FAGMS128* , PyObject *, PyObject *);
 
 static PyTypeObject FAGMS128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -553,6 +570,9 @@ static PyMethodDef FAGMS128_methods[] = {
     },
     {"get_max", (PyCFunction)Sketch_get_max<FAGMS128>, METH_NOARGS,
      "Returns the value of the biggest counter"
+    },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FAGMS128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
     },
     {NULL}  /* Sentinel */
 };

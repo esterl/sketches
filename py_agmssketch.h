@@ -78,6 +78,8 @@ template static PyObject * Sketch_get_key_size<AGMS8>(AGMS8* , PyObject *, PyObj
 template static PyObject * Sketch_get_rows<AGMS8>(AGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS8>(AGMS8* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<AGMS8>(AGMS8* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<AGMS8, uint8_t>(AGMS8* , PyObject *, PyObject *);
+
 
 static PyTypeObject AGMS8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -125,10 +127,10 @@ static PyTypeObject AGMS8Type = {
 
 
 static PyMethodDef AGMS8_methods[] = {
-    {"update", (PyCFunction)Sketch_update<AGMS<uint8_t>,uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    {"update", (PyCFunction)Sketch_update<AGMS8,uint8_t>, METH_VARARGS|METH_KEYWORDS,
      "Updates the sketch with the given key and value"
     },
-    {"difference", (PyCFunction)Sketch_difference<AGMS<uint8_t>, AGMS_Sketch<uint8_t>, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    {"difference", (PyCFunction)Sketch_difference<AGMS8, AGMS_Sketch<uint8_t>, uint8_t>, METH_VARARGS|METH_KEYWORDS,
      "Provides and estimation to the L2 difference between the sketches"
     },
     {"second_moment", (PyCFunction)Sketch_second_moment<AGMS8>, METH_NOARGS,
@@ -158,6 +160,9 @@ static PyMethodDef AGMS8_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<AGMS8>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<AGMS8, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 /******************************** uint16_t ************************************/
@@ -175,6 +180,7 @@ template static PyObject * Sketch_get_key_size<AGMS16>(AGMS16* , PyObject *, PyO
 template static PyObject * Sketch_get_rows<AGMS16>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS16>(AGMS16* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<AGMS16>(AGMS16* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<AGMS16, uint16_t>(AGMS16* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -255,6 +261,9 @@ static PyMethodDef AGMS16_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<AGMS16>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<AGMS16, uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -273,6 +282,7 @@ template static PyObject * Sketch_get_key_size<AGMS32>(AGMS32* , PyObject *, PyO
 template static PyObject * Sketch_get_rows<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS32>(AGMS32* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<AGMS32>(AGMS32* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<AGMS32, uint32_t>(AGMS32* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -350,6 +360,9 @@ static PyMethodDef AGMS32_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<AGMS32>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<AGMS32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -369,6 +382,7 @@ template static PyObject * Sketch_get_key_size<AGMS64>(AGMS64* , PyObject *, PyO
 template static PyObject * Sketch_get_rows<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS64>(AGMS64* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<AGMS64>(AGMS64* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<AGMS64, uint64_t>(AGMS64* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -446,6 +460,9 @@ static PyMethodDef AGMS64_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<AGMS64>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<AGMS64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -464,6 +481,7 @@ template static PyObject * Sketch_get_key_size<AGMS128>(AGMS128* , PyObject *, P
 template static PyObject * Sketch_get_rows<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_columns<AGMS128>(AGMS128* , PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<AGMS128>(AGMS128* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<AGMS128, uint128_t>(AGMS128* , PyObject *, PyObject *);
 
 static PyTypeObject AGMS128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -540,6 +558,9 @@ static PyMethodDef AGMS128_methods[] = {
     },
     {"get_max", (PyCFunction)Sketch_get_max<AGMS128>, METH_NOARGS,
      "Returns the value of the biggest counter"
+    },
+    {"inner_product", (PyCFunction)Sketch_inner_product<AGMS128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
     },
     {NULL}  /* Sentinel */
 };

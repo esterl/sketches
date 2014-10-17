@@ -70,6 +70,7 @@ template static PyObject * Sketch_get_rows<FastCount8>(FastCount8* , PyObject *,
 template static PyObject * Sketch_get_columns<FastCount8>(FastCount8* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FastCount8>(FastCount8*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount8>(FastCount8* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FastCount8, uint8_t>(FastCount8* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount8Type = {
     PyObject_HEAD_INIT(NULL)
@@ -150,6 +151,9 @@ static PyMethodDef FastCount8_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FastCount8>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FastCount8, uint8_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -169,6 +173,7 @@ template static PyObject * Sketch_get_rows<FastCount16>(FastCount16* , PyObject 
 template static PyObject * Sketch_get_columns<FastCount16>(FastCount16* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FastCount16>(FastCount16*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount16>(FastCount16* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FastCount16, uint16_t>(FastCount16* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount16Type = {
     PyObject_HEAD_INIT(NULL)
@@ -249,6 +254,9 @@ static PyMethodDef FastCount16_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FastCount16>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FastCount16, uint16_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -268,6 +276,7 @@ template static PyObject * Sketch_get_rows<FastCount32>(FastCount32* , PyObject 
 template static PyObject * Sketch_get_columns<FastCount32>(FastCount32* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FastCount32>(FastCount32*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount32>(FastCount32* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FastCount32, uint32_t>(FastCount32* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount32Type = {
     PyObject_HEAD_INIT(NULL)
@@ -345,6 +354,9 @@ static PyMethodDef FastCount32_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FastCount32>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FastCount32, uint32_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -365,6 +377,7 @@ template static PyObject * Sketch_get_rows<FastCount64>(FastCount64* , PyObject 
 template static PyObject * Sketch_get_columns<FastCount64>(FastCount64* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FastCount64>(FastCount64*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount64>(FastCount64* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FastCount64, uint64_t>(FastCount64* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount64Type = {
     PyObject_HEAD_INIT(NULL)
@@ -442,6 +455,9 @@ static PyMethodDef FastCount64_methods[] = {
     {"get_max", (PyCFunction)Sketch_get_max<FastCount64>, METH_NOARGS,
      "Returns the value of the biggest counter"
     },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FastCount64, uint64_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
+    },
     {NULL}  /* Sentinel */
 };
 
@@ -461,6 +477,7 @@ template static PyObject * Sketch_get_rows<FastCount128>(FastCount128* , PyObjec
 template static PyObject * Sketch_get_columns<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_iadd<FastCount128>(FastCount128*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount128>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_inner_product<FastCount128, uint128_t>(FastCount128* , PyObject *, PyObject *);
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -537,6 +554,9 @@ static PyMethodDef FastCount128_methods[] = {
     },
     {"get_max", (PyCFunction)Sketch_get_max<FastCount128>, METH_NOARGS,
      "Returns the value of the biggest counter"
+    },
+    {"inner_product", (PyCFunction)Sketch_inner_product<FastCount128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
+    "Computes the inner product between two sketches"
     },
     {NULL}  /* Sentinel */
 };
