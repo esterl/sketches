@@ -2,9 +2,9 @@ import hashlib
 
 def record_results(sketch_in, sketch_out):
     est_difference_1st = sketch_in.estimate_first_moment(sketch_out)
-    est_difference_2nd = sketch_in.estimate_second_moment(sketch_out)
+    est_difference_2nd = sketch_in.difference(sketch_out)
     est_input_1st = sketch_in.sketch.first_moment()
-    est_output_1st = sketch_out.sketch.second_moment()
+    est_output_1st = sketch_out.sketch.first_moment()
     est_input_2nd = sketch_in.sketch.second_moment()
     est_output_2nd = sketch_out.sketch.second_moment()
     return (est_difference_1st, est_difference_2nd, est_input_1st, 
@@ -19,17 +19,17 @@ class NetworkSketch():
     #sketch
     #buffer
     
-    def __init__(self,sketch, key=0L, mask=None):
+    def __init__(self,sketch, keys=[0L], mask=None):
         self.buffer = []
         self.sketch = sketch
-        self.key=key
+        self.keys=keys
         if mask is None:
             self.mask = (1L << sketch.get_key_size() ) -1
         else:
             self.mask = mask
     
-    def change_key(self,new_key):
-        self.key = new_key
+    def change_key(self,new_keys):
+        self.keys = new_keys
     
     def clear(self):
         self.buffer = []
@@ -37,7 +37,7 @@ class NetworkSketch():
     
     def get_sketch(self):
         for packet in self.buffer:
-            self.sketch.update(str((packet^self.key)&self.mask),1)
+            self.update(packet)
         self.buffer=[]
         return self.sketch
     
@@ -51,14 +51,20 @@ class NetworkSketch():
         self.buffer.append(long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16))
     
     def update(self, pkt):
-	if pkt.name == 'Ethernet':
+        if pkt.name == 'Ethernet':
             pkt = pkt.getlayer(1)
         if pkt.name == 'IPv6':
             pkt.setfieldval('hlim', 0)
         elif pkt.name == 'IP':
             pkt.setfieldval('ttl', 0)
-        packet_hash = long(hashlib.md5(str(pkt)).hexdigest(),base=16)
-        self.sketch.update(str((packet_hash^self.key)&self.mask),1.)
+        packet_hash = hashlib.sha256(str(pkt)).hexdigest()
+        slice_len = 256/len(self.keys)
+        # Since the string its in HEX each char is 4 bits
+        ini_range = xrange(0, 256/4, slice_len/4)
+        end_range = xrange(slice_len/4, 256/4+1, slice_len/4)
+        for ini,end,key in zip(ini_range, end_range, self.keys):
+            hash_slice = long(packet_hash[ini:end], base=16)
+            self.sketch.update(str((hash_slice^key)&self.mask), 1.)
     
     def second_moment(self):
         return self.sketch.second_moment()
@@ -77,7 +83,7 @@ class NetworkSketch():
         return self
     
     def copy(self):
-        result = NetworkSketch(self.sketch.copy(), self.key)
+        result = NetworkSketch(self.sketch.copy(), self.keys)
         return result
     
     def test(self, pcap, drop_probability, is_random=True, time_interval=None, 
@@ -106,7 +112,8 @@ class NetworkSketch():
         for pkt in pkts:
             try:
                 complete_pkt = pkt/Raw(os.urandom(max(pkt.len-len(pkt),0)))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, AttributeError):
+                print pkt
                 continue
             # Check test condition
             if time:
