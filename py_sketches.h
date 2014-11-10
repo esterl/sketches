@@ -178,4 +178,21 @@ Sketch_get_max(SketchType* self, PyObject *args, PyObject *kwds)
     result = self->sketch->get_max();
     return PyFloat_FromDouble(result);
 }
+
+template<typename SketchType>
+static PyObject *
+Sketch_get_counters(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    double *result;
+    result = self->sketch->get_counters();
+    int num_columns = self->sketch->get_num_columns();
+    int num_rows = self->sketch->get_num_rows();
+    
+    PyObject* py_result = PyList_New(num_rows*num_columns);
+    for (int i=0; i < num_rows*num_columns; i++){
+        PyList_SetItem(py_result, i, PyFloat_FromDouble(result[i]));
+    }
+    
+    return py_result;
+}
 #endif

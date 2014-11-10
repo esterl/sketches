@@ -478,6 +478,8 @@ template static PyObject * Sketch_get_columns<FastCount128>(FastCount128* , PyOb
 template static PyObject * Sketch_iadd<FastCount128>(FastCount128*, PyObject *, PyObject *);
 template static PyObject * Sketch_get_max<FastCount128>(FastCount128* , PyObject *, PyObject *);
 template static PyObject * Sketch_inner_product<FastCount128, uint128_t>(FastCount128* , PyObject *, PyObject *);
+template static PyObject * Sketch_get_counters<FastCount128>(FastCount128* , PyObject *, PyObject *);
+
 
 static PyTypeObject FastCount128Type = {
     PyObject_HEAD_INIT(NULL)
@@ -557,6 +559,9 @@ static PyMethodDef FastCount128_methods[] = {
     },
     {"inner_product", (PyCFunction)Sketch_inner_product<FastCount128, uint128_t>, METH_VARARGS|METH_KEYWORDS,
     "Computes the inner product between two sketches"
+    },
+    {"get_counters", (PyCFunction)Sketch_get_counters<FastCount128>, METH_NOARGS,
+     "Returns the value of the counters of the sketch"
     },
     {NULL}  /* Sentinel */
 };

@@ -51,7 +51,7 @@ class NetworkSketch():
         self.buffer.append(long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16))
     
     def update(self, pkt):
-	if pkt.name == 'Ethernet':
+        if pkt.name == 'Ethernet':
             pkt = pkt.getlayer(1)
         if pkt.name == 'IPv6':
             pkt.setfieldval('hlim', 0)
