@@ -38,5 +38,5 @@ typedef uint64_t prime17_t;
 typedef uint64_t prime31_t;
 typedef ttmath::UInt<2> prime61_t;
 typedef ttmath::UInt<3> prime89_t;
-typedef ttmath::UInt<15> prime521_t;
+typedef ttmath::UInt<17> prime521_t;
 #endif //SKETCHES_MERSENNE_H
