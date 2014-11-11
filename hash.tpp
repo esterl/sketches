@@ -14,8 +14,8 @@ void Hash_CW2<T1,T2>::init(unsigned B, T2 seed0, T2 seed1)
     if (!isPowerOfTwo(B)) 
         throw std::domain_error("The number of buckets should be a power of 2");
     mask = B - 1;
-    seeds[0] = mersenne_modulus<T1>(seed0, mersenne_exponent);
-    seeds[1] = mersenne_modulus<T1>(seed1, mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(seed0, mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(seed1, mersenne_exponent);
 }
 
 template<typename T1, typename T2>
@@ -39,8 +39,8 @@ template<typename T1, typename T2>
 unsigned Hash_CW2<T1,T2>::element(T1 j)
 {
     T2 result = j;
-    result = mersenne_modulus(result*seeds[1], mersenne_exponent) + seeds[0];
-    result = mersenne_modulus(result, mersenne_exponent);
+    result = mersenne_modulus<T2>(result*seeds[1], mersenne_exponent) + seeds[0];
+    result = mersenne_modulus<T2>(result, mersenne_exponent);
     T2 temp = mask;
     unsigned res = result & temp;
     return res;
@@ -62,10 +62,10 @@ void Hash_CW4<T1,T2>::init(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
     if (!isPowerOfTwo(B)) 
         throw std::domain_error("The number of buckets should be a power of 2");
     mask = B - 1;
-    seeds[0] = mersenne_modulus<T1>(seed0, mersenne_exponent);
-    seeds[1] = mersenne_modulus<T1>(seed1, mersenne_exponent);
-    seeds[2] = mersenne_modulus<T1>(seed2, mersenne_exponent);
-    seeds[3] = mersenne_modulus<T1>(seed3, mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(seed0, mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(seed1, mersenne_exponent);
+    seeds[2] = mersenne_modulus<T2>(seed2, mersenne_exponent);
+    seeds[3] = mersenne_modulus<T2>(seed3, mersenne_exponent);
 }
 
 template<typename T1, typename T2>
