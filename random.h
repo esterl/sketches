@@ -34,6 +34,11 @@ ttmath::UInt<17> random<ttmath::UInt<17> >(){
 }
 
 template<>
+ttmath::UInt<15> random<ttmath::UInt<15> >(){
+    return random_ttmath<15>();
+}
+
+template<>
 ttmath::UInt<132> random<ttmath::UInt<132> >(){
     return random_ttmath<132>();
 }

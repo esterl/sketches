@@ -133,8 +133,8 @@ template<typename T1, typename T2>
 int Xi_CW2<T1,T2>::element(T1 j)
 {
     T2 result = j;
-    result = mersenne_modulus(result*seeds[1], mersenne_exponent) + seeds[0];
-    result = mersenne_modulus(result, mersenne_exponent);
+    result = mersenne_modulus<T2>(result*seeds[1], mersenne_exponent) + seeds[0];
+    result = mersenne_modulus<T2>(result, mersenne_exponent);
     T2 temp = 1U;
     int res = result & temp;
     if (res == 0) return -1;
