@@ -101,7 +101,7 @@ for pkt in pkts:
         neighbor = neighbors[src]
         # Complete packet
         try:
-            last_random = os.urandom(max(pkt.len-len(pkt),0))
+            last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
             complete_pkt = pkt/Raw(last_random)
         except (TypeError, ValueError, AttributeError):
             print pkt.__repr__()
