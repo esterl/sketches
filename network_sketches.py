@@ -1,4 +1,5 @@
 import hashlib
+import random
 
 def record_results(sketch_in, sketch_out):
     est_difference_1st = sketch_in.estimate_first_moment(sketch_out)
@@ -9,7 +10,6 @@ def record_results(sketch_in, sketch_out):
     est_output_2nd = sketch_out.sketch.second_moment()
     return (est_difference_1st, est_difference_2nd, est_input_1st, 
                 est_output_1st, est_input_2nd, est_output_2nd)
-    
     
     
     
@@ -57,7 +57,7 @@ class NetworkSketch():
             pkt.setfieldval('hlim', 0)
         elif pkt.name == 'IP':
             pkt.setfieldval('ttl', 0)
-        packet_hash = hashlib.sha256(str(pkt)).hexdigest()
+        packet_hash = hashlib.sha256(str(pkt)[0:pkt.len]).hexdigest()
         slice_len = 256/len(self.keys)
         # Since the string its in HEX each char is 4 bits
         ini_range = xrange(0, 256/4, slice_len/4)
@@ -85,6 +85,22 @@ class NetworkSketch():
     def copy(self):
         result = NetworkSketch(self.sketch.copy(), self.keys)
         return result
+    
+    def detect_link(self, other, threshold, verbose=False):
+        difference = self.difference(other)
+        num_packets = self.second_moment()
+        if difference/max(1, num_packets) > threshold and verbose:
+            print difference, num_packets
+        return difference/max(1, num_packets) > threshold
+    
+    def corrupt(self, other, threshold):
+        max_val = 1L << self.sketch.get_key_size()
+        random_value = None
+        while not other.detect_link(self, threshold):
+            random_value = random.randrange(max_val)
+            self.sketch.update(str(random_value), 1.)
+        if random_value:
+            self.sketch.update(str(random_value), -1.)
     
     def test(self, pcap, drop_probability, is_random=True, time_interval=None, 
                 num_packets=None, max_iter=10):
