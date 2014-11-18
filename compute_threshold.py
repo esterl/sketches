@@ -69,7 +69,7 @@ for pkt in pkts:
             neigh_in[neighbor].clear()
             local_in[neighbor].clear()
             local_out[neighbor].clear()
-            next_interval += interval
+        next_interval += interval
     
     src = pkt.getfieldval('src')
     dst = pkt.getfieldval('dst')
