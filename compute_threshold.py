@@ -9,26 +9,18 @@ from scapy.all import *
 
 neighbors = {
     #qMp-fe4c fe80::6f0:21ff:fe03:64
-    "04:f0:21:03:00:64" : (0.05**4, 0.0, 2.8, 11.2),
+    "04:f0:21:03:00:64" : (0.05**4, 0.0, 1.5, 1.8),
     #GS-RamblaBadal fe80::215:6dff:fe80:11ce
-    "00:15:6d:80:11:ce" : (0.05**4, 0.0, 1.8, 1.9),
-    #GS_Sagunt62-RS fe80::6f0:21ff:fe03:65
-    "04:f0:21:03:00:65" : (0.36**4, 0.26**4, 9.5, 14.7),
-    #GSgranVia fe80::227:22ff:fe68:db37
-    "00:27:22:68:db:37" : (0.04477456, 0.6561, 144.7063, 45.99776),
+    "00:15:6d:80:11:ce" : (0.5, 0.5, 33.9, 98.6),
     #GSmVictoria fe80::de9f:dbff:fe08:8da9
-    "dc:9f:db:08:8d:a9" : (0.05**4, 0.03**4, 1.4, 1.1),
-    #GS_SanBaltassar fe80::6f0:21ff:fe03:52
-    "04:f0:21:03:00:52" : (0.07**4, 0.0, 1.2, 0.7),
-    #GS-JocsFlorals fe80::227:22ff:fed6:21bf
-    "00:27:22:d6:21:bf" : (0.05**4, 0.05**4, 1.3, 0.7)
+    "dc:9f:db:08:8d:a9" : (0.05**4, 0.03**4, 2.5, 4.8),
 }
 
 _id = sys.argv[1]
-pcap = "night_sagunt.pcap"
+pcap = "morning_sagunt.pcap"
 local_mac = "dc:9f:db:08:89:71"
 local_address = "fe80::de9f:dbff:fe08:8971"
-pattern = 'sagunt'
+pattern = 'morning_sagunt'
 interval = 5.
 num_cols = 32
 num_rows = 32
