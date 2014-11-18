@@ -51,7 +51,7 @@ class NetworkSketch():
         self.buffer.append(long(hashlib.md5(str(pkt['IP'])).hexdigest(),base=16))
     
     def update(self, pkt):
-        if pkt.name == 'Ethernet':
+        while not pkt.name in ['IPv6', 'IP']:
             pkt = pkt.getlayer(1)
         if pkt.name == 'IPv6':
             pkt.setfieldval('hlim', 0)
@@ -86,17 +86,16 @@ class NetworkSketch():
         result = NetworkSketch(self.sketch.copy(), self.keys)
         return result
     
-    def detect_link(self, other, threshold, verbose=False):
+    def detect_link(self, other, threshold, nmax = 0):
         difference = self.difference(other)
+        if difference < nmax: return False
         num_packets = self.second_moment()
-        if difference/max(1, num_packets) > threshold and verbose:
-            print difference, num_packets
         return difference/max(1, num_packets) > threshold
     
-    def corrupt(self, other, threshold):
+    def corrupt(self, other, threshold, nmax=0):
         max_val = 1L << self.sketch.get_key_size()
         random_value = None
-        while not other.detect_link(self, threshold):
+        while not other.detect_link(self, threshold, nmax):
             random_value = random.randrange(max_val)
             self.sketch.update(str(random_value), 1.)
         if random_value:

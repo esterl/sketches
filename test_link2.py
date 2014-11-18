@@ -18,8 +18,6 @@ neighbors = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument("_id")
-parser.add_argument("threshold", type=float)
-parser.add_argument("nmax", default=0, nargs='?', type=int)
 
 globals().update(vars(parser.parse_args()))
 
@@ -30,6 +28,14 @@ pattern = 'morning_sagunt'
 interval = 5.
 num_cols = 32
 num_rows = 32
+thresholds = {
+    #qMp-fe4c fe80::6f0:21ff:fe03:64
+    "04:f0:21:03:00:64" : 0.001,
+    #GS-RamblaBadal fe80::215:6dff:fe80:11ce
+    "00:15:6d:80:11:ce" : 2,
+    #GSmVictoria fe80::de9f:dbff:fe08:8da9
+    "dc:9f:db:08:8d:a9" : 0.001,
+}
 
 neigh_in = dict()
 neigh_out = dict()
@@ -60,11 +66,11 @@ for pkt in pkts:
         # Corrupt sketches and create global:
         detected = False
         for neighbor in neighbors:
-            neigh_in[neighbor].corrupt(local_out[neighbor], threshold, nmax)
-            if local_out[neighbor].detect_link(neigh_in[neighbor], threshold, nmax):
+            neigh_in[neighbor].corrupt(local_out[neighbor], thresholds[neighbor])
+            if local_out[neighbor].detect_link(neigh_in[neighbor], thresholds[neighbor]):
                 detected = True
-            neigh_out[neighbor].corrupt(local_in[neighbor], threshold, nmax)
-            if local_in[neighbor].detect_link(neigh_out[neighbor], threshold, nmax):
+            neigh_out[neighbor].corrupt(local_in[neighbor], thresholds[neighbor])
+            if local_in[neighbor].detect_link(neigh_out[neighbor], thresholds[neighbor]):
                 detected = True
             global_in += neigh_out[neighbor]
             global_out += neigh_in[neighbor]
