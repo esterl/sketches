@@ -17,13 +17,31 @@ neighbors = {
 }
 
 _id = sys.argv[1]
-pcap = "morning_sagunt.pcap"
+pcap = "pcaps/morning_sagunt.pcap"
 local_mac = "dc:9f:db:08:89:71"
 local_address = "fe80::de9f:dbff:fe08:8971"
 pattern = 'morning_sagunt'
 interval = 5.
 num_cols = 32
 num_rows = 32
+
+
+# First check which packets are exactly the same:
+pkts = PcapReader(pcap)
+hashes = collections.defaultdict(list)
+for (i,pkt) in enumerate(pkts):
+    while not pkt.name in ['IPv6', 'IP']:
+            pkt = pkt.getlayer(1)
+    # TODO check if pkt.len or len(pkt)
+    hashes[hashlib.sha256(str(pkt)[0:len(pkt)]).hexdigest()].append(i)
+pkts.close()
+
+index_repeated_pkts = dict()
+for pkt_hash, indexes in hashes.iteritems():
+    if len(indexes) > 1:
+        for i in indexes:
+            index_repeated_pkts[i] = pkt_hash
+
 
 neigh_in = dict()
 neigh_out = dict()
@@ -37,12 +55,16 @@ for neighbor in neighbors:
     local_in[neighbor] = net_sketch.copy()
     local_out[neighbor] = net_sketch.copy()
 
+
 results = []
+# Get the startime
 pkts = PcapReader(pcap)
 next_interval = pkts.next().time + interval
 pkts.close()
+
 pkts = PcapReader(pcap)
 last_random = ""
+i = 0
 for pkt in pkts:
     # New interval?
     if pkt.time > next_interval:
@@ -80,8 +102,18 @@ for pkt in pkts:
         neighbor = neighbors[src]
         # Complete packet
         try:
-            last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
-            complete_pkt = pkt/Raw(last_random)
+            if i in index_repeated_pkts:
+                pkt_hash = index_repeated_pkts[i]
+                if pkt_hash in repeated_random:
+                    last_random = repeated_random[pkt_hash]
+                else:
+                    last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                    repeated_random[pkt_hash] = last_random
+                complete_pkt = pkt/Raw(last_random)
+            else:
+                # TODO check if with the new headers still pkt.len - 14 is ok
+                last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                complete_pkt = pkt/Raw(last_random)
         except (TypeError, ValueError, AttributeError):
             print pkt.__repr__()
             continue
@@ -99,6 +131,7 @@ for pkt in pkts:
         if link_drop:
             # Skip also next:
             pkts.next()
+            i = i + 1
             continue
     elif dst in neighbors and src == local_mac:
         neighbor = neighbors[dst]
