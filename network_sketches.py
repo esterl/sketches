@@ -1,5 +1,6 @@
 import hashlib
 import random
+from scipy.stats import binom
 
 def record_results(sketch_in, sketch_out):
     est_difference_1st = sketch_in.estimate_first_moment(sketch_out)
@@ -86,16 +87,21 @@ class NetworkSketch():
         result = NetworkSketch(self.sketch.copy(), self.keys)
         return result
     
-    def detect_link(self, other, threshold, nmax = 0):
+    def detect_link(self, other, threshold, loss_probability, incoming=True, nmax = 0):
         difference = self.difference(other)
         if difference < nmax: return False
-        num_packets = self.second_moment()
-        return difference/max(1, num_packets) > threshold
+        if incoming: 
+            received = self.second_moment()
+            sent = received + difference
+        else:
+            sent = self.second_moment()
+            received = self.second_moment() - difference
+        return binom.cdf(received, round(sent), 1-loss_probability) < threshold
     
-    def corrupt(self, other, threshold, nmax=0):
+    def corrupt(self, other, threshold, loss_probability, incoming, nmax=0):
         max_val = 1L << self.sketch.get_key_size()
         random_value = None
-        while not other.detect_link(self, threshold, nmax):
+        while not other.detect_link(self, threshold, loss_probability, incoming, nmax):
             random_value = random.randrange(max_val)
             self.sketch.update(str(random_value), 1.)
         if random_value:

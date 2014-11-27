@@ -41,6 +41,7 @@ for pkt_hash, indexes in hashes.iteritems():
     if len(indexes) > 1:
         for i in indexes:
             index_repeated_pkts[i] = pkt_hash
+repeated_random = dict()
 
 
 neigh_in = dict()
@@ -64,8 +65,9 @@ pkts.close()
 
 pkts = PcapReader(pcap)
 last_random = ""
-i = 0
+i = -1
 for pkt in pkts:
+    i += 1
     # New interval?
     if pkt.time > next_interval:
         # Compare every sketch and record difference:
@@ -131,7 +133,7 @@ for pkt in pkts:
         if link_drop:
             # Skip also next:
             pkts.next()
-            i = i + 1
+            i += 1
             continue
     elif dst in neighbors and src == local_mac:
         neighbor = neighbors[dst]
@@ -163,4 +165,3 @@ results_dtype = [ ('Neighbor', '|S96'),
 result = np.array(results, results_dtype)
 np.savetxt("threshold_%s.csv" % _id, result, delimiter=',', fmt="%s", 
             header=",".join(result.dtype.names), comments='')
-

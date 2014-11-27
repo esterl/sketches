@@ -19,7 +19,7 @@ neighbors = {
 parser = argparse.ArgumentParser()
 parser.add_argument("_id")
 parser.add_argument("threshold", type=float)
-parser.add_argument("nmax", default=0, nargs='?', type=int)
+parser.add_argument("nmax", default=1, nargs='?', type=int)
 
 globals().update(vars(parser.parse_args()))
 
@@ -30,6 +30,23 @@ pattern = 'morning_sagunt'
 interval = 5.
 num_cols = 32
 num_rows = 32
+
+# First check which packets are exactly the same:
+pkts = PcapReader(pcap)
+hashes = collections.defaultdict(list)
+for (i,pkt) in enumerate(pkts):
+    while not pkt.name in ['IPv6', 'IP']:
+            pkt = pkt.getlayer(1)
+    # TODO check if pkt.len or len(pkt)
+    hashes[hashlib.sha256(str(pkt)[0:len(pkt)]).hexdigest()].append(i)
+pkts.close()
+
+index_repeated_pkts = dict()
+for pkt_hash, indexes in hashes.iteritems():
+    if len(indexes) > 1:
+        for i in indexes:
+            index_repeated_pkts[i] = pkt_hash
+repeated_random = dict()
 
 neigh_in = dict()
 neigh_out = dict()
@@ -51,20 +68,21 @@ pkts = PcapReader(pcap)
 last_random = ""
 global_in = net_sketch.copy()
 global_out = net_sketch.copy()
+i = -1
 for pkt in pkts:
-    # New interval?
-    error_now = False
-    if pkt.time < 1412019186.31 and pkt.time> 1412019181.31:
-        error_now=True
+    i += 1
     if pkt.time > next_interval:
         # Corrupt sketches and create global:
         detected = False
         for neighbor in neighbors:
-            neigh_in[neighbor].corrupt(local_out[neighbor], threshold, nmax)
-            if local_out[neighbor].detect_link(neigh_in[neighbor], threshold, nmax):
+            loss_probability = neighbors[neighbor][1]
+            neigh_in[neighbor].corrupt(local_out[neighbor], threshold, loss_probability, False, nmax)
+            if local_out[neighbor].detect_link(neigh_in[neighbor], threshold, 
+                                                loss_probability, False, nmax):
                 detected = True
-            neigh_out[neighbor].corrupt(local_in[neighbor], threshold, nmax)
-            if local_in[neighbor].detect_link(neigh_out[neighbor], threshold, nmax):
+            loss_probability = neighbors[neighbor][0]
+            neigh_out[neighbor].corrupt(local_in[neighbor], threshold, loss_probability, True, nmax)
+            if local_in[neighbor].detect_link(neigh_out[neighbor], threshold, loss_probability, True, nmax):
                 detected = True
             global_in += neigh_out[neighbor]
             global_out += neigh_in[neighbor]
@@ -115,12 +133,24 @@ for pkt in pkts:
         if link_drop:
             # Skip also next:
             pkts.next()
+            i += 1
             continue
     elif dst in neighbors and src == local_mac:
         neighbor = neighbors[dst]
         # Complete packet
         try:
-            complete_pkt = pkt/Raw(last_random)
+            if i in index_repeated_pkts:
+                pkt_hash = index_repeated_pkts[i]
+                if pkt_hash in repeated_random:
+                    last_random = repeated_random[pkt_hash]
+                else:
+                    last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                    repeated_random[pkt_hash] = last_random
+                complete_pkt = pkt/Raw(last_random)
+            else:
+                # TODO check if with the new headers still pkt.len - 14 is ok
+                last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                complete_pkt = pkt/Raw(last_random)
         except (TypeError, ValueError, AttributeError):
             print pkt.__repr__()
             continue
