@@ -58,8 +58,7 @@ class NetworkSketch():
             pkt.setfieldval('hlim', 0)
         elif pkt.name == 'IP':
             pkt.setfieldval('ttl', 0)
-        
-        packet_hash = hashlib.sha256(pkt.original).hexdigest()
+        packet_hash = hashlib.sha256(pkt.__str__()[0:len(pkt.original)]).hexdigest()
         slice_len = 256/len(self.keys)
         # Since the string its in HEX each char is 4 bits
         ini_range = xrange(0, 256/4, slice_len/4)

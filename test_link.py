@@ -45,23 +45,6 @@ num_cols = 32
 num_rows = 32
 captured_length = 94
 
-# First check which packets are exactly the same:
-pkts = PcapReader(pcap)
-hashes = collections.defaultdict(list)
-for (i,pkt) in enumerate(pkts):
-    while not pkt.name in ['IPv6', 'IP']:
-            pkt = pkt.getlayer(1)
-    # TODO check if pkt.len or len(pkt)
-    hashes[hashlib.sha256(pkt.original).hexdigest()].append(i)
-pkts.close()
-
-index_repeated_pkts = dict()
-for pkt_hash, indexes in hashes.iteritems():
-    if len(indexes) > 1:
-        for i in indexes:
-            index_repeated_pkts[i] = pkt_hash
-repeated_random = dict()
-
 neigh_in = dict()
 neigh_out = dict()
 local_in = dict()
@@ -79,7 +62,6 @@ pkts = PcapReader(pcap)
 next_interval = pkts.next().time + interval
 pkts.close()
 pkts = PcapReader(pcap)
-last_random = ""
 global_in = net_sketch.copy()
 global_out = net_sketch.copy()
 i = -1
@@ -126,35 +108,15 @@ for pkt in pkts:
         continue
     if src in neighbors and dst == local_mac:
         neighbor = neighbors[src]
-        # Complete packet
-        try:
-            if i in index_repeated_pkts:
-                pkt_hash = index_repeated_pkts[i]
-                if pkt_hash in repeated_random:
-                    last_random = repeated_random[pkt_hash]
-                else:
-                    last_random = os.urandom(max(get_packet_length(pkt) - captured_length,0))
-                    repeated_random[pkt_hash] = last_random
-                complete_pkt = pkt/Raw(last_random)
-                complete_pkt.original = pkt.original + last_random
-            else:
-                # TODO check if with the new headers still pkt.len - 14 is ok
-                last_random = os.urandom(max(get_packet_length(pkt) - captured_length,0))
-                complete_pkt = pkt/Raw(last_random)
-                complete_pkt.original = pkt.original + last_random
-        except (TypeError, ValueError, AttributeError):
-            print pkt.__repr__()
-            continue
         # Compute the packet drop probabilities:
         link_drop = random.random() < neighbor[0]
         
         # Add to neigh out_dump
-        complete_pkt.time = pkt.time
-        neigh_out[src].update(complete_pkt)
+        neigh_out[src].update(pkt)
         
         # Add to local in if no drop:
         if not link_drop:
-            local_in[src].update(complete_pkt)
+            local_in[src].update(pkt)
         # First drop with p_neigh probability:
         if link_drop:
             # Skip also next:
@@ -163,22 +125,14 @@ for pkt in pkts:
             continue
     elif dst in neighbors and src == local_mac:
         neighbor = neighbors[dst]
-        # Complete packet
-        try:
-            complete_pkt = pkt/Raw(last_random)
-            complete_pkt.original = pkt.original + last_random
-        except (TypeError, ValueError, AttributeError):
-            print pkt.__repr__()
-            continue
         
         # Add to local out
-        complete_pkt.time = pkt.time
-        local_out[dst].update(complete_pkt)
+        local_out[dst].update(pkt)
         
         # If not dropped, add to neigh_in
         if random.random() < neighbor[1]:
             continue
-        neigh_in[dst].update(complete_pkt)
+        neigh_in[dst].update(pkt)
 
 results_dtype = [ ('EstimatedIn', 'float'), 
                   ('EstimatedOut', 'float'),
