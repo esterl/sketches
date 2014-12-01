@@ -7,6 +7,19 @@ from network_sketches import *
 from os.path import basename
 from scapy.all import *
 
+def get_packet_length(pkt):
+    n = 0
+    while not pkt.name in ['IPv6', 'IP']:
+        header = pkt.copy()
+        header.remove_payload()
+        n += len(header)
+        pkt = pkt.getlayer(1)
+    ip_len = pkt.len
+    header = pkt.copy()
+    header.remove_payload()
+    n += len(header)
+    return n + ip_len
+
 neighbors = {
     #qMp-fe4c fe80::6f0:21ff:fe03:64
     "04:f0:21:03:00:64" : (0.05**4, 0.0, 1.5, 1.8),
@@ -24,16 +37,18 @@ pattern = 'morning_sagunt'
 interval = 5.
 num_cols = 32
 num_rows = 32
+captured_length = 94
 
 
 # First check which packets are exactly the same:
+# editcap -v -D 0 <pcap> /dev/null | grep Hash: | awk '{ print $7 }' | sort | uniq -c | grep -v ' 1 ' 
 pkts = PcapReader(pcap)
 hashes = collections.defaultdict(list)
 for (i,pkt) in enumerate(pkts):
     while not pkt.name in ['IPv6', 'IP']:
             pkt = pkt.getlayer(1)
     # TODO check if pkt.len or len(pkt)
-    hashes[hashlib.sha256(str(pkt)[0:len(pkt)]).hexdigest()].append(i)
+    hashes[hashlib.sha256(pkt.original).hexdigest()].append(i)
 pkts.close()
 
 index_repeated_pkts = dict()
@@ -109,13 +124,15 @@ for pkt in pkts:
                 if pkt_hash in repeated_random:
                     last_random = repeated_random[pkt_hash]
                 else:
-                    last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                    last_random = os.urandom(max(get_packet_length(pkt) - captured_length,0))
                     repeated_random[pkt_hash] = last_random
                 complete_pkt = pkt/Raw(last_random)
+                complete_pkt.original = pkt.original + last_random
             else:
                 # TODO check if with the new headers still pkt.len - 14 is ok
-                last_random = os.urandom(max(len(pkt)-pkt.len-14,0))
+                last_random = os.urandom(max(get_packet_length(pkt) - captured_length,0))
                 complete_pkt = pkt/Raw(last_random)
+                complete_pkt.original = pkt.original + last_random
         except (TypeError, ValueError, AttributeError):
             print pkt.__repr__()
             continue
@@ -140,6 +157,7 @@ for pkt in pkts:
         # Complete packet
         try:
             complete_pkt = pkt/Raw(last_random)
+            complete_pkt.original = pkt.original + last_random
         except (TypeError, ValueError, AttributeError):
             print pkt.__repr__()
             continue
