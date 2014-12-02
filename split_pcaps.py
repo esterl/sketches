@@ -66,7 +66,7 @@ for pkt in pkts:
     src = pkt.getfieldval('src')
     dst = pkt.getfieldval('dst')
     # Skip pkts for or from local address
-    if pkt.getlayer(1).src == local_address or pkt.getlayer(1).dst == local_address:
+    if pkt['IPv6'].src == local_address or pkt['IPv6'].dst == local_address:
         continue
     if src in neighbors and dst == local_mac:
         in_pkt = pkt
@@ -76,14 +76,6 @@ for pkt in pkts:
         from_neighbor = src
         to_neighbor = out_pkt.getfieldval('dst')
         
-        # Complete packets:
-        try:
-            random_bytes = os.urandom(max(len(pkt)-pkt.len-14,0))
-            in_complete = in_pkt/Raw(random_bytes)
-            out_complete = out_pkt/Raw(random_bytes)
-        except (TypeError, ValueError, AttributeError):
-            print pkt.__repr__()
-            continue
         
         # Compute drop probabilities:
         link1_drop = random.random() < neighbors[from_neighbor][0]
@@ -91,15 +83,14 @@ for pkt in pkts:
         malicious_drop = random.random() < p_drop
         
         # Add to from_neigh out pcap
-        in_complete.time = in_pkt.time
         # Use the eth dst to indicate drop
         if link1_drop:
-            in_complete.dst = '00:00:00:00:00:01'
+            in_pkt.dst = '00:00:00:00:00:01'
         elif malicious_drop:
-            in_complete.dst = '00:00:00:00:00:00'
+            in_pkt.dst = '00:00:00:00:00:00'
         elif link2_drop:
-            in_complete.dst = '00:00:00:00:00:02'
-        neigh_out[from_neighbor].write(in_complete)
+            in_pkt.dst = '00:00:00:00:00:02'
+        neigh_out[from_neighbor].write(in_pkt)
         
         # If the packet was dropped by the first link, skip to next iteration
         if link1_drop:
@@ -108,18 +99,18 @@ for pkt in pkts:
         # Otherwise, add to local_in with some delay
         link1_delay = max(0.0, random.gauss(neighbors[from_neighbor][2], 
                                                 neighbors[from_neighbor][3])/2.)/1000
-        in_complete.time += link1_delay
-        local_in[from_neighbor].write(in_complete)
-        local_in_glob.write(in_complete)
+        in_pkt.time += link1_delay
+        local_in[from_neighbor].write(in_pkt)
+        local_in_glob.write(in_pkt)
         
         # If the packet was dropped by the node, skip to next iteration:
         if malicious_drop:
             continue
         
         # Otherwise, add to local_out the out packet:
-        out_complete.time = out_pkt.time + link1_delay
-        local_out[to_neighbor].write(out_complete)
-        local_out_glob.write(out_complete)
+        out_pkt.time += link1_delay
+        local_out[to_neighbor].write(out_pkt)
+        local_out_glob.write(out_pkt)
         
         # If the packet was dropped by the second link, skip to next interation
         if link2_drop:
@@ -128,8 +119,8 @@ for pkt in pkts:
         # Otherwise add to the neighbor in pcap with some delay
         link2_delay = max(0.0, random.gauss(neighbors[to_neighbor][2], 
                                                 neighbors[to_neighbor][3])/2.)/1000
-        out_complete.time += link2_delay
-        neigh_in[to_neighbor].write(out_complete)
+        out_pkt.time += link2_delay
+        neigh_in[to_neighbor].write(out_pkt)
 
 
 # Close pcaps

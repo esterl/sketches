@@ -9,8 +9,8 @@ from os.path import basename
 pattern = sys.argv[1]
 _id = sys.argv[2]
 
-in_pcap_files = glob.glob('%s_*:*_in.pcap' % pattern)
-out_pcap_files = glob.glob('%s_*:*_out.pcap' % pattern)
+in_pcap_files = glob.glob('pcaps/%s_??:??:??:??:??:??_in.pcap' % pattern)
+out_pcap_files = glob.glob('pcaps/%s_??:??:??:??:??:??_out.pcap' % pattern)
 pcaps = [ PcapReader(filename) for filename in in_pcap_files + out_pcap_files ]
 pkts = [ pcap.next() for pcap in pcaps ]
 is_in = [ True for pcap in in_pcap_files ] + [ False for pcap in out_pcap_files ]
@@ -37,13 +37,12 @@ rows = sketch.get_rows()
 results = []
 loop_condition = True
 n = 0
-prevn = 0
+in_pkts = [0, 0, 0]
+out_pkts = [0, 0, 0]
+drop_pkts = [0, 0, 0]
+link_pkts = [0, 0, 0]
+max_iter=31
 while loop_condition:
-    min_time = float("inf")
-    for pkt in pkts:
-        try: min_time = min(min_time, pkt.time)
-        except AttributeError: pass
-    print n, min_time, next_interval
     loop_condition = False
     for sketch in sketches:
         sketch.clear()
@@ -51,9 +50,17 @@ while loop_condition:
         if pkts[i]:
             loop_condition = True
         while pkts[i] and pkts[i].time < next_interval + desync[i]:
-            n += 1
             pkt = pkts[i]
             sketches[i].update(pkt)
+            if is_in[i]:
+                in_pkts[2] += 1
+                dst = pkt.getfieldval('dst')
+                if dst == '00:00:00:00:00:00':
+                    drop_pkts[2] += 1
+                elif dst in ['00:00:00:00:00:01','00:00:00:00:00:02'] :
+                    link_pkts[2] += 1
+            else:
+                out_pkts[2] += 1
             try: 
                 pkts[i] = pcap.next()
             except StopIteration: pkts[i] = None
@@ -80,21 +87,46 @@ while loop_condition:
     intersection_previous_out = sketch_in.inner_product(previous_out)
     intersection_next_in = sketch_out.inner_product(next_in)
     intersection_next_out = sketch_in.inner_product(next_out)
+    dup_previous_in = sketch_in.inner_product(previous_in)
+    dup_next_in = sketch_in.inner_product(next_in)
+    dup_previous_out = sketch_out.inner_product(next_out)
+    dup_next_out = sketch_out.inner_product(next_out)
     max_value = max(sketch_in.sketch.get_max(), sketch_out.sketch.get_max())
-    result = (estimated_sent, estimated_received, estimated_missing_packets, 
+    result = (  in_pkts[1], out_pkts[1], drop_pkts[1], link_pkts[1], estimated_sent, 
+                estimated_received, estimated_missing_packets, 
                 intersection_previous_in, intersection_previous_out, 
-                intersection_next_in, intersection_next_out, max_value, 
+                intersection_next_in, intersection_next_out, dup_previous_in, 
+                dup_next_in, dup_previous_out, dup_next_out, max_value, 
                 interval, rows, columns, str(sketch_in.sketch.__class__))
     results.append(result)
+    n += 1
     next_interval += interval
+    in_pkts.pop(0)
+    in_pkts.append(0)
+    out_pkts.pop(0)
+    out_pkts.append(0)
+    drop_pkts.pop(0)
+    drop_pkts.append(0)
+    link_pkts.pop(0)
+    link_pkts.append(0)
+    if n > max_iter:
+        break
 
-results_dtype = [ ('EstimatedIn', 'float'), 
+results_dtype = [ ('InPackets', 'float'), 
+                  ('OutPackets', 'float'), 
+                  ('MaliciousDrop', 'float'), 
+                  ('LinkDrop', 'float'), 
+                  ('EstimatedIn', 'float'), 
                   ('EstimatedOut', 'float'),
                   ('EstimatedDifference', 'float'), 
                   ('IntersectionPreviousIn', 'float'), 
                   ('IntersectionPreviousOut', 'float'), 
                   ('IntersectionNextIn', 'float'), 
                   ('IntersectionNextOut', 'float'), 
+                  ('DupPreviousIn', 'float'), 
+                  ('DupNextIn', 'float'), 
+                  ('DupPreviousOut', 'float'), 
+                  ('DupNextOut', 'float'), 
                   ('MaxValue', 'float'), 
                   ('Interval', 'float'), 
                   ('SketchRows', 'float'), 
