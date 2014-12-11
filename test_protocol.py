@@ -4,6 +4,7 @@ import numpy as np
 from network_sketches import *
 import glob
 from os.path import basename
+from math import copysign
 
 def get_sketch(hash_length, columns, rows, random_generator):
     if hash_length==8:
@@ -27,8 +28,8 @@ num_cols = int(sys.argv[3])
 num_rows = int(sys.argv[4])
 hash_length = int(sys.argv[5])
 
-in_pcap_files = glob.glob('%s_??:??:??:??:??:??_in.pcap' % pattern)
-out_pcap_files = glob.glob('%s_??:??:??:??:??:??_out.pcap' % pattern)
+in_pcap_files = sorted(glob.glob('%s_??:??:??:??:??:??_in.pcap' % pattern))
+out_pcap_files = sorted(glob.glob('%s_??:??:??:??:??:??_out.pcap' % pattern))
 pcaps = [ PcapReader(filename) for filename in in_pcap_files + out_pcap_files ]
 pkts = [ pcap.next() for pcap in pcaps ]
 is_in = [ True for pcap in in_pcap_files ] + [ False for pcap in out_pcap_files ]
@@ -40,7 +41,11 @@ interval = float(sys.argv[6])
 result_path = sys.argv[7]
 desync_dev = float(sys.argv[8])*interval
 # Supose there is always in for out and in the same order
-desync = [ random.gauss(0, desync_dev) for filename in in_pcap_files ]
+#desync = [ random.gauss(0, desync_dev) for filename in in_pcap_files ]
+desync = [ desync_dev * i for i in [0, 1, -1]]
+for (i,d) in enumerate(desync):
+    if abs(d) > interval/2.:
+        desync[i] = copysign(interval/2., d)
 desync = desync + desync
 max_desync = max(desync) - min(desync)
 next_interval = start_time + interval
@@ -60,7 +65,7 @@ in_pkts = [0, 0, 0]
 out_pkts = [0, 0, 0]
 drop_pkts = [0, 0, 0]
 link_pkts = [0, 0, 0]
-max_iter=31
+max_iter=101
 while loop_condition:
     loop_condition = False
     for sketch in sketches:
@@ -92,7 +97,9 @@ while loop_condition:
     # Sum all in sketches substract all out sketches
     next_in = net_sketch.copy()
     next_out = net_sketch.copy()
+    max_values = []
     for (i, sketch) in enumerate(sketches):
+        max_values.append(sketch.sketch.get_max())
         if is_in[i]:
             next_in += sketch
         else:
@@ -110,12 +117,12 @@ while loop_condition:
     dup_next_in = sketch_in.inner_product(next_in)
     dup_previous_out = sketch_out.inner_product(next_out)
     dup_next_out = sketch_out.inner_product(next_out)
-    max_value = max(sketch_in.sketch.get_max(), sketch_out.sketch.get_max())
+    max_values = "\"" + str(max_values) + "\""
     result = (  in_pkts[1], out_pkts[1], drop_pkts[1], link_pkts[1], estimated_sent, 
                 estimated_received, estimated_missing_packets, 
                 intersection_previous_in, intersection_previous_out, 
                 intersection_next_in, intersection_next_out, dup_previous_in, 
-                dup_next_in, dup_previous_out, dup_next_out, max_value, 
+                dup_next_in, dup_previous_out, dup_next_out, max_values, 
                 interval, rows, columns, str(sketch_in.sketch.__class__), desync_dev, max_desync)
     results.append(result)
     n += 1
@@ -146,7 +153,7 @@ results_dtype = [ ('InPackets', 'float'),
                   ('DupNextIn', 'float'), 
                   ('DupPreviousOut', 'float'), 
                   ('DupNextOut', 'float'), 
-                  ('MaxValue', 'float'), 
+                  ('MaxValues', '|S96'), 
                   ('Interval', 'float'), 
                   ('SketchRows', 'float'), 
                   ('SketchColumns', 'float'), 
