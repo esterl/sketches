@@ -460,6 +460,7 @@ Hash_Tab<uint128_t>::Hash_Tab(unsigned B, prime31_t** seeds)
         }
     }
     // Initialize 4-universal hash tables
+    T = new uint16_t*[2*q-1];
     for (unsigned i = 0; i<q; i++){
         T[i] = new uint16_t[POW16];
         Hash_CW4<uint16_t, prime31_t> hash = Hash_CW4<uint16_t, prime31_t>(POW16, seeds[q]);
@@ -537,7 +538,7 @@ Hash_Tab<uint128_t>::~Hash_Tab()
 {
     unsigned q = 8;
     for (unsigned i = 0; i<2*q-1; i++){
-        delete[] T;
+        delete[] T[i];
     }
     delete[] T;
 }
