@@ -1,6 +1,7 @@
 import hashlib
 import random
 from scipy.stats import binom
+import warnings
 
 def record_results(sketch_in, sketch_out):
     est_difference_1st = sketch_in.estimate_first_moment(sketch_out)
@@ -58,7 +59,11 @@ class NetworkSketch():
             pkt.setfieldval('hlim', 0)
         elif pkt.name == 'IP':
             pkt.setfieldval('ttl', 0)
-        packet_hash = hashlib.sha256(pkt.__str__()[0:len(pkt.original)]).hexdigest()
+        try:
+            packet_hash = hashlib.sha256(pkt.__str__()[0:len(pkt.original)]).hexdigest()
+        except TypeError:
+            warnings.warn('Packet error')
+            packet_hash = hashlib.sha256(pkt.original).hexdigest()
         slice_len = 256/len(self.keys)
         # Since the string its in HEX each char is 4 bits
         ini_range = xrange(0, 256/4, slice_len/4)
@@ -189,4 +194,57 @@ class NetworkSketch():
                           ('SketchColumns', 'float'), 
                           ('SketchClass','|S96')]
         return np.array(results, results_dtype)
-
+    
+    def test_base(self, pcap, time_interval=None, num_packets=None, max_iter=10):
+        import numpy as np
+        from scapy.all import *
+        if time_interval is None:
+            if num_packets is None:
+                return
+            time=False
+        else:
+            time=True
+        rows = self.sketch.get_rows()
+        columns = self.sketch.get_columns()
+        pkts = PcapReader(pcap)
+        start_time = pkts.next().time
+        pkts.close()
+        pkts = PcapReader(pcap)
+        if time: max_t = start_time + time_interval
+        sketched_packets = 0.
+        results = []
+        iters = 0
+        next_iter = False
+        for pkt in pkts:
+            # Check test condition
+            if time:
+                if pkt.time>max_t:
+                    next_iter = True
+                    # Update max_t
+                    while pkt.time>max_t:
+                        max_t += time_interval
+            else:
+                if sketched_packets >= num_packets:
+                    next_iter = True
+            if next_iter:
+                iters +=1
+                estimation = self.second_moment()
+                result = (sketched_packets, estimation, time_interval, rows, 
+                                columns, str(self.sketch.__class__))
+                results.append(result)
+                self.clear()
+                sketched_packets = 0
+                next_iter = False
+            # Enough iterations?
+            if iters >= max_iter:
+                break
+            # Update sketches:
+            self.update(pkt)
+            sketched_packets += 1
+        results_dtype = [ ('SketchedPackets', 'float'), 
+                          ('EstimatedPackets', 'float'),
+                          ('TimeInterval', 'float'), 
+                          ('SketchRows', 'float'), 
+                          ('SketchColumns', 'float'), 
+                          ('SketchClass','|S96')]
+        return np.array(results, results_dtype)

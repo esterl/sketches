@@ -137,8 +137,6 @@ double AGMS_Sketch<T>::inner_join(Sketch<T> *other)
 template<typename T>
 double AGMS_Sketch<T>::second_moment()
 {
-std::cout << "second_moment" << std::endl;
-print(this->sketch_elem, this->num_cols, this->num_rows);
     return this->inner_join(this);
 }
 
