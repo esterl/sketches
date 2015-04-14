@@ -1,6 +1,8 @@
 #include <Python.h>
 
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 #include "utils.h"
 #include "py_sketches.h"
@@ -23,6 +25,9 @@ extern "C"{
 PyMODINIT_FUNC
 initsketches(void) 
 {
+    // Set random seed:
+    srand(time(NULL));
+    
     PyObject* m;
 
     FastCount8Type.tp_new = Sketch_new<FastCount8>;
