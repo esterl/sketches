@@ -2,6 +2,7 @@ import hashlib
 import random
 from scipy.stats import binom
 import warnings
+from scapy.all import *
 
 def record_results(sketch_in, sketch_out):
     est_difference_1st = sketch_in.estimate_first_moment(sketch_out)
@@ -64,6 +65,17 @@ class NetworkSketch():
         except TypeError:
             warnings.warn('Packet error')
             packet_hash = hashlib.sha256(pkt.original).hexdigest()
+        slice_len = 256/len(self.keys)
+        # Since the string its in HEX each char is 4 bits
+        ini_range = xrange(0, 256/4, slice_len/4)
+        end_range = xrange(slice_len/4, 256/4+1, slice_len/4)
+        for ini,end,key in zip(ini_range, end_range, self.keys):
+            hash_slice = long(packet_hash[ini:end], base=16)
+            self.sketch.update(str((hash_slice^key)&self.mask), 1.)
+    
+    # Shorter version that doesn't care about fixing TTL and so on
+    def lazy_update(self, pkt):
+        packet_hash = hashlib.sha256(pkt.original).hexdigest()
         slice_len = 256/len(self.keys)
         # Since the string its in HEX each char is 4 bits
         ini_range = xrange(0, 256/4, slice_len/4)
@@ -197,7 +209,6 @@ class NetworkSketch():
     
     def test_base(self, pcap, time_interval=None, num_packets=None, max_iter=10):
         import numpy as np
-        from scapy.all import *
         if time_interval is None:
             if num_packets is None:
                 return
@@ -239,7 +250,7 @@ class NetworkSketch():
             if iters >= max_iter:
                 break
             # Update sketches:
-            self.update(pkt)
+            self.lazy_update(pkt)
             sketched_packets += 1
         results_dtype = [ ('SketchedPackets', 'float'), 
                           ('EstimatedPackets', 'float'),
