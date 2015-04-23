@@ -75,7 +75,8 @@ class NetworkSketch():
     
     # Shorter version that doesn't care about fixing TTL and so on
     def lazy_update(self, pkt):
-        packet_hash = hashlib.sha256(pkt.original).hexdigest()
+        str_random = os.urandom(max(pkt.len-len(pkt.original),0))
+        packet_hash = hashlib.sha256(pkt.original + str_random).hexdigest()
         slice_len = 256/len(self.keys)
         # Since the string its in HEX each char is 4 bits
         ini_range = xrange(0, 256/4, slice_len/4)
