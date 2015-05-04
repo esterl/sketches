@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <cmath>        // std::abs
+#include <stdexcept>    // std::invalid_argument
 
 void print(double * values, unsigned int buckets, unsigned int rows){
 std::cout << std::endl;
@@ -13,8 +14,8 @@ std::cout << std::endl;
     }
 }
 
-/**************************Basic math functions *******************************/
-inline double average(double* values, unsigned int n)
+/************************** Auxiliary functions *******************************/
+double mean(double* values, unsigned int n)
 {
     double sum = 0;
     for (unsigned int i = 0; i < n; i++)
@@ -22,7 +23,20 @@ inline double average(double* values, unsigned int n)
     return sum / (double) n;
 }
 
-inline double median(double* values, unsigned int n)
+double trimmean(double* values, unsigned int n)
+{
+    double trim = 0.05;
+    double *aux = new double[n];
+    std::sort(aux, aux+n);
+    
+    unsigned int start = std::round(trim * n);
+    unsigned int size = n - 2*start;
+    double result = mean(values+start, size);
+    delete [] aux;
+    return result;
+}
+
+double median(double* values, unsigned int n)
 {
     if (n == 1)
         return values[0];
@@ -33,21 +47,8 @@ inline double median(double* values, unsigned int n)
     double *aux = new double[n];
     for (unsigned int i = 0; i < n; i++)
         aux[i] = values[i];
-
-    // implement bubble sort
-    bool rpt = true;
-    while (rpt){
-        rpt = false;
-
-        for (unsigned int i = 0; i < n - 1; i++) {
-            if (aux[i] > aux[i+1]) {
-                double t = aux[i];
-                aux[i] = aux[i + 1];
-                aux[i + 1] = t;
-                rpt = true;
-            }
-        }
-    }
+    
+    std::sort(aux, aux+n);
     
     double res;
     if (n%2 == 0)
@@ -57,6 +58,18 @@ inline double median(double* values, unsigned int n)
     
     delete [] aux;
     return res;
+}
+
+fptr get_average_function(const char *name){
+    if (strcmp(name, "mean") == 0) {
+        return (*mean);
+    } else if (strcmp(name, "trimmean") == 0) {
+        return (*trimmean);
+    } else if (strcmp(name, "median") == 0) {
+        return (*median);
+    } else {
+        throw std::invalid_argument("Unknown average function");
+    }
 }
 
 inline double min(double* values, unsigned int n)
@@ -71,10 +84,12 @@ inline double min(double* values, unsigned int n)
 
 /**************************AGMS_Sketch implementation**************************/
 template<typename T>
-AGMS_Sketch<T>::AGMS_Sketch(unsigned int cols, unsigned int rows, Xi<T> **xis)
+AGMS_Sketch<T>::AGMS_Sketch(unsigned int cols, unsigned int rows, Xi<T> **xis, 
+                            const char* avg_func)
 {
     this->num_rows = rows;
     this->num_cols = cols;
+    this->average_function = get_average_function(avg_func);
     
     this->xis = new Xi<T>*[rows*cols];
     this->sketch_elem = new double[rows * cols];
@@ -89,6 +104,7 @@ AGMS_Sketch<T>::AGMS_Sketch(AGMS_Sketch<T>* copy)
 {
     this->num_rows = copy->num_rows;
     this->num_cols = copy->num_cols;
+    this->average_function = copy->average_function;
     
     this->xis = new Xi<T>*[this->num_rows * this->num_cols];
     this->sketch_elem = new double[this->num_rows * this->num_cols];
@@ -124,9 +140,9 @@ double AGMS_Sketch<T>::inner_join(Sketch<T> *other)
 
     double *avg_est = new double[this->num_rows];
     for (int i = 0; i < this->num_rows; i++)
-        avg_est[i] = average(basic_est + i * this->num_cols, this->num_cols);
+        avg_est[i] = mean(basic_est + i * this->num_cols, this->num_cols);
 
-    double result = median(avg_est, this->num_rows);
+    double result = (*average_function)(avg_est, this->num_rows);
 
     delete [] basic_est;
     delete [] avg_est;
@@ -149,10 +165,10 @@ double AGMS_Sketch<T>::first_moment()
 
     double *avg_est = new double[this->num_rows];
     for (int i = 0; i < this->num_rows; i++){
-        avg_est[i] = average(basic_est + i * this->num_cols, this->num_cols);
+        avg_est[i] = mean(basic_est + i * this->num_cols, this->num_cols);
     }
 
-    double result = median(avg_est, this->num_rows);
+    double result = (*average_function)(avg_est, this->num_rows);
 
     delete [] basic_est;
     delete [] avg_est;
@@ -176,10 +192,12 @@ Sketch<T>* AGMS_Sketch<T>::difference(Sketch<T> *other)
 
 template<typename T>
 FAGMS_Sketch<T>::FAGMS_Sketch(unsigned int buckets, unsigned int rows, 
-                                Hash<T> **hashes, Xi<T> **xis)
+                                Hash<T> **hashes, Xi<T> **xis, 
+                                const char *avg_func)
 {
     this->num_cols = buckets;
     this->num_rows = rows;
+    this->average_function = get_average_function(avg_func);
     
     this->hashes = new Hash<T>* [rows];
     this->xis = new Xi<T>* [rows];
@@ -198,6 +216,7 @@ FAGMS_Sketch<T>::FAGMS_Sketch(FAGMS_Sketch<T> *copy)
 {
     this->num_cols = copy->num_cols;
     this->num_rows = copy->num_rows;
+    this->average_function = copy->average_function;
     
     hashes = new Hash<T>* [this->num_rows];
     xis = new Xi<T>* [this->num_rows];
@@ -243,7 +262,7 @@ double FAGMS_Sketch<T>::inner_join(Sketch<T> *other)
             basic_est[i] += this->sketch_elem[j] * 
                                 ((FAGMS_Sketch<T>*)other)->sketch_elem[j];
     }
-    double result = median(basic_est, this->num_rows);
+    double result = (*average_function)(basic_est, this->num_rows);
     delete [] basic_est;
     return result;
 }
@@ -264,7 +283,7 @@ double FAGMS_Sketch<T>::first_moment()
         for (int j = i*this->num_cols; j < (i+1)*this->num_cols; j++)
             basic_est[i] += std::abs(this->sketch_elem[j]);
     }
-    double result = median(basic_est, this->num_rows);
+    double result = (*average_function)(basic_est, this->num_rows);
     delete [] basic_est;
     return result;
 }
@@ -358,7 +377,7 @@ double FastCount_Sketch<T>::inner_join(Sketch<T> *other)
             ((double)this->num_cols - 1) * ((double)this->num_cols * L2 - L1 * L1p);
     }
 
-    double result = average(basic_est, this->num_rows);
+    double result = mean(basic_est, this->num_rows);
     delete [] basic_est;
     return result;
 }
@@ -382,7 +401,7 @@ double FastCount_Sketch<T>::first_moment()
         }
     }
 
-    double result = average(basic_est, this->num_rows);
+    double result = mean(basic_est, this->num_rows);
     delete [] basic_est;
     return result;
 }

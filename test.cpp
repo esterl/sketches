@@ -1,17 +1,21 @@
 // Simple tests
-
+//g++ test.cpp; ./a.out
 #include <iostream>
 
 #include "ttmath/ttmath.h"
 #include "xis.h"
 #include "hash.h"
 #include "sketches.h"
+#include "random.h"
 
 typedef ttmath::UInt<2> bigint;
 typedef ttmath::UInt<132> bigint2;
 
 int main()
 {
+/********************** Random testing ****************************************/
+    uint32_t r1 = random<uint32_t>();
+    std::cout << "Random value" << r1 << std::endl;
 /**********************Some ttmath testing ************************************/
     bigint2 a = 15637580004L;
     bigint2 b = 16;
@@ -107,42 +111,51 @@ int main()
     result2 = hash7.element(2500);
     std::cout << "Result of applying TabHash over 2500 " << 
                     "(should be 10): " << result2 << std::endl;
+    Hash_Tab<uint128_t> hash8 = Hash_Tab<uint128_t>(16);
 
 /**********************Testing Sketches.h implementation***********************/
 
 //    //TODO should make sure each Sketch goes with they Xi/Hash selected:
-//    Sketch<unsigned int> *difference_sketch;
-//    //AGMS sketch:
-//    std::cout << "AGMS Sketch " << std::endl;
-//    unsigned int num_buckets = 16;
-//    unsigned int num_rows = 16;
-//    Xi_BCH5<unsigned int>** xis;
-//    xis = new Xi_BCH5<unsigned int>*[num_buckets*num_rows];
-//    for (int i =0; i < num_buckets*num_rows; i++)
-//        xis[i] = new Xi_BCH5<unsigned int>();
-//    AGMS_Sketch<unsigned int> *sketch1, *sketch2;
-//    sketch1 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis);
-//    sketch2 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis);
-//    sketch1->update(5,1);
-//    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
-//                    std::endl;
-//    sketch1->update(5,1);
-//    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
-//                    std::endl;
-//    sketch2->update(4,2);
-//    sketch2->update(5,1);
-//    difference_sketch = sketch1->difference(sketch2);
-//    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
-//                    std::endl;
-//    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
-//                    std::endl;
-//    std::cout << "Inner join of the sketch " << sketch1->inner_join(sketch2) << 
-//                    std::endl;
-//    std::cout << "Number of rows" << sketch1->get_num_rows() << std::endl;
-//    sketch1->clear();
-//    delete sketch1;
-//    delete sketch2;
-//    delete [] xis;
+    Sketch<unsigned int> *difference_sketch;
+    //AGMS sketch:
+    std::cout << "AGMS Sketch " << std::endl;
+    unsigned int num_buckets = 16;
+    unsigned int num_rows = 16;
+    Xi_BCH5<unsigned int>** xis;
+    xis = new Xi_BCH5<unsigned int>*[num_buckets*num_rows];
+    for (int i =0; i < num_buckets*num_rows; i++)
+        xis[i] = new Xi_BCH5<unsigned int>();
+    AGMS_Sketch<unsigned int> *sketch1, *sketch2, *sketch3;
+    sketch1 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis);
+    sketch2 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis, "mean");
+    sketch3 = new AGMS_Sketch<unsigned int>(num_buckets, num_rows, (Xi<unsigned int>**)xis, "trimmean");
+    sketch1->update(5,1);
+    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
+                    std::endl;
+    sketch1->update(5,1);
+    std::cout << "Second moment of the sketch " << sketch1->second_moment() << 
+                    std::endl;
+    sketch2->update(4,2);
+    sketch2->update(5,1);
+    std::cout << "Second moment of mean sketch " << sketch2->second_moment() << 
+                    std::endl;
+    sketch3->update(4,2);
+    sketch3->update(5,1);
+    std::cout << "Second moment of trimmean sketch " << sketch3->second_moment() << 
+                    std::endl;
+    difference_sketch = sketch1->difference(sketch2);
+    std::cout << "Difference1 of the sketches " << difference_sketch->first_moment() << 
+                    std::endl;
+    std::cout << "Difference2 of the sketches " << difference_sketch->second_moment() << 
+                    std::endl;
+    std::cout << "Inner join of the sketch " << sketch1->inner_join(sketch2) << 
+                    std::endl;
+    std::cout << "Number of rows" << sketch1->get_num_rows() << std::endl;
+    sketch1->clear();
+    delete sketch1;
+    delete sketch2;
+    delete sketch3;
+    delete [] xis;
 //    
 //    //FAGMS Sketch
 //    std::cout << "FAGMS Sketch " << std::endl;

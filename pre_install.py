@@ -52,9 +52,13 @@ def create_py_files():
             {
                 unsigned int buckets, rows;
                 const char * random_generator = "cw";
-                static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
+                const char * avg_func = "median";
+                static char *kwlist[] = {"num_buckets", "num_rows", 
+                                         "random_generator", "average_function",
+                                         NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, 
+                            &buckets, &rows, &random_generator, &avg_func))
                     return -1;
                 
                 // Generate num_rows random hashes:
@@ -98,7 +102,7 @@ def create_py_files():
                 // Create the sketch:
                 if ( self == NULL ) return -1;
                 self->sketch = new FAGMS_Sketch<KeyType>(buckets, rows, 
-                                        (Hash<KeyType>**) hashes, xis);
+                                        (Hash<KeyType>**) hashes, xis, avg_func);
                 
                 return 0;
             }
@@ -112,9 +116,13 @@ def create_py_files():
             {
                 unsigned int buckets, rows;
                 const char * random_generator = "cw";
-                static char *kwlist[] = {"num_buckets", "num_rows","random_generator", NULL};
+                const char * avg_func = "median";
+                static char *kwlist[] = {"num_buckets", "num_rows",
+                                         "random_generator", "average_function", 
+                                         NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, 
+                            &buckets, &rows, &random_generator, &avg_func))
                     return -1;
                 
                 // Generate num_rows random hashes:
@@ -149,7 +157,7 @@ def create_py_files():
                 }
                 // Create the sketch:
                 if ( self == NULL ) return -1;
-                self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, xis);
+                self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, xis, avg_func);
 
                 return 0;
             }

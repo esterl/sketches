@@ -14,6 +14,8 @@
     1) "Statistical Analysis of Sketch Estimators" by F. Rusu and A. Dobra */
 
 // TODO move implementations to tpp
+typedef double (*fptr) (double*, unsigned int);
+
 template<typename T>
 class Sketch
 {
@@ -72,10 +74,12 @@ class AGMS_Sketch : public Sketch<T>
 {
     protected:
         Xi<T> **xis;
+        fptr average_function;
 
 
     public:
-        AGMS_Sketch(unsigned int num_cols, unsigned int num_rows, Xi<T> **xis);
+        AGMS_Sketch(unsigned int num_cols, unsigned int num_rows, Xi<T> **xis, 
+                    const char *avg_func="median");
         AGMS_Sketch(AGMS_Sketch<T>* copy);
         virtual ~AGMS_Sketch();
 
@@ -106,11 +110,13 @@ class FAGMS_Sketch : public Sketch<T>
     protected:
         Hash<T> **hashes;
         Xi<T> **xis;
+        fptr average_function;
 
 
     public:
         FAGMS_Sketch(unsigned int num_buckets, unsigned int num_rows, 
-                        Hash<T> **hashes, Xi<T> **xis);
+                        Hash<T> **hashes, Xi<T> **xis, 
+                        const char *avg_func="median");
         FAGMS_Sketch(FAGMS_Sketch<T> *copy);
         virtual ~FAGMS_Sketch();
 

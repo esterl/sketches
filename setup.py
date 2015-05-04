@@ -5,7 +5,7 @@ create_py_files()
 
 sketches = Extension('sketches',
                     sources = ['sketchesmodule.cpp'],
-                    extra_compile_args = ['-Wno-write-strings'])
+                    extra_compile_args = ['-Wno-write-strings', '-std=c++11'])
 
 setup (name = 'sketches',
        version = '1.1',
