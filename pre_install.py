@@ -51,7 +51,7 @@ def create_py_files():
             FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
             {
                 unsigned int buckets, rows;
-                const char * random_generator = "cw";
+                const char * random_generator = "cw4";
                 const char * avg_func = "median";
                 static char *kwlist[] = {"num_buckets", "num_rows", 
                                          "random_generator", "average_function",
@@ -115,7 +115,7 @@ def create_py_files():
             AGMS_init(AGMS<KeyType> *self, PyObject *args, PyObject *kwds)
             {
                 unsigned int buckets, rows;
-                const char * random_generator = "cw";
+                const char * random_generator = "cw4";
                 const char * avg_func = "median";
                 static char *kwlist[] = {"num_buckets", "num_rows",
                                          "random_generator", "average_function", 
@@ -170,7 +170,7 @@ def create_py_files():
             CountMin_init(CountMin<KeyType> *self, PyObject *args, PyObject *kwds)
             {
                 unsigned int buckets, rows;
-                const char * random_generator = "cw";
+                const char * random_generator = "cw2";
                 static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
                 
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
