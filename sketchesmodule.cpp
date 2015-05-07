@@ -171,7 +171,7 @@ initsketches(void)
     Py_INCREF(&FAGMS32Type);
     Py_INCREF(&FAGMS64Type);
     Py_INCREF(&FAGMS128Type);
-    PyModule_AddObject(m, "FAGMS8", (PyObject *)&FAGMS16Type);
+    PyModule_AddObject(m, "FAGMS8", (PyObject *)&FAGMS8Type);
     PyModule_AddObject(m, "FAGMS16", (PyObject *)&FAGMS16Type);
     PyModule_AddObject(m, "FAGMS32", (PyObject *)&FAGMS32Type);
     PyModule_AddObject(m, "FAGMS64", (PyObject *)&FAGMS64Type);
