@@ -9,7 +9,7 @@ def create_py_files():
             FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
             {
                 unsigned int buckets, rows;
-                const char * random_generator = "cw";
+                const char * random_generator = "cw4";
                 static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
                 
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
@@ -57,7 +57,7 @@ def create_py_files():
                                          "random_generator", "average_function",
                                          NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, 
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|ss", kwlist, 
                             &buckets, &rows, &random_generator, &avg_func))
                     return -1;
                 
@@ -121,7 +121,7 @@ def create_py_files():
                                          "random_generator", "average_function", 
                                          NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, 
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|ss", kwlist, 
                             &buckets, &rows, &random_generator, &avg_func))
                     return -1;
                 
