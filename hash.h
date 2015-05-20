@@ -43,7 +43,7 @@ class Hash
    polynomial operations take place. Should be at least twice the space of the
    used Mersenne prime.*/
 template<typename T1, typename T2>
-class Hash_CW2: Hash<T1>{
+class Hash_CW2: public Hash<T1>{
     protected:
         T2 seeds[2];
         unsigned mask;
@@ -64,7 +64,7 @@ class Hash_CW2: Hash<T1>{
 /* Polynomials over a Merssenne prime (p) scheme using the Carter and Wegman 
    trick for generating 4-wise independent random variables from {B}.*/
 template<typename T1, typename T2>
-class Hash_CW4: Hash<T1> {
+class Hash_CW4: public Hash<T1> {
     protected:
         T2 seeds[4];
         unsigned mask;
@@ -87,7 +87,7 @@ class Hash_CW4: Hash<T1> {
    generating 4-wise independent random variables from {B}. We expect B to be a
    power of 2 below 2^16, so that the pre-computed tables can be kept smaller.*/
 template<typename T>
-class Hash_Tab: Hash<T>{
+class Hash_Tab: public Hash<T>{
     public:
         Hash_Tab(unsigned B);
 
@@ -98,7 +98,7 @@ class Hash_Tab: Hash<T>{
 };
 
 template<>
-class Hash_Tab<uint8_t>: Hash<uint8_t>{
+class Hash_Tab<uint8_t>: public Hash<uint8_t>{
     protected:
         uint16_t * table;
         void init(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2, prime13_t seed3);
@@ -115,7 +115,7 @@ class Hash_Tab<uint8_t>: Hash<uint8_t>{
 };
 
 template<>
-class Hash_Tab<uint16_t>: Hash<uint16_t>{
+class Hash_Tab<uint16_t>: public Hash<uint16_t>{
     protected:
         uint16_t* table;
         void init(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2, prime17_t s3);
@@ -132,7 +132,7 @@ class Hash_Tab<uint16_t>: Hash<uint16_t>{
 };
 
 template<>
-class Hash_Tab<uint32_t>: Hash<uint32_t>{
+class Hash_Tab<uint32_t>: public Hash<uint32_t>{
     protected:
         unsigned mask;
         uint16_t *T0, *T1, *T2;
@@ -171,7 +171,7 @@ class Hash_Tab<uint64_t>: Hash<uint64_t>{
 };
 
 template<>
-class Hash_Tab<uint128_t>: Hash<uint128_t>{
+class Hash_Tab<uint128_t>: public Hash<uint128_t>{
     protected:
         uint16_t **T;
         unsigned mask;

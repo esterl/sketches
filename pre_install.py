@@ -52,20 +52,28 @@ def create_py_files():
             {
                 unsigned int buckets, rows;
                 const char * random_generator = "cw4";
+                const char * hash_func = "cw2";
                 const char * avg_func = "median";
                 static char *kwlist[] = {"num_buckets", "num_rows", 
                                          "random_generator", "average_function",
-                                         NULL};
+                                         "hash_function", NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|ss", kwlist, 
-                            &buckets, &rows, &random_generator, &avg_func))
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|sss", kwlist, 
+                            &buckets, &rows, &random_generator, &avg_func, 
+                            &hash_func))
                     return -1;
                 
                 // Generate num_rows random hashes:
-                Hash_CW2<KeyType, PrimeSpaceType>** hashes;
-                hashes = new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
-                for (unsigned int i =0; i < rows; i++) {
-                    hashes[i] = new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
+                Hash<KeyType>** hashes;
+                hashes = new Hash<KeyType>*[rows];
+                if (strcmp(hash_func, "cw2") == 0) {
+                    for (unsigned int i =0; i < rows; i++) {
+                        hashes[i] = new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
+                    }
+                } else if (strcmp(hash_func, "cw4") == 0){
+                    for (unsigned int i =0; i < rows; i++) {
+                        hashes[i] = new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
+                    }
                 }
                 
                 // Generate num_rows random variables:
