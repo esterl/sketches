@@ -1,9 +1,10 @@
 #ifndef SKETCHES_MERSENNE_H
 #define SKETCHES_MERSENNE_H
+#include "ttmath/ttmath.h"
 // The modulus operator with Mersenne prime 'p = 2^s-1' can be simplified as:
 // i = (x & p) + (k >> s); if i>=p then return i-p else return i;
 template<typename T>
-inline T mersenne_modulus(T value, int mersenne_exponent){
+inline T mersenne_modulus(T value, int mersenne_exponent) {
     T p = 1U;
     p = (p << mersenne_exponent) - p;
     T i = (value & p) + (value >> mersenne_exponent);
@@ -11,9 +12,9 @@ inline T mersenne_modulus(T value, int mersenne_exponent){
 }
 
 template<typename T>
-inline int get_mersenne_exponent(){
+inline int get_mersenne_exponent() {
     int mersenne_exponent;
-    uint32_t space_exponent = sizeof(T)*8;
+    uint32_t space_exponent = sizeof(T) * 8;
     if (space_exponent < 13)
         mersenne_exponent = 13;
     else if (space_exponent < 17)
@@ -39,4 +40,37 @@ typedef uint64_t prime31_t;
 typedef ttmath::UInt<2> prime61_t;
 typedef ttmath::UInt<3> prime89_t;
 typedef ttmath::UInt<17> prime521_t;
+
+// Define types associated for each input space
+template<typename T>
+struct hash_type_for;
+
+template<>
+struct hash_type_for<uint8_t> {
+    using type = uint32_t;
+};
+
+template<>
+struct hash_type_for<uint16_t> {
+    using type = uint64_t;
+};
+
+//template<>
+//struct hash_type_for<uint32_t> {
+//    using type = uint64_t;
+//};
+
+template<>
+struct hash_type_for<unsigned int> {
+    using type = long unsigned int;
+};
+
+template<>
+struct hash_type_for<uint128_t> {
+    using type = prime521_t;
+};
+
+template<typename T>
+using hash_type_for_t = typename hash_type_for<T>::type;
+
 #endif //SKETCHES_MERSENNE_H

@@ -2,7 +2,7 @@
 #define SKETCHES_XIS_H
 
 #include <stdint.h>
-
+#include "mersenne.h"
 /* Generating schemes for different types of  +/- 1 random variables.
    Based on the implementation by F. Rusu at:
    http://www.cise.ufl.edu/~frusu/code.html
@@ -35,7 +35,7 @@ class Xi
 
 /* BCH Scheme for generating +/-1 3-wise independent random variables.*/
 template <typename T>
-class Xi_BCH3: Xi<T> {
+class Xi_BCH3: public Xi<T> {
     protected:
         T seeds[2];
 
@@ -53,7 +53,7 @@ class Xi_BCH3: Xi<T> {
 /* Extended Hamming Scheme for generating +/-1 3-wise independent random 
    variables.*/
 template <typename T>
-class Xi_EH3: Xi<T> {
+class Xi_EH3: public Xi<T> {
     protected:
         T seeds[2];
 
@@ -72,8 +72,8 @@ class Xi_EH3: Xi<T> {
    refers to the input space, whereas T2 refers to the space where the 
    polynomial operations take place. Should be at least twice the space of the
    used Mersenne prime.*/
-template <typename T1, typename T2>
-class Xi_CW2 : Xi<T1>{
+template<typename T1, typename T2 = hash_type_for_t<T1>>
+class Xi_CW2 : public Xi<T1>{
     protected:
         T2 seeds[2];
         int mersenne_exponent;
@@ -89,8 +89,8 @@ class Xi_CW2 : Xi<T1>{
 
 /* As Xi_CW2 but for implementing +/-1 4-wise independent random variables. */
 // TODO CW2 and CW4 could be implemented as templates of the integer k.
-template <typename T1, typename T2>
-class Xi_CW4 : Xi<T1> {
+template <typename T1, typename T2 = hash_type_for_t<T1>>
+class Xi_CW4 : public Xi<T1> {
     protected:
         T2 seeds[4];
         int mersenne_exponent;
@@ -106,7 +106,7 @@ class Xi_CW4 : Xi<T1> {
 
 /* BCH Scheme for generating +/-1 5-wise independent random variables.*/
 template<typename T>
-class Xi_BCH5 : Xi<T> {
+class Xi_BCH5 : public Xi<T> {
     protected:
         T seeds[3];
 
