@@ -79,7 +79,7 @@ public:
     virtual Sketch* difference(Sketch *other) = 0;
 
     //copy Sketch
-    virtual Sketch* copy();
+    virtual Sketch* copy() = 0;
 };
 
 /* AGMS sketch, as proposed in the paper:
