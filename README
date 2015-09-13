@@ -1,0 +1,7 @@
+1. C++ Library
+To build the c++ library, simply run make and make install
+
+2. Python Library
+To build and use the python library, first build the c++ library and then, from
+the pythonlib folder run "python setup.py install"
+

@@ -6,7 +6,7 @@
 
 #include "utils.h"
 #include "py_sketches.h"
-#include "sketches.h"
+#include <sketches.h>
 #include "py_fastcountsketch.h"
 #include "py_countminsketch.h"
 #include "py_agmssketch.h"

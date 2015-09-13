@@ -45,6 +45,7 @@ public:
  polynomial operations take place. Should be at least twice the space of the
  used Mersenne prime.*/
 template<typename T1, typename T2 = hash_type_for_t<T1>>
+//template<typename T1, typename T2>
 class Hash_CW2: public Hash<T1> {
 protected:
     T2 seeds[2];
@@ -65,6 +66,7 @@ public:
 /* Polynomials over a Merssenne prime (p) scheme using the Carter and Wegman 
  trick for generating 4-wise independent random variables from {B}.*/
 template<typename T1, typename T2 = hash_type_for_t<T1>>
+//template<typename T1, typename T2>
 class Hash_CW4: public Hash<T1> {
 protected:
     T2 seeds[4];

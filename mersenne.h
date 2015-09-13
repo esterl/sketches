@@ -1,6 +1,7 @@
 #ifndef SKETCHES_MERSENNE_H
 #define SKETCHES_MERSENNE_H
 #include "ttmath/ttmath.h"
+
 // The modulus operator with Mersenne prime 'p = 2^s-1' can be simplified as:
 // i = (x & p) + (k >> s); if i>=p then return i-p else return i;
 template<typename T>
@@ -54,11 +55,6 @@ template<>
 struct hash_type_for<uint16_t> {
     using type = uint64_t;
 };
-
-//template<>
-//struct hash_type_for<uint32_t> {
-//    using type = uint64_t;
-//};
 
 template<>
 struct hash_type_for<unsigned int> {

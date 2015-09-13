@@ -4,7 +4,7 @@
 #include <Python.h>
 
 #include "utils.h"
-#include "sketches.h"
+#include <sketches.h>
 
 /************************** Templated functions *******************************/
 

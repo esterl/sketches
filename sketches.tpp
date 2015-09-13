@@ -4,92 +4,31 @@
 #include <cmath>        // std::abs
 #include <stdexcept>    // std::invalid_argument
 
-void print(double * values, unsigned int buckets, unsigned int rows) {
-    std::cout << std::endl;
-    for (unsigned int i = 0; i < rows; i++) {
-        for (unsigned int j = i * buckets; j < (i + 1) * buckets; j++) {
-            std::cout << values[j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
 /************************** Auxiliary functions *******************************/
-double mean(double* values, unsigned int n) {
-    double sum = 0;
-    for (unsigned int i = 0; i < n; i++)
-        sum += values[i];
-    return sum / (double) n;
-}
+void print(double * values, unsigned int buckets, unsigned int rows);
 
-double trimmean(double* values, unsigned int n) {
-    double trim = 0.05;
-    double *aux = new double[n];
-    std::sort(aux, aux + n);
+double mean(double* values, unsigned int n);
 
-    unsigned int start = std::round(trim * n);
-    unsigned int size = n - 2 * start;
-    double result = mean(values + start, size);
-    delete[] aux;
-    return result;
-}
+double trimmean(double* values, unsigned int n);
 
-double median(double* values, unsigned int n) {
-    if (n == 1)
-        return values[0];
+double median(double* values, unsigned int n);
 
-    if (n == 2)
-        return (values[0] + values[1]) / 2.;
+fptr get_average_function(const char *name);
 
-    double *aux = new double[n];
-    for (unsigned int i = 0; i < n; i++)
-        aux[i] = values[i];
-
-    std::sort(aux, aux + n);
-
-    double res;
-    if (n % 2 == 0)
-        res = (aux[n / 2 - 1] + aux[n / 2]) / 2.;
-    else
-        res = aux[n / 2];
-
-    delete[] aux;
-    return res;
-}
-
-fptr get_average_function(const char *name) {
-    if (strcmp(name, "mean") == 0) {
-        return (*mean);
-    } else if (strcmp(name, "trimmean") == 0) {
-        return (*trimmean);
-    } else if (strcmp(name, "median") == 0) {
-        return (*median);
-    } else {
-        throw std::invalid_argument("Unknown average function");
-    }
-}
-
-inline double min(double* values, unsigned int n) {
-    double min = values[0];
-    for (unsigned int i = 1; i < n; i++)
-        if (values[i] < min)
-            min = values[i];
-
-    return min;
-}
+double min(double* values, unsigned int n);
 
 template<typename T>
 Xi<T>* get_random_xi(const char* generator) {
     Xi<T> *xi;
-    if (strcmp(generator, "bch3")==0){
+    if (strcmp(generator, "bch3") == 0) {
         xi = new Xi_BCH3<T>();
-    } else if(strcmp(generator, "bch5")==0){
+    } else if (strcmp(generator, "bch5") == 0) {
         xi = new Xi_BCH5<T>();
-    }else if(strcmp(generator, "eh3")==0){
+    } else if (strcmp(generator, "eh3") == 0) {
         xi = new Xi_EH3<T>();
-    }else if(strcmp(generator, "cw2")==0){
+    } else if (strcmp(generator, "cw2") == 0) {
         xi = new Xi_CW2<T>();
-    }else if(strcmp(generator, "cw4")==0){
+    } else if (strcmp(generator, "cw4") == 0) {
         xi = new Xi_CW4<T>();
     }
     return xi;
@@ -98,11 +37,11 @@ Xi<T>* get_random_xi(const char* generator) {
 template<typename T>
 Hash<T>* get_random_hash(const char* hash_func, unsigned buckets) {
     Hash<T> *hash;
-    if(strcmp(hash_func,"cw2")==0){
+    if (strcmp(hash_func, "cw2") == 0) {
         hash = new Hash_CW2<T>(buckets);
-    }else if (strcmp(hash_func, "cw4")==0){
+    } else if (strcmp(hash_func, "cw4") == 0) {
         hash = new Hash_CW4<T>(buckets);
-    }else if (strcmp(hash_func, "tab")==0){
+    } else if (strcmp(hash_func, "tab") == 0) {
         hash = new Hash_Tab<T>(buckets);
     }
     return hash;
@@ -225,6 +164,18 @@ template<typename T>
 Sketch<T>* AGMS_Sketch<T>::copy() {
     AGMS_Sketch<T>* copy = new AGMS_Sketch<T>(this);
     return copy;
+}
+
+template<typename T>
+double AGMS_Sketch<T>::get_optimized_bytes() {
+    double max = this->get_max();
+    double min = this->get_min();
+    if (max < abs(min))
+        max = abs(min);
+    if (max == 0)
+        return 0;
+    double bits = 1 + ceil(log2(max));
+    return bits * this->num_cols * this->num_rows;
 }
 
 /**************************FAGMS_Sketch implementation*************************/
@@ -353,6 +304,18 @@ Sketch<T>* FAGMS_Sketch<T>::copy() {
     return copy;
 }
 
+template<typename T>
+double FAGMS_Sketch<T>::get_optimized_bytes() {
+    double max = this->get_max();
+    double min = this->get_min();
+    if (max < abs(min))
+        max = abs(min);
+    if (max == 0)
+        return 0;
+    double bits = 1 + ceil(log2(max));
+    return bits * this->num_cols * this->num_rows;
+}
+
 /********************* FastCount_Sketch implementation ************************/
 
 template<typename T>
@@ -378,7 +341,6 @@ FastCount_Sketch<T>::FastCount_Sketch(unsigned int buckets, unsigned int rows,
     this->num_rows = rows;
 
     this->hashes = new Hash<T>*[rows];
-    hashes[0]->copy();
     for (unsigned int i = 0; i < rows; i++) {
         this->hashes[i] = get_random_hash<T>(hash_func, buckets);
     }
@@ -479,6 +441,14 @@ Sketch<T>* FastCount_Sketch<T>::copy() {
     return copy;
 }
 
+template<typename T>
+double FastCount_Sketch<T>::get_optimized_bytes() {
+    double max = this->get_max();
+    if (max == 0)
+        return 0;
+    double bits = ceil(log2(max));
+    return bits * this->num_cols * this->num_rows;
+}
 /********************* CountMin_Sketch implementation ************************/
 
 template<typename T>
@@ -579,4 +549,13 @@ template<typename T>
 Sketch<T>* CountMin_Sketch<T>::copy() {
     CountMin_Sketch<T>* copy = new CountMin_Sketch<T>(this);
     return copy;
+}
+
+template<typename T>
+double CountMin_Sketch<T>::get_optimized_bytes() {
+    double max = this->get_max();
+    if (max == 0)
+        return 0;
+    double bits = ceil(log2(max));
+    return bits * this->num_cols * this->num_rows;
 }

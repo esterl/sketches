@@ -6,7 +6,7 @@
 #include "xis.h"
 #include "hash.h"
 
-/* Implementation of different sketches for stimating size of joins and 
+/* Implementation of different sketches for estimating size of joins and
  self-join; as well as the L2 difference between two data-streams.
  Based on the implementation by F. Rusu at:
  http://www.cise.ufl.edu/~frusu/code.html
@@ -36,32 +36,29 @@ public:
     double* get_counters() {
         return sketch_elem;
     }
-    ;
     double get_max() {
         return *std::max_element(sketch_elem, sketch_elem + num_rows * num_cols);
     }
-    ;
+    double get_min() {
+        return *std::min_element(sketch_elem, sketch_elem + num_rows * num_cols);
+    }
     void clear() {
         for (int i = 0; i < num_rows * num_cols; i++)
             sketch_elem[i] = 0.0;
     }
-    ;
     Sketch<T>& operator+=(const Sketch<T>& other) {
         for (int i = 0; i < num_rows * num_cols; i++)
             sketch_elem[i] += other.sketch_elem[i];
         return *this;
     }
-    ;
     void operator-=(const Sketch<T>& other) {
         for (int i = 0; i < num_rows * num_cols; i++)
             sketch_elem[i] -= other.sketch_elem[i];
     }
-    ;
 
     virtual ~Sketch() {
         delete[] sketch_elem;
     }
-    ;
 
     //updating the sketch with the value corresponding to the given key
     virtual void update(T key, double weight) = 0;
@@ -79,7 +76,10 @@ public:
     virtual Sketch* difference(Sketch *other) = 0;
 
     //copy Sketch
-    virtual Sketch* copy();
+    virtual Sketch* copy() = 0;
+
+    virtual double get_bytes() { return sizeof(double) * num_rows * num_cols; };
+    virtual double get_optimized_bytes() = 0;
 };
 
 /* AGMS sketch, as proposed in the paper:
@@ -112,6 +112,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
+    virtual double get_optimized_bytes();
 };
 
 /* Fast-AGMS sketches proposed in the paper:
@@ -150,6 +151,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
+    virtual double get_optimized_bytes();
 };
 
 /* Fast-Count sketches proposed in the paper:
@@ -183,6 +185,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
+    virtual double get_optimized_bytes();
 };
 
 /* Count-Min sketches proposed in the paper:
@@ -214,6 +217,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
+    virtual double get_optimized_bytes();
 };
 
 #include "sketches.tpp"
