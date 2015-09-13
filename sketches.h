@@ -77,7 +77,6 @@ public:
 
     //copy Sketch
     virtual Sketch* copy() = 0;
-
     virtual double get_bytes() { return sizeof(double) * num_rows * num_cols; };
     virtual double get_optimized_bytes() = 0;
 };
