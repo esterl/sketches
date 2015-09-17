@@ -57,8 +57,13 @@ struct hash_type_for<uint16_t> {
 };
 
 template<>
-struct hash_type_for<unsigned int> {
-    using type = long unsigned int;
+struct hash_type_for<uint32_t> {
+    using type = prime61_t;
+};
+
+template<>
+struct hash_type_for<uint64_t> {
+    using type = prime89_t;
 };
 
 template<>

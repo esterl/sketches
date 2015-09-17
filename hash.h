@@ -157,7 +157,7 @@ public:
 };
 
 template<>
-class Hash_Tab<uint64_t> : Hash<uint64_t> {
+class Hash_Tab<uint64_t> : public Hash<uint64_t> {
 protected:
     unsigned mask;
     uint16_t *T0, *T1, *T2, *T3, *T4, *T5, *T6;
