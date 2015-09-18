@@ -207,6 +207,8 @@ protected:
 public:
     CountMin_Sketch(unsigned int num_buckets, unsigned int num_rows,
             Hash<T> **hashes);
+    CountMin_Sketch(unsigned int num_buckets, unsigned int num_rows,
+            const char* hash_func);
     CountMin_Sketch(CountMin_Sketch<T> *copy);
     virtual ~CountMin_Sketch();
 

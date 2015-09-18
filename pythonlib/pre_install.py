@@ -4,49 +4,29 @@ def create_py_files():
     sketches = [{
         'type': 'FastCount',
         'init': textwrap.dedent("""\
-            template<typename KeyType, typename PrimeSpaceType>
+            template<typename KeyType>
             static int
             FastCount_init(FastCount<KeyType> *self, PyObject *args, PyObject *kwds)
             {
                 unsigned int buckets, rows;
                 const char * random_generator = "cw4";
-                static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", NULL};
+                static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", 
+                                            NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, 
+                                                    &rows, &random_generator))
                     return -1;
                 
-                // Generate num_rows random hashes:
-                Hash<KeyType>** hashes;
-                
-                if (strcmp(random_generator, "cw4") == 0) {
-                    hashes = (Hash<KeyType>**) new Hash_CW4<KeyType, PrimeSpaceType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = (Hash<KeyType>*) new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
-                    }
-                } else if (strcmp(random_generator, "cw2") == 0) {
-                    hashes = (Hash<KeyType>**) new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = (Hash<KeyType>*) new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
-                    }
-                } else if (strcmp(random_generator, "tab") == 0) {
-                    hashes = (Hash<KeyType>**) new Hash_Tab<KeyType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = (Hash<KeyType>*) new Hash_Tab<KeyType>(buckets);
-                    }
-                } else {
-                    throw std::invalid_argument("Unknown random generator type");
-                }
-                // Create the sketch:
                 if ( self == NULL ) return -1;
-                self->sketch = new FastCount_Sketch<KeyType>(buckets, rows, hashes);
-                
+                self->sketch = new FastCount_Sketch<KeyType>(buckets, rows, 
+                                                                random_generator);
                 return 0;
             }
             """)
         }, {
         'type': 'FAGMS',
         'init': textwrap.dedent("""\
-            template<typename KeyType, typename PrimeSpaceType>
+            template<typename KeyType>
             static int
             FAGMS_init(FAGMS<KeyType> *self, PyObject *args, PyObject *kwds)
             {
@@ -57,68 +37,23 @@ def create_py_files():
                 static char *kwlist[] = {"num_buckets", "num_rows", 
                                          "random_generator", "average_function",
                                          "hash_function", NULL};
-                
+
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|sss", kwlist, 
                             &buckets, &rows, &random_generator, &avg_func, 
                             &hash_func))
                     return -1;
-                
-                // Generate num_rows random hashes:
-                Hash<KeyType>** hashes;
-                hashes = new Hash<KeyType>*[rows];
-                if (strcmp(hash_func, "cw2") == 0) {
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
-                    }
-                } else if (strcmp(hash_func, "cw4") == 0){
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = new Hash_CW4<KeyType, PrimeSpaceType>(buckets);
-                    }
-                }
-                
-                // Generate num_rows random variables:
-                Xi<KeyType> ** xis;
-                if (strcmp(random_generator, "cw4") == 0) {
-                    xis =(Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_CW4<KeyType, PrimeSpaceType>();
-                    }
-                } else if (strcmp(random_generator, "cw2") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_CW2<KeyType, PrimeSpaceType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_CW2<KeyType, PrimeSpaceType>();
-                    }
-                } else if (strcmp(random_generator, "bch5") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_BCH5<KeyType>();
-                    }
-                } else if (strcmp(random_generator, "bch3") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_BCH3<KeyType>();
-                    }
-                } else if (strcmp(random_generator, "eh3") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_EH3<KeyType>();
-                    }
-                }else {
-                    throw std::invalid_argument("Unknown random generator type");
-                }
-                
-                // Create the sketch:
+
                 if ( self == NULL ) return -1;
                 self->sketch = new FAGMS_Sketch<KeyType>(buckets, rows, 
-                                        (Hash<KeyType>**) hashes, xis, avg_func);
-                
+                                        hash_func, random_generator, avg_func);
+
                 return 0;
             }
             """)
         }, {
         'type': 'AGMS',
         'init': textwrap.dedent("""\
-            template<typename KeyType, typename PrimeSpaceType>
+            template<typename KeyType>
             static int
             AGMS_init(AGMS<KeyType> *self, PyObject *args, PyObject *kwds)
             {
@@ -132,40 +67,11 @@ def create_py_files():
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|ss", kwlist, 
                             &buckets, &rows, &random_generator, &avg_func))
                     return -1;
-                
-                // Generate num_rows random hashes:
-                Xi<KeyType> ** xis;
-                if (strcmp(random_generator, "cw4") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_CW4<KeyType, PrimeSpaceType>*[rows*buckets];
-                    for (unsigned i =0; i < rows*buckets; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_CW4<KeyType, PrimeSpaceType>();
-                    }
-                } else if (strcmp(random_generator, "cw2") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_CW2<KeyType, PrimeSpaceType>*[rows*buckets];
-                    for (unsigned i=0; i < rows*buckets; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_CW2<KeyType, PrimeSpaceType>();
-                    }
-                } else if (strcmp(random_generator, "bch5") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_BCH5<KeyType>*[rows*buckets];
-                    for (unsigned i =0; i < rows*buckets; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_BCH5<KeyType>();
-                    }
-                } else if (strcmp(random_generator, "bch3") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_BCH3<KeyType>*[rows*buckets];
-                    for (unsigned i =0; i < rows*buckets; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_BCH3<KeyType>();
-                    }
-                } else if (strcmp(random_generator, "eh3") == 0) {
-                    xis = (Xi<KeyType>**) new Xi_EH3<KeyType>*[rows*buckets];
-                    for (unsigned i =0; i < rows*buckets; i++) {
-                        xis[i] = (Xi<KeyType>*) new Xi_EH3<KeyType>();
-                    }
-                } else {
-                    throw std::invalid_argument("Unknown random generator type");
-                }
                 // Create the sketch:
                 if ( self == NULL ) return -1;
-                self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, xis, avg_func);
+                self->sketch = new AGMS_Sketch<KeyType>(buckets, rows, 
+                                                        random_generator, 
+                                                        avg_func);
 
                 return 0;
             }
@@ -173,7 +79,7 @@ def create_py_files():
         }, {
         'type': 'CountMin',
         'init': textwrap.dedent("""\
-            template<typename KeyType, typename PrimeSpaceType>
+            template<typename KeyType>
             static int
             CountMin_init(CountMin<KeyType> *self, PyObject *args, PyObject *kwds)
             {
@@ -184,22 +90,10 @@ def create_py_files():
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, &rows, &random_generator))
                     return -1;
                 
-                // Generate num_rows random hashes:
-                Hash<KeyType>** hashes;
-                
-                if (strcmp(random_generator, "cw2") == 0) {
-                    hashes = (Hash<KeyType>**) new Hash_CW2<KeyType, PrimeSpaceType>*[rows];
-                    for (unsigned int i =0; i < rows; i++) {
-                        hashes[i] = (Hash<KeyType>*) new Hash_CW2<KeyType, PrimeSpaceType>(buckets);
-                    }
-                } else {
-                    throw std::invalid_argument("Unknown random generator type");
-                }
-                
                 // Create the sketch:
                 if ( self == NULL ) return -1;
-                self->sketch = new CountMin_Sketch<KeyType>(buckets, rows, hashes);
-
+                self->sketch = new CountMin_Sketch<KeyType>(buckets, rows, 
+                                                            random_generator);
                 return 0;
             }
             """)
@@ -230,7 +124,7 @@ def create_py_files():
     declarations = textwrap.dedent("""\
         typedef %(type)s<uint%(len)s_t> %(type)s%(len)s;
         template static void Sketch_dealloc<%(type)s%(len)s>(%(type)s%(len)s*);
-        template static int %(type)s_init<uint%(len)s_t, %(prime)s_t> (%(type)s%(len)s *, PyObject *, PyObject *);
+        template static int %(type)s_init<uint%(len)s_t> (%(type)s%(len)s *, PyObject *, PyObject *);
         template static PyObject * Sketch_difference<%(type)s%(len)s, %(type)s_Sketch<uint%(len)s_t>, uint%(len)s_t>(%(type)s%(len)s* , PyObject *, PyObject *);
         template static PyObject * Sketch_second_moment<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
         template static PyObject * Sketch_first_moment<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
@@ -283,7 +177,7 @@ def create_py_files():
             0,                              /* tp_descr_get */
             0,                              /* tp_descr_set */
             0,                              /* tp_dictoffset */
-            (initproc)%(type)s_init<uint%(len)s_t, %(prime)s_t>,     /* tp_init */
+            (initproc)%(type)s_init<uint%(len)s_t>,     /* tp_init */
             0,                              /* tp_alloc */
             0,                              /* tp_new */
         };

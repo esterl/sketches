@@ -468,6 +468,23 @@ CountMin_Sketch<T>::CountMin_Sketch(unsigned int buckets, unsigned int rows,
 }
 
 template<typename T>
+CountMin_Sketch<T>::CountMin_Sketch(unsigned int buckets, unsigned int rows,
+        const char *hash_func) {
+    this->num_cols = buckets;
+    this->num_rows = rows;
+
+    this->hashes = new Hash<T>*[rows];
+    for (unsigned i = 0; i < rows; i++) {
+        this->hashes[i] = get_random_hash<T>(hash_func, buckets);
+    }
+
+    this->sketch_elem = new double[buckets * rows];
+    for (int i = 0; i < buckets * rows; i++)
+        this->sketch_elem[i] = 0.0;
+}
+
+
+template<typename T>
 CountMin_Sketch<T>::CountMin_Sketch(CountMin_Sketch<T> * copy) {
     this->num_cols = copy->num_cols;
     this->num_rows = copy->num_rows;
