@@ -181,6 +181,24 @@ Sketch_get_max(SketchType* self, PyObject *args, PyObject *kwds)
 
 template<typename SketchType>
 static PyObject *
+Sketch_get_bytes(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    double result;
+    result = self->sketch->get_bytes();
+    return PyFloat_FromDouble(result);
+}
+
+template<typename SketchType>
+static PyObject *
+Sketch_get_optimized_bytes(SketchType* self, PyObject *args, PyObject *kwds)
+{
+    double result;
+    result = self->sketch->get_optimized_bytes();
+    return PyFloat_FromDouble(result);
+}
+
+template<typename SketchType>
+static PyObject *
 Sketch_get_counters(SketchType* self, PyObject *args, PyObject *kwds)
 {
     double *result;
