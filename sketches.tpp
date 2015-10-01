@@ -153,6 +153,7 @@ template<typename T>
 Sketch<T>* AGMS_Sketch<T>::difference(Sketch<T> *other) {
     AGMS_Sketch<T>* diff_sketch = new AGMS_Sketch<T>(this->num_cols,
             this->num_rows, xis);
+    diff_sketch->average_function = this->average_function;
     for (int i = 0; i < this->num_rows * this->num_cols; i++) {
         diff_sketch->sketch_elem[i] = this->sketch_elem[i]
                 - ((AGMS_Sketch<T>*) other)->sketch_elem[i];
@@ -291,6 +292,7 @@ template<typename T>
 Sketch<T>* FAGMS_Sketch<T>::difference(Sketch<T> *other) {
     FAGMS_Sketch<T>* diff_sketch = new FAGMS_Sketch<T>(this->num_cols,
             this->num_rows, hashes, xis);
+    diff_sketch->average_function = this->average_function;
     for (unsigned int i = 0; i < this->num_rows * this->num_cols; i++) {
         diff_sketch->sketch_elem[i] = this->sketch_elem[i]
                 - ((FAGMS_Sketch<T>*) other)->sketch_elem[i];
