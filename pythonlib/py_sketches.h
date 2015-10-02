@@ -190,10 +190,10 @@ Sketch_get_bytes(SketchType* self, PyObject *args, PyObject *kwds)
 
 template<typename SketchType>
 static PyObject *
-Sketch_get_optimized_bytes(SketchType* self, PyObject *args, PyObject *kwds)
+Sketch_get_optimized_bits(SketchType* self, PyObject *args, PyObject *kwds)
 {
     double result;
-    result = self->sketch->get_optimized_bytes();
+    result = self->sketch->get_optimized_bits();
     return PyFloat_FromDouble(result);
 }
 

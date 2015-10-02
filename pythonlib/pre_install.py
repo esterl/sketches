@@ -138,7 +138,7 @@ def create_py_files():
         template static PyObject * Sketch_iadd<%(type)s%(len)s>(%(type)s%(len)s*, PyObject *, PyObject *);
         template static PyObject * Sketch_get_max<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
         template static PyObject * Sketch_get_bytes<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
-        template static PyObject * Sketch_get_optimized_bytes<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
+        template static PyObject * Sketch_get_optimized_bits<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
         template static PyObject * Sketch_inner_product<%(type)s%(len)s, uint%(len)s_t>(%(type)s%(len)s* , PyObject *, PyObject *);
         template static PyObject * Sketch_get_counters<%(type)s%(len)s>(%(type)s%(len)s* , PyObject *, PyObject *);
         
@@ -221,8 +221,8 @@ def create_py_files():
             {"get_bytes", (PyCFunction)Sketch_get_bytes<%(type)s%(len)s>, METH_NOARGS,
              "Returns the necessary bytes to store in memory"
             },
-            {"get_optimized_bytes", (PyCFunction)Sketch_get_optimized_bytes<%(type)s%(len)s>, METH_NOARGS,
-             "Returns the necessary bytes to share over the network"
+            {"get_optimized_bits", (PyCFunction)Sketch_get_optimized_bits<%(type)s%(len)s>, METH_NOARGS,
+             "Returns the necessary bits to share over the network"
             },
             {"inner_product", (PyCFunction)Sketch_inner_product<%(type)s%(len)s, uint%(len)s_t>, METH_VARARGS|METH_KEYWORDS,
             "Computes the inner product between two sketches"

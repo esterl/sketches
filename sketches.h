@@ -78,7 +78,7 @@ public:
     //copy Sketch
     virtual Sketch* copy() = 0;
     virtual double get_bytes() { return sizeof(double) * num_rows * num_cols; };
-    virtual double get_optimized_bytes() = 0;
+    virtual double get_optimized_bits() = 0;
 };
 
 /* AGMS sketch, as proposed in the paper:
@@ -111,7 +111,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
-    virtual double get_optimized_bytes();
+    virtual double get_optimized_bits();
 };
 
 /* Fast-AGMS sketches proposed in the paper:
@@ -150,7 +150,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
-    virtual double get_optimized_bytes();
+    virtual double get_optimized_bits();
 };
 
 /* Fast-Count sketches proposed in the paper:
@@ -184,7 +184,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
-    virtual double get_optimized_bytes();
+    virtual double get_optimized_bits();
 };
 
 /* Count-Min sketches proposed in the paper:
@@ -218,7 +218,7 @@ public:
     virtual double first_moment();
     virtual Sketch<T>* difference(Sketch<T> *other);
     virtual Sketch<T>* copy();
-    virtual double get_optimized_bytes();
+    virtual double get_optimized_bits();
 };
 
 #include "sketches.tpp"

@@ -168,7 +168,7 @@ Sketch<T>* AGMS_Sketch<T>::copy() {
 }
 
 template<typename T>
-double AGMS_Sketch<T>::get_optimized_bytes() {
+double AGMS_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     double min = this->get_min();
     if (max < abs(min))
@@ -307,7 +307,7 @@ Sketch<T>* FAGMS_Sketch<T>::copy() {
 }
 
 template<typename T>
-double FAGMS_Sketch<T>::get_optimized_bytes() {
+double FAGMS_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     double min = this->get_min();
     if (max < abs(min))
@@ -444,7 +444,7 @@ Sketch<T>* FastCount_Sketch<T>::copy() {
 }
 
 template<typename T>
-double FastCount_Sketch<T>::get_optimized_bytes() {
+double FastCount_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     if (max == 0)
         return 0;
@@ -571,7 +571,7 @@ Sketch<T>* CountMin_Sketch<T>::copy() {
 }
 
 template<typename T>
-double CountMin_Sketch<T>::get_optimized_bytes() {
+double CountMin_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     if (max == 0)
         return 0;
