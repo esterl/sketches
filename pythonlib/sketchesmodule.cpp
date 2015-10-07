@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 #include "utils.h"
 #include "py_sketches.h"
@@ -26,7 +27,9 @@ PyMODINIT_FUNC
 initsketches(void) 
 {
     // Set random seed:
-    srand(time(NULL));
+    std::random_device rd;
+    std::uniform_int_distribution<int> seed;
+    srand((unsigned) seed(rd));
     
     PyObject* m;
 
