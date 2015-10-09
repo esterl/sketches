@@ -120,8 +120,10 @@ Xi_CW2<T1,T2>::Xi_CW2()
 {
     // Decide which Mersenne prime to use.
     mersenne_exponent = get_mersenne_exponent<T1>();
-    seeds[0] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
-    seeds[1] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
 }
 
 template<typename T1, typename T2>
@@ -167,10 +169,14 @@ Xi_CW4<T1,T2>::Xi_CW4()
 {
     // Decide which Mersenne prime to use
     mersenne_exponent = get_mersenne_exponent<T1>();
-    seeds[0] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
-    seeds[1] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
-    seeds[2] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
-    seeds[3] = mersenne_modulus<T2>(random<T2>(), mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
+    seeds[1] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
+    seeds[2] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
+    seeds[3] = mersenne_modulus<T2>(random<T2>(mersenne_exponent), 
+                                        mersenne_exponent);
 }
 
 template<typename T1, typename T2>

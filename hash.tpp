@@ -27,7 +27,8 @@ Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1)
 template<typename T1, typename T2>
 Hash_CW2<T1,T2>::Hash_CW2(unsigned B)
 {
-    init(B, random<T2>(), random<T2>());
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    init(B, random<T2>(mersenne_exponent), random<T2>(mersenne_exponent));
 }
 
 template<typename T1, typename T2>
@@ -77,7 +78,9 @@ Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
 template<typename T1, typename T2>
 Hash_CW4<T1,T2>::Hash_CW4(unsigned B)
 {
-    init(B, random<T2>(), random<T2>(), random<T2>(), random<T2>());
+    mersenne_exponent = get_mersenne_exponent<T1>();
+    init(B, random<T2>(mersenne_exponent), random<T2>(mersenne_exponent), 
+            random<T2>(mersenne_exponent), random<T2>(mersenne_exponent));
 }
 
 template<typename T1, typename T2>
