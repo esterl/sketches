@@ -26,7 +26,7 @@ ttmath::UInt<length> random_ttmath(unsigned bits){
     std::random_device rd;
     for ( unsigned int i = 0; i<length; i++){
         if ( bits < 64 ) {
-            std::uniform_int_distribution<uint64_t> dist(0, (1<<bits) - 1);
+            std::uniform_int_distribution<uint64_t> dist(0, (1UL<<bits) - 1);
             result.table[i] = dist(rd);
             bits = 0;
         } else {
