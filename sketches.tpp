@@ -117,7 +117,7 @@ double AGMS_Sketch<T>::inner_join(Sketch<T> *other) {
     for (int i = 0; i < this->num_rows; i++)
         avg_est[i] = mean(basic_est + i * this->num_cols, this->num_cols);
 
-    double result = (*average_function)(avg_est, this->num_rows);
+    double result = (*this->average_function)(avg_est, this->num_rows);
 
     delete[] basic_est;
     delete[] avg_est;
@@ -141,7 +141,7 @@ double AGMS_Sketch<T>::first_moment() {
         avg_est[i] = mean(basic_est + i * this->num_cols, this->num_cols);
     }
 
-    double result = (*average_function)(avg_est, this->num_rows);
+    double result = (*this->average_function)(avg_est, this->num_rows);
 
     delete[] basic_est;
     delete[] avg_est;
@@ -265,7 +265,7 @@ double FAGMS_Sketch<T>::inner_join(Sketch<T> *other) {
             basic_est[i] += this->sketch_elem[j]
                     * ((FAGMS_Sketch<T>*) other)->sketch_elem[j];
     }
-    double result = (*average_function)(basic_est, this->num_rows);
+    double result = (*this->average_function)(basic_est, this->num_rows);
     delete[] basic_est;
     return result;
 }
@@ -283,7 +283,7 @@ double FAGMS_Sketch<T>::first_moment() {
         for (int j = i * this->num_cols; j < (i + 1) * this->num_cols; j++)
             basic_est[i] += std::abs(this->sketch_elem[j]);
     }
-    double result = (*average_function)(basic_est, this->num_rows);
+    double result = (*this->average_function)(basic_est, this->num_rows);
     delete[] basic_est;
     return result;
 }
@@ -322,10 +322,11 @@ double FAGMS_Sketch<T>::get_optimized_bits() {
 
 template<typename T>
 FastCount_Sketch<T>::FastCount_Sketch(unsigned int buckets, unsigned int rows,
-        Hash<T> **hashes) {
+        Hash<T> **hashes, const char *avg_func) {
     this->num_cols = buckets;
     this->num_rows = rows;
-
+    this->average_function = get_average_function(avg_func);
+    
     this->hashes = new Hash<T>*[rows];
     hashes[0]->copy();
     for (unsigned int i = 0; i < rows; i++) {
@@ -338,10 +339,11 @@ FastCount_Sketch<T>::FastCount_Sketch(unsigned int buckets, unsigned int rows,
 
 template<typename T>
 FastCount_Sketch<T>::FastCount_Sketch(unsigned int buckets, unsigned int rows,
-        const char *hash_func) {
+        const char *hash_func, const char *avg_func) {
     this->num_cols = buckets;
     this->num_rows = rows;
-
+    this->average_function = get_average_function(avg_func);
+    
     this->hashes = new Hash<T>*[rows];
     for (unsigned int i = 0; i < rows; i++) {
         this->hashes[i] = get_random_hash<T>(hash_func, buckets);
@@ -355,6 +357,7 @@ template<typename T>
 FastCount_Sketch<T>::FastCount_Sketch(FastCount_Sketch<T> *copy) {
     this->num_cols = copy->num_cols;
     this->num_rows = copy->num_rows;
+    this->average_function = copy->average_function;
 
     // Copy hashes:
     hashes = new Hash<T>*[this->num_rows];
@@ -401,7 +404,7 @@ double FastCount_Sketch<T>::inner_join(Sketch<T> *other) {
                 * ((double) this->num_cols * L2 - L1 * L1p);
     }
 
-    double result = mean(basic_est, this->num_rows);
+    double result = (*this->average_function)(basic_est, this->num_rows);
     delete[] basic_est;
     return result;
 }
@@ -422,7 +425,7 @@ double FastCount_Sketch<T>::first_moment() {
         }
     }
 
-    double result = mean(basic_est, this->num_rows);
+    double result = (*this->average_function)(basic_est, this->num_rows);
     delete[] basic_est;
     return result;
 }

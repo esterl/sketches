@@ -22,6 +22,7 @@ protected:
     unsigned int num_rows;
     unsigned int num_cols;
     double *sketch_elem;
+    fptr average_function;
 
 public:
     unsigned int get_key_size() {
@@ -95,7 +96,6 @@ template<typename T>
 class AGMS_Sketch: public Sketch<T> {
 protected:
     Xi<T> **xis;
-    fptr average_function;
 
 public:
     AGMS_Sketch(unsigned int num_cols, unsigned int num_rows, Xi<T> **xis,
@@ -133,7 +133,6 @@ class FAGMS_Sketch: public Sketch<T> {
 protected:
     Hash<T> **hashes;
     Xi<T> **xis;
-    fptr average_function;
 
 public:
     FAGMS_Sketch(unsigned int num_buckets, unsigned int num_rows,
@@ -172,9 +171,9 @@ protected:
 
 public:
     FastCount_Sketch(unsigned int num_buckets, unsigned int num_rows,
-            Hash<T> **hashes);
+            Hash<T> **hashes, const char *avg_func = "mean");
     FastCount_Sketch(unsigned int num_buckets, unsigned int num_rows,
-            const char* hash_func);
+            const char* hash_func, const char *avg_func = "mean");
     FastCount_Sketch(FastCount_Sketch<T> *copy);
     virtual ~FastCount_Sketch();
 

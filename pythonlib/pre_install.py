@@ -10,16 +10,18 @@ def create_py_files():
             {
                 unsigned int buckets, rows;
                 const char * random_generator = "cw4";
-                static char *kwlist[] = {"num_buckets", "num_rows", "random_generator", 
-                                            NULL};
+                const char * avg_func = "mean";
+                static char *kwlist[] = {"num_buckets", "num_rows", 
+                                         "random_generator", "average_function",
+                                         NULL};
                 
-                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|s", kwlist, &buckets, 
-                                                    &rows, &random_generator))
+                if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|ss", kwlist, 
+                        &buckets, &rows, &random_generator, &avg_func))
                     return -1;
                 
                 if ( self == NULL ) return -1;
                 self->sketch = new FastCount_Sketch<KeyType>(buckets, rows, 
-                                                                random_generator);
+                                                    random_generator, avg_func);
                 return 0;
             }
             """)
@@ -39,8 +41,8 @@ def create_py_files():
                                          "hash_function", NULL};
 
                 if (! PyArg_ParseTupleAndKeywords(args, kwds, "II|sss", kwlist, 
-                            &buckets, &rows, &random_generator, &avg_func, 
-                            &hash_func))
+                        &buckets, &rows, &random_generator, &avg_func, 
+                        &hash_func))
                     return -1;
 
                 if ( self == NULL ) return -1;
