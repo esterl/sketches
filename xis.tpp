@@ -83,13 +83,13 @@ Xi_EH3<T>::~Xi_EH3()
 template<typename T>
 int Xi_EH3<T>::element(T j)
 {
-    uint64_t maskA = 0xAAAAAAAAAAAAAAAA;
-    uint64_t mask32 = 0xFFFFFFFFFFFFFFFF;
+    T maskA = 0xAAAAAAAAAAAAAAAA;
+    T mask32 = 0xFFFFFFFFFFFFFFFF;
     unsigned int p_res = 0;
     T temp = j;
     for (int i = 0; i <= sizeof(T)*8/64; i++){
-        T current = temp & (T) mask32;
-        p_res ^= seq_xor((seeds[1]&current) ^ (current & (current<<1) & (T) maskA));
+        T current = temp & mask32;
+        p_res ^= seq_xor((seeds[1]&current) ^ (current & (current<<1) & maskA));
         temp = temp >> 64;
     }
     unsigned int res = int(seeds[0]) ^ p_res;
@@ -211,7 +211,7 @@ Xi<T1>* Xi_CW4<T1,T2>::copy()
     return (Xi<T1>*) result;
 }
 
-/**************************Xi_BCH3 implementation******************************/
+/**************************Xi_BCH5 implementation******************************/
 
 template<typename T>
 Xi_BCH5<T>::Xi_BCH5(T I1, T I2, T I3){

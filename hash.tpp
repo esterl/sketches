@@ -8,27 +8,26 @@ inline bool isPowerOfTwo(unsigned x)
 /**************************Hash_CW2 implementation*****************************/
 
 template<typename T1, typename T2>
-void Hash_CW2<T1,T2>::init(unsigned B, T2 seed0, T2 seed1)
+void Hash_CW2<T1,T2>::init(unsigned B, unsigned exponent, T2 seed0, T2 seed1)
 {
-    mersenne_exponent = get_mersenne_exponent<T1>();
+    mersenne_exponent = exponent;
     if (!isPowerOfTwo(B)) 
         throw std::domain_error("The number of buckets should be a power of 2");
     mask = B - 1;
-    seeds[0] = mersenne_modulus<T2>(seed0, mersenne_exponent);
-    seeds[1] = mersenne_modulus<T2>(seed1, mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(seed0, exponent);
+    seeds[1] = mersenne_modulus<T2>(seed1, exponent);
 }
 
 template<typename T1, typename T2>
-Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1)
+Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1, unsigned exponent)
 {
-    init(B, seed0, seed1);
+    init(B, seed0, seed1, exponent);
 }
 
 template<typename T1, typename T2>
-Hash_CW2<T1,T2>::Hash_CW2(unsigned B)
+Hash_CW2<T1,T2>::Hash_CW2(unsigned B, unsigned exponent)
 {
-    mersenne_exponent = get_mersenne_exponent<T1>();
-    init(B, random<T2>(mersenne_exponent), random<T2>(mersenne_exponent));
+    init(B, random<T2>(exponent), random<T2>(exponent), exponent);
 }
 
 template<typename T1, typename T2>
@@ -50,43 +49,45 @@ unsigned Hash_CW2<T1,T2>::element(T1 j)
 template<typename T1, typename T2>
 Hash<T1>* Hash_CW2<T1,T2>::copy()
 {
-    Hash_CW2<T1,T2> *result = new Hash_CW2<T1,T2>(mask+1, seeds[0], seeds[1]);
+    Hash_CW2<T1,T2> *result = new Hash_CW2<T1,T2>(mask+1, seeds[0], seeds[1], 
+                                                    mersenne_exponent);
     return (Hash<T1>*) result;
 }
 
 
 /**************************Hash_CW4 implementation*****************************/
 template<typename T1, typename T2>
-void Hash_CW4<T1,T2>::init(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
+void Hash_CW4<T1,T2>::init(unsigned B, unsigned exponent, T2 seed0, T2 seed1, 
+                            T2 seed2, T2 seed3)
 {
-    mersenne_exponent = get_mersenne_exponent<T1>();
+    mersenne_exponent = exponent;
     if (!isPowerOfTwo(B)) 
         throw std::domain_error("The number of buckets should be a power of 2");
     mask = B - 1;
-    seeds[0] = mersenne_modulus<T2>(seed0, mersenne_exponent);
-    seeds[1] = mersenne_modulus<T2>(seed1, mersenne_exponent);
-    seeds[2] = mersenne_modulus<T2>(seed2, mersenne_exponent);
-    seeds[3] = mersenne_modulus<T2>(seed3, mersenne_exponent);
+    seeds[0] = mersenne_modulus<T2>(seed0, exponent);
+    seeds[1] = mersenne_modulus<T2>(seed1, exponent);
+    seeds[2] = mersenne_modulus<T2>(seed2, exponent);
+    seeds[3] = mersenne_modulus<T2>(seed3, exponent);
 }
 
 template<typename T1, typename T2>
-Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3)
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3, 
+                            unsigned exponent)
 {
-    init(B, seed0, seed1, seed2, seed3);
+    init(B, exponent, seed0, seed1, seed2, seed3);
 }
 
 template<typename T1, typename T2>
-Hash_CW4<T1,T2>::Hash_CW4(unsigned B)
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B, unsigned exponent)
 {
-    mersenne_exponent = get_mersenne_exponent<T1>();
-    init(B, random<T2>(mersenne_exponent), random<T2>(mersenne_exponent), 
-            random<T2>(mersenne_exponent), random<T2>(mersenne_exponent));
+    init(B, exponent, random<T2>(exponent), random<T2>(exponent), 
+            random<T2>(exponent), random<T2>(exponent));
 }
 
 template<typename T1, typename T2>
-Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 *seeds)
+Hash_CW4<T1,T2>::Hash_CW4(unsigned B, T2 *seeds, unsigned exponent)
 {
-    init(B,  seeds[0], seeds[1], seeds[2], seeds[3]);
+    init(B, exponent, seeds[0], seeds[1], seeds[2], seeds[3]);
 }
 
 template<typename T1, typename T2>
@@ -115,7 +116,7 @@ unsigned Hash_CW4<T1,T2>::element(T1 j)
 template<typename T1, typename T2>
 Hash<T1>* Hash_CW4<T1,T2>::copy()
 {
-    Hash_CW4<T1,T2> * result = new Hash_CW4<T1,T2>( mask+1, seeds[0], seeds[1], 
-                                                    seeds[2], seeds[3]);
+    Hash_CW4<T1,T2> * result = new Hash_CW4<T1,T2>( mask+1, seeds, 
+                                                    mersenne_exponent);
     return (Hash<T1>*) result;
 }

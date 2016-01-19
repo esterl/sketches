@@ -51,11 +51,12 @@ protected:
     T2 seeds[2];
     unsigned mask;
     unsigned mersenne_exponent;
-    void init(unsigned B, T2 seed0, T2 seed1);
+    void init(unsigned B, unsigned exponent, T2 seed0, T2 seed1);
 
 public:
-    Hash_CW2(unsigned B, T2 seed0, T2 seed1);
-    Hash_CW2(unsigned B);
+    Hash_CW2(unsigned B, T2 seed0, T2 seed1, 
+                unsigned exponent=get_mersenne_exponent<T1>());
+    Hash_CW2(unsigned B, unsigned exponent=get_mersenne_exponent<T1>());
 
     virtual unsigned element(T1 j);
     virtual Hash<T1>* copy();
@@ -72,12 +73,14 @@ protected:
     T2 seeds[4];
     unsigned mask;
     unsigned mersenne_exponent;
-    void init(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3);
+    void init(unsigned B, unsigned exponent, T2 s0, T2 s1, T2 s2, T2 s3);
 
 public:
-    Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3);
-    Hash_CW4(unsigned B);
-    Hash_CW4(unsigned B, T2 *seeds);
+    Hash_CW4(unsigned B, T2 seed0, T2 seed1, T2 seed2, T2 seed3, 
+                unsigned exponent=get_mersenne_exponent<T1>());
+    Hash_CW4(unsigned B, unsigned exponent=get_mersenne_exponent<T1>());
+    Hash_CW4(unsigned B, T2 *seeds, 
+                unsigned exponent=get_mersenne_exponent<T1>());
 
     virtual unsigned element(T1 j);
     virtual Hash<T1>* copy();
