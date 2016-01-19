@@ -107,8 +107,7 @@ template<>
 class Hash_Tab<uint8_t> : public Hash<uint8_t> {
 protected:
     uint16_t * table;
-    void init(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2,
-            prime13_t seed3);
+    void init(Hash<uint8_t> *aux_hash);
 
 public:
     Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1, prime13_t seed2,
@@ -126,8 +125,7 @@ template<>
 class Hash_Tab<uint16_t> : public Hash<uint16_t> {
 protected:
     uint16_t* table;
-    void init(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2,
-            prime17_t s3);
+    void init(Hash<uint16_t> *aux_hash);
 
 public:
     Hash_Tab(unsigned B, prime17_t s0, prime17_t s1, prime17_t s2,
@@ -146,10 +144,10 @@ class Hash_Tab<uint32_t> : public Hash<uint32_t> {
 protected:
     unsigned mask;
     uint16_t *T0, *T1, *T2;
-    void init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2);
+    void init(unsigned B, prime17_t* s0, prime17_t* s1, prime31_t* s2);
 
 public:
-    Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2);
+    Hash_Tab(unsigned B, prime17_t* s0, prime17_t* s1, prime31_t* s2);
     Hash_Tab(unsigned B);
     Hash_Tab();
 
@@ -168,8 +166,8 @@ protected:
     uint64_t** getCauchy();
 
 public:
-    Hash_Tab(unsigned B, prime31_t* seeds0, prime31_t* seeds1,
-            prime31_t* seeds2, prime31_t* seeds3, prime31_t* seeds4,
+    Hash_Tab(unsigned B, prime17_t* seeds0, prime17_t* seeds1,
+            prime17_t* seeds2, prime17_t* seeds3, prime31_t* seeds4,
             prime31_t* seeds5, prime31_t* seeds6);
     Hash_Tab(unsigned B);
     Hash_Tab();

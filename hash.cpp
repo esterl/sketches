@@ -9,27 +9,27 @@ const uint32_t POW21 = 2097152; // 2^21
 const uint64_t mask16 = 0xFFFF;
 const uint64_t mask21 = 0x1FFFFF;
 
-// Implementation for 8b --> Mersenne prime 13 == 8191 (max number of buckets)
-void Hash_Tab<uint8_t>::init(unsigned B, prime13_t seed0, prime13_t seed1,
-                            prime13_t seed2, prime13_t seed3)
+// Tabulated hasing for 8 bits uses a precomputed table. Its mersenne prime is
+// M13 = 8191, which is the max number of buckets (though numbers of the order
+// of 2^8 = 256 won't produce good results.
+void Hash_Tab<uint8_t>::init(Hash<uint8_t> *aux_hash)
 {
     table = new uint16_t[POW8];
-
-    // Use Hash_CW4 to fill the table:
-    Hash_CW4<uint8_t, prime13_t> aux_hash = Hash_CW4<uint8_t, prime13_t>(B, seed0, seed1, seed2, seed3);
     for (unsigned i=0; i < POW8; i++)
-        table[i] = aux_hash.element(i);
+        table[i] = aux_hash->element(i);
 }
 
 Hash_Tab<uint8_t>::Hash_Tab(unsigned B, prime13_t seed0, prime13_t seed1,
                             prime13_t seed2, prime13_t seed3)
 {
-    init(B, seed0, seed1, seed2, seed3);
+    auto aux = Hash_CW4<uint8_t>(B, seed0, seed1, seed2, seed3);
+    init(&aux);
 }
 
 Hash_Tab<uint8_t>::Hash_Tab(unsigned B)
 {
-    init(B, random<prime13_t>(), random<prime13_t>(), random<prime13_t>(), random<prime13_t>());
+    auto aux = Hash_CW4<uint8_t>(B);
+    init(&aux);
 }
 
 // Empty constructor (for copy)
@@ -58,27 +58,26 @@ Hash_Tab<uint8_t>::~Hash_Tab()
 }
 
 
-// Implementation for 16b
-void Hash_Tab<uint16_t>::init(unsigned B, prime17_t seed0, prime17_t seed1,
-                                prime17_t seed2,prime17_t seed3)
+// Implementation of tabulated hashing for 16 bits. Uses a single table with 
+// precomputed values using an auxiliary hash function.
+void Hash_Tab<uint16_t>::init(Hash<uint16_t> *aux_hash)
 {
     table = new uint16_t[POW16];
-
-    // Use Hash_CW4 to fill the table:
-    Hash_CW4<uint16_t, prime17_t> aux_hash = Hash_CW4<uint16_t, prime17_t>(B, seed0, seed1, seed2, seed3);
     for (unsigned i=0; i < POW16; i++)
-        table[i] = aux_hash.element(i);
+        table[i] = aux_hash->element(i);
 }
 
 Hash_Tab<uint16_t>::Hash_Tab(unsigned B, prime17_t seed0, prime17_t seed1,
                                 prime17_t seed2,prime17_t seed3)
 {
-    init(B, seed0, seed1, seed2, seed3);
+    auto aux_hash = Hash_CW4<uint16_t>(B, seed0, seed1, seed2, seed3);
+    init(&aux_hash);
 }
 
 Hash_Tab<uint16_t>::Hash_Tab(unsigned B)
 {
-    init(B, random<prime17_t>(), random<prime17_t>(), random<prime17_t>(), random<prime17_t>());
+    auto aux_hash = Hash_CW4<uint16_t>(B);
+    init(&aux_hash);
 }
 
 // Empty constructor (for copy)
@@ -105,8 +104,11 @@ Hash_Tab<uint16_t>::~Hash_Tab()
     delete[] table;
 }
 
-// Implementation for 32b
-void Hash_Tab<uint32_t>::init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2)
+// Implementation for 32 bits uses two tables with 4-universal hashing for 
+// 16 bits and one for 17 bits. By composing the results from the three tables
+// a 4-universal hashing for 32 bits is obtained.
+void Hash_Tab<uint32_t>::init(unsigned B, prime17_t* s0, prime17_t* s1, 
+                                prime31_t* s2)
 {
     T0 = new uint16_t[POW16];
     T1 = new uint16_t[POW16];
@@ -116,14 +118,17 @@ void Hash_Tab<uint32_t>::init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_
     mask = B -1 ;
 
     // Use Hash_CW4 to fill the tables:
-    Hash_CW4<uint32_t, prime31_t> *aux_hash0, *aux_hash1, *aux_hash2;
+    Hash_CW4<uint16_t> *aux_hash0, *aux_hash1;
+    Hash_CW4<uint32_t, prime31_t> *aux_hash2;
 
-    aux_hash0 = (s0==NULL) ? new Hash_CW4<uint32_t, prime31_t>(POW16) :
-                                new Hash_CW4<uint32_t, prime31_t>(POW16, s0);
-    aux_hash1 = (s1==NULL) ? new Hash_CW4<uint32_t, prime31_t>(POW16) :
-                                new Hash_CW4<uint32_t, prime31_t>(POW16, s1);
-    aux_hash2 = (s2==NULL) ? new Hash_CW4<uint32_t, prime31_t>(POW16) :
-                                new Hash_CW4<uint32_t, prime31_t>(POW16, s2);
+    aux_hash0 = (s0==NULL) ? new Hash_CW4<uint16_t>(POW16) :
+                                new Hash_CW4<uint16_t>(POW16, s0);
+    aux_hash1 = (s1==NULL) ? new Hash_CW4<uint16_t>(POW16) :
+                                new Hash_CW4<uint16_t>(POW16, s1);
+    // Because our range is [0, POW17-1] we do not need prime61, but prime31 is
+    // enough
+    aux_hash2 = (s2==NULL) ? new Hash_CW4<uint32_t, prime31_t>(POW16, 31) :
+                                new Hash_CW4<uint32_t, prime31_t>(POW16, s2, 31);
 
     for (uint32_t i=0; i < POW16; i++){
         T0[i] = aux_hash0->element(i);
@@ -138,7 +143,7 @@ void Hash_Tab<uint32_t>::init(unsigned B, prime31_t* s0, prime31_t* s1, prime31_
     delete aux_hash2;
 }
 
-Hash_Tab<uint32_t>::Hash_Tab(unsigned B, prime31_t* s0, prime31_t* s1, prime31_t* s2)
+Hash_Tab<uint32_t>::Hash_Tab(unsigned B, prime17_t* s0, prime17_t* s1, prime31_t* s2)
 {
     init(B, s0, s1, s2);
 }
@@ -190,8 +195,8 @@ uint64_t** Hash_Tab<uint64_t>::getCauchy(){
     return _cauchy;
 }
 
-Hash_Tab<uint64_t>::Hash_Tab(unsigned B, prime31_t* seeds0, prime31_t* seeds1,
-                                prime31_t* seeds2, prime31_t* seeds3,
+Hash_Tab<uint64_t>::Hash_Tab(unsigned B, prime17_t* seeds0, prime17_t* seeds1,
+                                prime17_t* seeds2, prime17_t* seeds3,
                                 prime31_t* seeds4, prime31_t* seeds5,
                                 prime31_t* seeds6)
 {
@@ -208,16 +213,16 @@ Hash_Tab<uint64_t>::Hash_Tab(unsigned B, prime31_t* seeds0, prime31_t* seeds1,
     mask = B-1;
 
     // Use Hash_CW4 to fill the tables:
-    Hash_CW4<uint32_t, prime31_t> aux_hash0 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds0);
-    Hash_CW4<uint32_t, prime31_t> aux_hash1 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds1);
-    Hash_CW4<uint32_t, prime31_t> aux_hash2 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds2);
-    Hash_CW4<uint32_t, prime31_t> aux_hash3 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds3);
+    Hash_CW4<uint16_t> aux_hash0 = Hash_CW4<uint16_t>(POW16, seeds0);
+    Hash_CW4<uint16_t> aux_hash1 = Hash_CW4<uint16_t>(POW16, seeds1);
+    Hash_CW4<uint16_t> aux_hash2 = Hash_CW4<uint16_t>(POW16, seeds2);
+    Hash_CW4<uint16_t> aux_hash3 = Hash_CW4<uint16_t>(POW16, seeds3);
     for (unsigned i=0; i < POW16; i++){
         T0[i] = aux_hash0.element(i);
         T1[i] = aux_hash1.element(i);
         T2[i] = aux_hash2.element(i);
         T3[i] = aux_hash3.element(i);
-    }
+    }       
     Hash_CW4<uint32_t, prime31_t> aux_hash4 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds4);
     Hash_CW4<uint32_t, prime31_t> aux_hash5 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds5);
     Hash_CW4<uint32_t, prime31_t> aux_hash6 = Hash_CW4<uint32_t, prime31_t>(POW16, seeds6);
@@ -246,19 +251,19 @@ Hash_Tab<uint64_t>::Hash_Tab(unsigned B)
     mask = B-1;
 
     // Use Hash_CW4 to fill the tables:
-    Hash_CW4<uint32_t, prime61_t> aux_hash0 = Hash_CW4<uint32_t, prime61_t>(POW16);
-    Hash_CW4<uint32_t, prime61_t> aux_hash1 = Hash_CW4<uint32_t, prime61_t>(POW16);
-    Hash_CW4<uint32_t, prime61_t> aux_hash2 = Hash_CW4<uint32_t, prime61_t>(POW16);
-    Hash_CW4<uint32_t, prime61_t> aux_hash3 = Hash_CW4<uint32_t, prime61_t>(POW16);
+    Hash_CW4<uint16_t> aux_hash0 = Hash_CW4<uint16_t>(POW16);
+    Hash_CW4<uint16_t> aux_hash1 = Hash_CW4<uint16_t>(POW16);
+    Hash_CW4<uint16_t> aux_hash2 = Hash_CW4<uint16_t>(POW16);
+    Hash_CW4<uint16_t> aux_hash3 = Hash_CW4<uint16_t>(POW16);
     for (unsigned i=0; i < POW16; i++){
         T0[i] = aux_hash0.element(i);
         T1[i] = aux_hash1.element(i);
         T2[i] = aux_hash2.element(i);
         T3[i] = aux_hash3.element(i);
     }
-    Hash_CW4<uint32_t, prime61_t> aux_hash4 = Hash_CW4<uint32_t, prime61_t>(POW16);
-    Hash_CW4<uint32_t, prime61_t> aux_hash5 = Hash_CW4<uint32_t, prime61_t>(POW16);
-    Hash_CW4<uint32_t, prime61_t> aux_hash6 = Hash_CW4<uint32_t, prime61_t>(POW16);
+    Hash_CW4<uint32_t, prime31_t> aux_hash4 = Hash_CW4<uint32_t, prime31_t>(POW16);
+    Hash_CW4<uint32_t, prime31_t> aux_hash5 = Hash_CW4<uint32_t, prime31_t>(POW16);
+    Hash_CW4<uint32_t, prime31_t> aux_hash6 = Hash_CW4<uint32_t, prime31_t>(POW16);
     for (unsigned i=0; i < POW19; i++){
         T4[i] = aux_hash4.element(i);
         T5[i] = aux_hash5.element(i);
@@ -339,21 +344,21 @@ Hash_Tab<uint128_t>::Hash_Tab(unsigned B, prime31_t** seeds)
         {
             seeds[i] = new prime31_t[4];
             for (unsigned j=0; j<4; j++)
-                seeds[i][j] = random<prime31_t>();
+                seeds[i][j] = random<prime31_t>(31);
         }
     }
     // Initialize 4-universal hash tables
     T = new uint16_t*[2*q-1];
     for (unsigned i = 0; i<q; i++){
         T[i] = new uint16_t[POW16];
-        Hash_CW4<uint16_t, prime31_t> hash = Hash_CW4<uint16_t, prime31_t>(POW16, seeds[q]);
+        Hash_CW4<uint16_t, prime31_t> hash = Hash_CW4<uint16_t, prime31_t>(POW16, seeds[q], 31);
         for (unsigned j = 0; j<POW16; j++)
             T[i][j] = hash.element(j);
     }
 
     for (unsigned i = q; i<2*q-1; i++){
         T[i] = new uint16_t[POW20];
-        Hash_CW4<uint32_t, prime31_t> hash = Hash_CW4<uint32_t, prime31_t>(POW16, seeds[q]);
+        Hash_CW4<uint32_t, prime31_t> hash = Hash_CW4<uint32_t, prime31_t>(POW16, seeds[q], 31);
         for (unsigned j = 0; j<POW20; j++)
             T[i][j] = hash.element(j);
     }
