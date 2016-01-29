@@ -21,13 +21,13 @@ void Hash_CW2<T1,T2>::init(unsigned B, unsigned exponent, T2 seed0, T2 seed1)
 template<typename T1, typename T2>
 Hash_CW2<T1,T2>::Hash_CW2(unsigned B, T2 seed0, T2 seed1, unsigned exponent)
 {
-    init(B, seed0, seed1, exponent);
+    init(B, exponent, seed0, seed1);
 }
 
 template<typename T1, typename T2>
 Hash_CW2<T1,T2>::Hash_CW2(unsigned B, unsigned exponent)
 {
-    init(B, random<T2>(exponent), random<T2>(exponent), exponent);
+    init(B, exponent, random<T2>(exponent), random<T2>(exponent));
 }
 
 template<typename T1, typename T2>
