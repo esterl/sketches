@@ -175,7 +175,7 @@ double AGMS_Sketch<T>::get_optimized_bits() {
         max = abs(min);
     if (max == 0)
         return 0;
-    double bits = 1 + ceil(log2(max));
+    double bits = 1 + ceil(log2(max+1));
     return bits * this->num_cols * this->num_rows;
 }
 
@@ -314,7 +314,7 @@ double FAGMS_Sketch<T>::get_optimized_bits() {
         max = abs(min);
     if (max == 0)
         return 0;
-    double bits = 1 + ceil(log2(max));
+    double bits = 1 + ceil(log2(max+1));
     return bits * this->num_cols * this->num_rows;
 }
 
@@ -451,7 +451,7 @@ double FastCount_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     if (max == 0)
         return 0;
-    double bits = ceil(log2(max));
+    double bits = ceil(log2(max+1));
     return bits * this->num_cols * this->num_rows;
 }
 /********************* CountMin_Sketch implementation ************************/
@@ -578,6 +578,6 @@ double CountMin_Sketch<T>::get_optimized_bits() {
     double max = this->get_max();
     if (max == 0)
         return 0;
-    double bits = ceil(log2(max));
+    double bits = ceil(log2(max+1));
     return bits * this->num_cols * this->num_rows;
 }
